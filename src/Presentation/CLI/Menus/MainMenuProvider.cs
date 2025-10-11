@@ -11,7 +11,26 @@ public class MainMenuProvider(IServiceProvider serviceProvider) : IMenuProvider
     {
         var navigation = serviceProvider.GetRequiredService<NavigationService>();
         
-        
-        throw new NotImplementedException();
+        var items = new[]
+        {
+            new MenuItem("Сказать привет", async _ =>
+            {
+                Console.WriteLine("Привет!");
+                return MenuResult.None();
+            }, hotkey: ConsoleKey.H),
+
+            new MenuItem("Подменю", async _ =>
+            {
+                var sub = new MenuState("Подменю", new[]
+                {
+                    new MenuItem("Назад", _ => Task.FromResult(MenuResult.Pop()))
+                });
+                return MenuResult.Push(sub);
+            }) ,
+
+            new MenuItem("Выход", _ => Task.FromResult(MenuResult.Exit()), hotkey: ConsoleKey.E)
+        };
+
+        return Task.FromResult(new MenuState("Главное меню", items));
     }
 }
