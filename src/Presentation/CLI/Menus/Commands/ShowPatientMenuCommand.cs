@@ -13,16 +13,16 @@ public class ShowPatientMenuCommand(IServiceProvider serviceProvider) : IMenuCom
 {
     public string Title => "Пациенты";
 
-    public Task<MenuResult> ExecuteAsync(CancellationToken ct = default)
+    public async Task<MenuResult> ExecuteAsync(CancellationToken ct = default)
     {
         var provider = serviceProvider.GetRequiredService<PatientMenuProvider>();
-        return Task.FromResult(MenuResult.Push(provider.CreateMenuAsync(ct).Result));
+        return MenuResult.Push(provider.CreateMenuAsync(ct).Result);
     }
 }
 
 public class PatientMenuProvider(IServiceProvider serviceProvider, IConsoleInputService input, IDataService data, IPatientRepository patients, PatientService patientService) : IMenuProvider
 {
-    public Task<MenuState> CreateMenuAsync(CancellationToken ct = default)
+    public async Task<MenuState> CreateMenuAsync(CancellationToken ct = default)
     {
         var items = new List<MenuItem>
         {
@@ -64,7 +64,7 @@ public class PatientMenuProvider(IServiceProvider serviceProvider, IConsoleInput
             }),
             new("Назад", _ => Task.FromResult(MenuResult.Pop()))
         };
-        return Task.FromResult(new MenuState("Пациенты", items));
+        return new MenuState("Пациенты", items);
     }
 }
 

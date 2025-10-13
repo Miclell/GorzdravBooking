@@ -51,7 +51,7 @@ public class AppointmentService(IAppointmentRepository appointmentRepository, IA
                 LpuId = appointment.PatientProfile.LpuId,
                 PatientId = appointment.PatientProfile.PatientId,
                 EsiaId = "", // TODO: разобраться можно ли отменить запись без id госуслуг
-                AppointtmentType = "" // TODO: уточнить тип записи
+                AppointmentType = "" // TODO: уточнить тип записи
             };
 
             var externalCancelSuccess = true;
