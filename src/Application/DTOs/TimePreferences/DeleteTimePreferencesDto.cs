@@ -1,6 +1,12 @@
 ﻿namespace Application.DTOs.TimePreferences;
 
-public record DeleteTimePreferencesDto(
-    Guid PatientProfileId,
-    string Name
-);
+using StatefulMenu.Core.Attributes;
+
+public class DeleteTimePreferencesDto
+{
+    [InputField("Профиль пациента Id")]
+    public Guid PatientProfileId { get; set; }
+
+    [InputField("Название пресета")]
+    public string Name { get; set; } = null!;
+}

@@ -9,27 +9,19 @@ public class MainMenuProvider(IServiceProvider serviceProvider) : IMenuProvider
 {
     public Task<MenuState> CreateMenuAsync(CancellationToken ct = new CancellationToken())
     {
-        var navigation = serviceProvider.GetRequiredService<NavigationService>();
-        
-        var items = new[]
+        var commands = new IMenuCommand[]
         {
-            new MenuItem("Сказать привет", async _ =>
-            {
-                Console.WriteLine("Привет!");
-                return MenuResult.None();
-            }, hotkey: ConsoleKey.H),
-
-            new MenuItem("Подменю", async _ =>
-            {
-                var sub = new MenuState("Подменю", new[]
-                {
-                    new MenuItem("Назад", _ => Task.FromResult(MenuResult.Pop()))
-                });
-                return MenuResult.Push(sub);
-            }) ,
-
-            new MenuItem("Выход", _ => Task.FromResult(MenuResult.Exit()), hotkey: ConsoleKey.E)
+            serviceProvider.GetRequiredService<Commands.ShowAppointmentMenuCommand>(),
+            serviceProvider.GetRequiredService<Commands.ShowPatientMenuCommand>(),
+            serviceProvider.GetRequiredService<Commands.ShowDistrictMenuCommand>(),
+            serviceProvider.GetRequiredService<Commands.ExitCommand>()
         };
+
+        var items = commands
+            .Select(c => c is Commands.ExitCommand
+                ? new MenuItem(c.Title, _ => c.ExecuteAsync(ct), hotkey: ConsoleKey.E)
+                : new MenuItem(c.Title, _ => c.ExecuteAsync(ct)))
+            .ToList();
 
         return Task.FromResult(new MenuState("Главное меню", items));
     }

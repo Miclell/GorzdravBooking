@@ -11,4 +11,9 @@
       <PackageReference Include="StatefulMenu" Version="1.0.0-preview.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Application\Application.csproj" />
+      <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj" />
+    </ItemGroup>
+
 </Project>

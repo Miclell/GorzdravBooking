@@ -1,4 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using App;
+using CLI.Menus;
+using Infrastructure;
+using Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu;
 using StatefulMenu.Commands.Interfaces;
 using StatefulMenu.Core.Interfaces;
@@ -7,20 +12,24 @@ namespace CLI;
 
 class Program
 {
-    // TODO переделать либу в тотал это пизда
-    
     static async Task Main(string[] args)
     {
-        var services = new ServiceCollection()
-            .AddStatefulMenu();
-        
-        var provider = services.BuildServiceProvider();
-        var nav = provider.GetRequiredService<INavigationService>();
-        
-        var root = provider.GetRequiredService<IMenuProvider>();
+        var services = new ServiceCollection();
 
+        services.AddInfrastructure();
+        services.AddApplication();
+        services.AddStatefulMenu(typeof(Program).Assembly);
+
+        var provider = services.BuildServiceProvider();
+
+        using (var scope = provider.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            await db.Database.MigrateAsync();
+        }
+
+        var nav = provider.GetRequiredService<INavigationService>();
+        var root = provider.GetRequiredService<MainMenuProvider>();
         await nav.RunAsync(root);
-        
-        Console.WriteLine("Hello, World!");
     }
 }
