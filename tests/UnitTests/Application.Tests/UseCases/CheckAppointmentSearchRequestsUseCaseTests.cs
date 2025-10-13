@@ -8,6 +8,8 @@ using Xunit;
 
 namespace Application.Tests.UseCases;
 
+
+// TODO переделать тест когда не будет комментариев и будет полное взаимодействие с апишкой
 public class CheckAppointmentSearchRequestsUseCaseTests
 {
     private readonly Mock<IAppointmentSearchRequestRepository> _mockRepo;
