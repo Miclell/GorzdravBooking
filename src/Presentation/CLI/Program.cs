@@ -1,4 +1,4 @@
-﻿using App;
+﻿using Application;
 using CLI.Menus;
 using Infrastructure;
 using Infrastructure.Repositories;

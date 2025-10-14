@@ -1,8 +1,9 @@
-﻿using System.Reflection;
-using Application.Abstract;
+﻿using Application.Abstract;
+using Application.Coordinators.Implementation;
+using Application.Coordinators.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace App;
+namespace Application;
 
 public static class DependencyInjection
 {
@@ -18,6 +19,8 @@ public static class DependencyInjection
             .AddClasses(classes => classes.AssignableTo<IAppUseCase>())
             .AsImplementedInterfaces()
             .WithScopedLifetime());
+
+        services.AddScoped<IAppointmentCoordinator, AppointmentCoordinator>();
 
         return services;
     }

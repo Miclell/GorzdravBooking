@@ -1,11 +1,17 @@
-﻿using Core.Enums;
+﻿using Application.Coordinators.Interfaces;
+using Application.DTOs.Appointment;
+using Application.Services;
+using Core.Enums;
 using Core.Interfaces.Repositories;
+using Core.Interfaces.Services;
+using Core.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Application.UseCases;
 
 public class CheckAppointmentSearchRequestsUseCase(
     IAppointmentSearchRequestRepository appointmentSearchRequestRepository,
+    IAppointmentCoordinator appointmentCoordinator,
     ILogger<CheckAppointmentSearchRequestsUseCase> logger)
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken = default)
@@ -65,6 +71,9 @@ public class CheckAppointmentSearchRequestsUseCase(
 
     private async Task ProcessRequestAsync(Core.Entities.AppointmentSearchRequest request, CancellationToken cancellationToken)
     {
+        var result = await appointmentCoordinator.CreateCompleteAppointmentAsync(request, cancellationToken);
+        
+        
         
         // Здесь логика записи в систему ЛПУ
         // Например: дергаем API, проверяем свободные слоты

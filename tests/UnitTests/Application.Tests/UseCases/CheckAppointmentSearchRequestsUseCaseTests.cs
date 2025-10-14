@@ -1,7 +1,9 @@
-﻿using Application.UseCases;
+﻿using Application.Services;
+using Application.UseCases;
 using Core.Entities;
 using Core.Enums;
 using Core.Interfaces.Repositories;
+using Core.Interfaces.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -18,8 +20,9 @@ public class CheckAppointmentSearchRequestsUseCaseTests
     public CheckAppointmentSearchRequestsUseCaseTests()
     {
         _mockRepo = new Mock<IAppointmentSearchRequestRepository>();
+        var _mockService = new Mock<AppointmentService>();
         var mockLogger = new Mock<ILogger<CheckAppointmentSearchRequestsUseCase>>();
-        _useCase = new CheckAppointmentSearchRequestsUseCase(_mockRepo.Object, mockLogger.Object);
+        _useCase = new CheckAppointmentSearchRequestsUseCase(_mockRepo.Object, _mockService.Object, mockLogger.Object);
     }
 
     [Fact]
@@ -35,7 +38,7 @@ public class CheckAppointmentSearchRequestsUseCaseTests
                 Status = SearchRequestStatus.InProgress,
                 LastSearchAttempt = null, // никогда не проверялся
                 SearchInterval = TimeSpan.FromHours(1),
-                SpecificStartPoints = new List<DateTime>(),
+                SpecificStartPoints = [],
                 CreatedAt = DateTime.UtcNow.AddHours(-2)
             },
             new()
@@ -45,7 +48,7 @@ public class CheckAppointmentSearchRequestsUseCaseTests
                 Status = SearchRequestStatus.InProgress,
                 LastSearchAttempt = DateTime.UtcNow.AddMinutes(-30), // проверялся 30 мин назад
                 SearchInterval = TimeSpan.FromHours(1),
-                SpecificStartPoints = new List<DateTime>(),
+                SpecificStartPoints = [],
                 CreatedAt = DateTime.UtcNow.AddHours(-3)
             }
         };
@@ -70,11 +73,11 @@ public class CheckAppointmentSearchRequestsUseCaseTests
         {
             Id = Guid.NewGuid(),
             Status = SearchRequestStatus.InProgress,
-            SpecificStartPoints = new List<DateTime> 
-            { 
+            SpecificStartPoints =
+            [
                 now.AddMinutes(-10), // уже прошло - должно обработаться
-                now.AddMinutes(10)   // еще не наступило
-            },
+                now.AddMinutes(10)
+            ],
             LastSearchAttempt = null,
             CreatedAt = now.AddHours(-1)
         };

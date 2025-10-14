@@ -54,9 +54,7 @@ public class AppointmentService(IAppointmentRepository appointmentRepository, IA
                 AppointmentType = "" // TODO: уточнить тип записи
             };
 
-            var externalCancelSuccess = true;
-            // TODO раскомментировать когда будет готов внешний сервис
-            // var externalCancelSuccess = await appointmentService.CancelAppointmentAsync(cancelRequest);
+            var externalCancelSuccess = await appointmentService.CancelAppointmentAsync(cancelRequest);
             
             if (!externalCancelSuccess)
             {
@@ -64,7 +62,7 @@ public class AppointmentService(IAppointmentRepository appointmentRepository, IA
                     "Не удалось отменить запись во внешней системе. AppointmentId: {AppointmentId}, ExternalId: {ExternalAppointmentId}",
                     appointmentId, appointment.AppointmentId);
                 // TODO: решить, нужно ли падать здесь или просто логировать и продолжать
-                // return Result.Failure("External.Cancel.Failed", "Failed to cancel appointment in external system");
+                return Error.Failure("External.Cancel.Failed", "Failed to cancel appointment in external system");
             }
 
             await appointmentRepository.DeleteAsync(appointmentId, cancellationToken);
