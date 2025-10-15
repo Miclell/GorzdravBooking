@@ -83,4 +83,44 @@ public class TimePreferencesService(ITimePreferencesRepository timePreferencesRe
             return Error.Failure(e.ToString(), "Failed to get time preferences");
         }
     }
+
+    public async Task<Result<TimePreferencesPresetDto>> GetByPresetAsync(Guid patientProfileId, string name, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var preferences = await timePreferencesRepository
+                .GetByPresetAsync(patientProfileId, name, cancellationToken);
+
+            var timePreferencesEnumerable = preferences.ToList();
+            if (timePreferencesEnumerable.Count == 0)
+                return Error.NotFound("Preferences.Not.Found", "Preferences not found");
+    
+            var anyTimePreference = timePreferencesEnumerable.FirstOrDefault(p => p.AnyTime);
+            var hasAnyTime = anyTimePreference != null;
+    
+            var presetDto = new TimePreferencesPresetDto(
+                Name: name,
+                PatientProfileId: patientProfileId,
+                AnyTime: hasAnyTime,
+                Preferences: hasAnyTime 
+                    ? new List<TimePreferenceDto>().AsReadOnly()
+                    : timePreferencesEnumerable
+                        .Select(p => new TimePreferenceDto(
+                            Day: p.Day,
+                            From: p.PreferredTimeFrom, 
+                            To: p.PreferredTimeTo
+                        ))
+                        .ToList()
+                        .AsReadOnly()
+            );
+    
+            return Result.Success(presetDto);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Ошибка при получении пресета - {Name} для пациента {PatientProfileId}", name, patientProfileId);
+            return Error.Failure(e.ToString(), "Failed to get time preferences");
+        }
+        
+    }
 }

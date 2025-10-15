@@ -32,13 +32,19 @@ public class TimePreferencesRepository(AppDbContext context) : ITimePreferencesR
         await context.SaveChangesAsync(cancellationToken);
     }
 
-
     public async Task UpdateAsync(TimePreferences preferences, CancellationToken cancellationToken = default)
     {
         context.TimePreferences.Update(preferences);
         await context.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<TimePreferences>> GetByPresetAsync(Guid patientProfileId, string name, CancellationToken cancellationToken = default)
+    { 
+        return await context.TimePreferences
+            .Where(tp => tp.PatientProfileId == patientProfileId && tp.Name == name)
+            .ToListAsync(cancellationToken);
+    }
+    
     public async Task DeleteByPresetAsync(Guid patientProfileId, string name, CancellationToken cancellationToken = default)
     {
         var preferences = context.TimePreferences
@@ -47,5 +53,7 @@ public class TimePreferencesRepository(AppDbContext context) : ITimePreferencesR
         context.TimePreferences.RemoveRange(preferences);
         await context.SaveChangesAsync(cancellationToken);
     }
+    
+    
 
 }
