@@ -24,7 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "rbin", "rbin", "{36DC7A83-4
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleUI", "rbin\ConsoleUI\ConsoleUI.csproj", "{AD4632FF-C8B8-4FE2-92B4-F8A823D98BC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Tests", "Infrastructure.Tests\Infrastructure.Tests.csproj", "{9050955D-745A-4774-9E01-D890BD8D9EB4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Tests", "tests\UnitTests\Infrastructure.Tests\Infrastructure.Tests.csproj", "{9050955D-745A-4774-9E01-D890BD8D9EB4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Tests", "tests\UnitTests\Application.Tests\Application.Tests.csproj", "{4E2D90A3-80C4-485C-A90F-EE0F86C6083B}"
 EndProject
