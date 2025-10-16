@@ -11,6 +11,9 @@
     &lt;TestId&gt;xUnit::9050955D-745A-4774-9E01-D890BD8D9EB4::net9.0::Infrastructure.Tests.ServicesTests.DoctorServiceTests&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::9050955D-745A-4774-9E01-D890BD8D9EB4::net9.0::Infrastructure.Tests.ServicesTests.AppointmentServiceTests&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::4E2D90A3-80C4-485C-A90F-EE0F86C6083B::net9.0::Application.Tests.UseCases.CheckAppointmentSearchRequestsUseCaseTests&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::4E2D90A3-80C4-485C-A90F-EE0F86C6083B::net9.0::Application.Tests.Coordinators.AppointmentCoordinatorTests&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::4E2D90A3-80C4-485C-A90F-EE0F86C6083B::net9.0::Application.Tests.Services.UserServiceTests&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::4E2D90A3-80C4-485C-A90F-EE0F86C6083B::net9.0::Application.Tests.Services.PatientServiceTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	<s:Boolean x:Key="/Default/UnloadedProject/UnloadedProjects/=ad4632ff_002Dc8b8_002D4fe2_002D92b4_002Df8a823d98bc6_0023ConsoleUI/@EntryIndexedValue">True</s:Boolean>

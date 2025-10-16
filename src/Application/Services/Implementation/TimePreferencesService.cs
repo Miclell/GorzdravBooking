@@ -1,13 +1,15 @@
 ﻿using Application.Abstract;
 using Application.Common.Results;
 using Application.DTOs.TimePreferences;
+using Application.Services.Interfaces;
 using Core.Entities;
 using Core.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Services;
+namespace Application.Services.Implementation;
 
-public class TimePreferencesService(ITimePreferencesRepository timePreferencesRepository, ILogger<TimePreferencesService> logger) : IAppService
+public class TimePreferencesService(ITimePreferencesRepository timePreferencesRepository, 
+    ILogger<TimePreferencesService> logger) : IAppService, ITimePreferencesService
 {
     public async Task<Result<List<Guid>>> CreateRangeAsync(IEnumerable<CreateTimePreferenceDto> dtos, CancellationToken cancellationToken = default)
     {
@@ -121,6 +123,5 @@ public class TimePreferencesService(ITimePreferencesRepository timePreferencesRe
             logger.LogError(e, "Ошибка при получении пресета - {Name} для пациента {PatientProfileId}", name, patientProfileId);
             return Error.Failure(e.ToString(), "Failed to get time preferences");
         }
-        
     }
 }

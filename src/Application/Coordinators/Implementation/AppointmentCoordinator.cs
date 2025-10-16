@@ -2,31 +2,30 @@
 using Application.Coordinators.Interfaces;
 using Application.DTOs.Appointment;
 using Application.DTOs.TimePreferences;
-using Application.Services;
-using Core.Interfaces.Repositories;
-using Core.Interfaces.Services;
+using Application.Services.Interfaces;
 using Core.Models;
 
 namespace Application.Coordinators.Implementation;
 
-public class AppointmentCoordinator(IAppointmentService externalAppointmentService,
-    TimePreferencesService timePreferencesService,
-    AppointmentService appointmentService) : IAppointmentCoordinator
+public class AppointmentCoordinator(Core.Interfaces.Services.IAppointmentService externalAppointmentService,
+    ITimePreferencesService timePreferencesService,
+    IAppointmentService appointmentService) : IAppointmentCoordinator
 {
     public async Task<Result<bool>> CreateCompleteAppointmentAsync(Core.Entities.AppointmentSearchRequest request, CancellationToken cancellationToken)
     {
         try
         {
+            var timePreferences = await timePreferencesService.GetByPresetAsync(
+                request.PatientProfileId,
+                request.TimePreferencesPresetName,
+                cancellationToken);
+            
+            if (timePreferences.IsFailure)
+                return timePreferences.Error;
+            
             var appointments = await externalAppointmentService.GetByDoctorAsync(
                 int.Parse(request.PatientProfile.LpuId),
                 request.DoctorId);
-
-            var timePreferences = await timePreferencesService.GetByPresetAsync(request.PatientProfileId,
-                request.TimePreferencesPresetName,
-                cancellationToken);
-
-            if (timePreferences.IsFailure)
-                return timePreferences.Error;
             
             var appointment = TryGetPreferAppointment(
                 appointments, 

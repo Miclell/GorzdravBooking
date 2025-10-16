@@ -1,16 +1,17 @@
 ﻿using Application.Abstract;
 using Application.Common.Results;
 using Application.DTOs.AppointmentSearchRequest;
+using Application.Services.Interfaces;
 using Core.Entities;
 using Core.Enums;
 using Core.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Services;
+namespace Application.Services.Implementation;
 
 public class AppointmentSearchRequestService(
     IAppointmentSearchRequestRepository appointmentSearchRequestRepository,
-    ILogger<AppointmentSearchRequestService> logger) : IAppService
+    ILogger<AppointmentSearchRequestService> logger) : IAppService, IAppointmentSearchRequestService
 {
     public async Task<Result<Guid>> CreateAsync(
         CreateAppointmentSearchRequestDto createDto,

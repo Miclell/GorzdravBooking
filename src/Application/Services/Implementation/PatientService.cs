@@ -1,13 +1,15 @@
 ﻿using Application.Abstract;
 using Application.Common.Results;
 using Application.DTOs.Patient;
+using Application.Services.Interfaces;
 using Core.Entities;
 using Core.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Services;
+namespace Application.Services.Implementation;
 
-public class PatientService(IPatientRepository patientRepository, ILogger<PatientService> logger) : IAppService
+public class PatientService(IPatientRepository patientRepository, 
+    ILogger<PatientService> logger) : IAppService, IPatientService
 {
     public async Task<Result<Guid>> Create(CreatePatientDto createPatientDto, CancellationToken cancellationToken = default)
     {

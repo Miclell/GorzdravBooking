@@ -1,15 +1,16 @@
 ﻿using Application.Abstract;
 using Application.Common.Results;
 using Application.DTOs.User;
+using Application.Services.Interfaces;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Security;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Services;
+namespace Application.Services.Implementation;
 
 public class UserService(IUserRepository userRepository, 
     IPasswordHasher passwordHasher, 
-    ILogger<UserService> logger) : IAppService
+    ILogger<UserService> logger) : IAppService, IUserService
 {
     public async Task<Result<Guid>> Create(BaseUserDto baseUserDto, CancellationToken cancellationToken = default)
     {
@@ -66,7 +67,7 @@ public class UserService(IUserRepository userRepository,
         }
         catch (Exception e)
         {
-            logger.LogError("Database error update user {UserId} password", userId);
+            logger.LogError(e, "Database error update user {UserId} password", userId);
             return Error.Failure(e.ToString(), "Ошибка");
         }
     }

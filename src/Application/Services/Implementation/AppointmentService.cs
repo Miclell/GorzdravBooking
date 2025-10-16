@@ -6,10 +6,10 @@ using Core.Interfaces.Services;
 using Core.Models;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Services;
+namespace Application.Services.Implementation;
 
 public class AppointmentService(IAppointmentRepository appointmentRepository, IAppointmentService appointmentService,
-    ILogger<AppointmentService> logger) : IAppService
+    ILogger<AppointmentService> logger) : IAppService, Interfaces.IAppointmentService
 {
     public async Task<Result<Guid>> CreateAsync(CreateAppointmentDto createDto, CancellationToken cancellationToken = default)
     {
