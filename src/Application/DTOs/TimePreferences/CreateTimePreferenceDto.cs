@@ -4,6 +4,18 @@ using StatefulMenu.Core.Attributes;
 
 public class CreateTimePreferenceDto
 {
+    public CreateTimePreferenceDto(string name, Guid id, DayOfWeek day,
+        TimeOnly? preferredTimeFrom, TimeOnly? preferredTimeTo,
+        bool anyTime)
+    {
+        Name = name;
+        PatientProfileId = id;
+        Day = day;
+        PreferredTimeFrom = preferredTimeFrom;
+        PreferredTimeTo = preferredTimeTo;
+        AnyTime = anyTime;
+    }
+    
     [InputField("Название пресета")]
     public string Name { get; set; } = null!;
     
