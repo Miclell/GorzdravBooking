@@ -8,12 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="StatefulMenu" Version="1.0.0-preview.1" />
+      <ProjectReference Include="..\..\..\rbin\StatefulMenu\StatefulMenu.csproj" />
+      <ProjectReference Include="..\..\Application\Application.csproj" />
+      <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Application\Application.csproj" />
-      <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj" />
+      <Folder Include="Menus\PatientMenu\CreatePatientFlow\Providers\" />
+      <Folder Include="Menus\PatientMenu\ShowPatientsFlow\" />
     </ItemGroup>
 
 </Project>

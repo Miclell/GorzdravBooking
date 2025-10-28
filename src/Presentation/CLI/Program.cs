@@ -1,24 +1,24 @@
-﻿using Application;
+﻿using System.Reflection;
+using Application;
 using CLI.Menus;
 using Infrastructure;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu;
-using StatefulMenu.Commands.Interfaces;
 using StatefulMenu.Core.Interfaces;
 
 namespace CLI;
 
-class Program
+public static class Program
 {
-    static async Task Main(string[] args)
+    private static async Task Main(string[] args)
     {
         var services = new ServiceCollection();
 
         services.AddInfrastructure();
         services.AddApplication();
-        services.AddStatefulMenu(typeof(Program).Assembly);
+        services.AddStatefulMenu();
 
         var provider = services.BuildServiceProvider();
 

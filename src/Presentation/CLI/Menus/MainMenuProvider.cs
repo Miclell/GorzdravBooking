@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CLI.Menus.PatientMenu;
+using Microsoft.Extensions.DependencyInjection;
+using StatefulMenu.Commands.BuiltIn;
 using StatefulMenu.Commands.Interfaces;
 using StatefulMenu.Core.Models;
 using StatefulMenu.Infrastructure.Services;
@@ -11,14 +13,12 @@ public class MainMenuProvider(IServiceProvider serviceProvider) : IMenuProvider
     {
         var commands = new IMenuCommand[]
         {
-            serviceProvider.GetRequiredService<Commands.ShowAppointmentMenuCommand>(),
-            serviceProvider.GetRequiredService<Commands.ShowPatientMenuCommand>(),
-            serviceProvider.GetRequiredService<Commands.ShowDistrictMenuCommand>(),
-            serviceProvider.GetRequiredService<Commands.ExitCommand>()
+            serviceProvider.GetRequiredService<ShowPatientMenuCommand>(),
+            serviceProvider.GetRequiredService<ExitCommand>()
         };
 
         var items = commands
-            .Select(c => c is Commands.ExitCommand
+            .Select(c => c is ExitCommand
                 ? new MenuItem(c.Title, _ => c.ExecuteAsync(ct), hotkey: ConsoleKey.E)
                 : new MenuItem(c.Title, _ => c.ExecuteAsync(ct)))
             .ToList();
