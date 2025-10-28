@@ -6,7 +6,7 @@ using Infrastructure.ApiClient.Models;
 
 namespace Infrastructure.Services;
 
-public class SpecialtyService(IApiService apiService) : ISpecialtyService
+public class ExternalSpecialtyService(IApiService apiService) : IExternalSpecialtyService
 {
     public async Task<List<MedicalSpeciality>> GetByLpuAsync(int lpuId)
     {

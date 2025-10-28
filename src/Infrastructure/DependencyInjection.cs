@@ -22,12 +22,12 @@ public static class DependencyInjection
         services.AddGorzdravClient(); 
 
         // Services
-        services.AddScoped<IAppointmentService, AppointmentService>();
-        services.AddScoped<IDistrictService, DistrictService>();
-        services.AddScoped<IDoctorService, DoctorService>();
-        services.AddScoped<ILpuService, LpuService>();
-        services.AddScoped<ISpecialtyService, SpecialtyService>();
-        services.AddScoped<IPatientService, PatientService>();
+        services.AddScoped<IExternalAppointmentService, ExternalAppointmentService>();
+        services.AddScoped<IExternalDistrictService, ExternalDistrictService>();
+        services.AddScoped<IExternalDoctorService, ExternalDoctorService>();
+        services.AddScoped<IExternalLpuService, ExternalLpuService>();
+        services.AddScoped<IExternalSpecialtyService, ExternalSpecialtyService>();
+        services.AddScoped<IExternalPatientService, ExternalPatientService>();
         
         // Repositories
         services.AddScoped<IUserRepository, UserRepository>();

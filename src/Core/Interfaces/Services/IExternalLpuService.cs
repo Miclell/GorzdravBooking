@@ -2,7 +2,7 @@
 
 namespace Core.Interfaces.Services;
 
-public interface ILpuService
+public interface IExternalLpuService
 {
     Task<List<Lpu>> GetByDistrictAsync(string districtId);
 }

@@ -6,11 +6,11 @@ using StatefulMenu.Core.Models;
 
 namespace CLI.Menus.Booking.Providers;
 
-public class DistrictMenuProvider(IDistrictService districtService, IDataService data, IServiceProvider sp) : IMenuProvider
+public class DistrictMenuProvider(IExternalDistrictService externalDistrictService, IDataService data, IServiceProvider sp) : IMenuProvider
 {
     public async Task<MenuState> CreateMenuAsync(CancellationToken ct = default)
     {
-        var districts = await districtService.GetDistrictsAsync();
+        var districts = await externalDistrictService.GetDistrictsAsync();
         var items = districts
             .Select(d => new MenuItem(d.Name, _ =>
             {

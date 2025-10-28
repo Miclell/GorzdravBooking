@@ -6,7 +6,7 @@ using Infrastructure.ApiClient.Models;
 
 namespace Infrastructure.Services;
 
-public class LpuService(IApiService apiService) : ILpuService
+public class ExternalLpuService(IApiService apiService) : IExternalLpuService
 {
     public async Task<List<Lpu>> GetByDistrictAsync(string districtId)
     {

@@ -12,14 +12,14 @@ namespace Application.Tests.Coordinators;
 
 public class AppointmentCoordinatorTests
 {
-    private readonly Mock<Core.Interfaces.Services.IAppointmentService> _mockExternalService;
+    private readonly Mock<Core.Interfaces.Services.IExternalAppointmentService> _mockExternalService;
     private readonly Mock<ITimePreferencesService> _mockTimePreferencesService;
     private readonly Mock<IAppointmentService> _mockAppointmentService;
     private readonly AppointmentCoordinator _coordinator;
 
     public AppointmentCoordinatorTests()
     {
-        _mockExternalService = new Mock<Core.Interfaces.Services.IAppointmentService>();
+        _mockExternalService = new Mock<Core.Interfaces.Services.IExternalAppointmentService>();
         _mockTimePreferencesService = new Mock<ITimePreferencesService>();
         _mockAppointmentService = new Mock<IAppointmentService>();
         

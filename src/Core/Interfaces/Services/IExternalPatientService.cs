@@ -2,7 +2,7 @@
 
 namespace Core.Interfaces.Services;
 
-public interface IPatientService
+public interface IExternalPatientService
 {
     Task<string> GetPatientIdAsync(PatientIdSearchRequest request);
 

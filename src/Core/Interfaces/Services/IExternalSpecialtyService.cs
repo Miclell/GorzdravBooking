@@ -2,7 +2,7 @@
 
 namespace Core.Interfaces.Services;
 
-public interface ISpecialtyService
+public interface IExternalSpecialtyService
 {
     Task<List<MedicalSpeciality>> GetByLpuAsync(int lpuId);
 }

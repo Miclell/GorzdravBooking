@@ -6,14 +6,14 @@ using StatefulMenu.Core.Models;
 
 namespace CLI.Menus.Booking.Providers;
 
-public class SpecialtyMenuProvider(ISpecialtyService specialtyService, IDataService data, IServiceProvider sp) : IMenuProvider
+public class SpecialtyMenuProvider(IExternalSpecialtyService externalSpecialtyService, IDataService data, IServiceProvider sp) : IMenuProvider
 {
     public async Task<MenuState> CreateMenuAsync(CancellationToken ct = default)
     {
         if (!data.TryGet<int>("lpuId", out var lpuId))
             return new MenuState("Специальности", new List<MenuItem> { new("Назад", _ => Task.FromResult(MenuResult.Pop())) });
 
-        var specs = await specialtyService.GetByLpuAsync(lpuId);
+        var specs = await externalSpecialtyService.GetByLpuAsync(lpuId);
         var items = specs
             .Select(s => new MenuItem(s.Name, _ =>
             {

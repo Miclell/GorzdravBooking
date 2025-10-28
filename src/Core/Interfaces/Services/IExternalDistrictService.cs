@@ -2,7 +2,7 @@
 
 namespace Core.Interfaces.Services;
 
-public interface IDistrictService
+public interface IExternalDistrictService
 {
     Task<List<District>> GetDistrictsAsync();
 }

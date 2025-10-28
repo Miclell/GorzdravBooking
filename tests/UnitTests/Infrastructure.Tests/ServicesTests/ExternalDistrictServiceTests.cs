@@ -6,13 +6,13 @@ using Xunit;
 
 namespace Infrastructure.Tests.ServicesTests;
 
-public class DistrictServiceTests
+public class ExternalDistrictServiceTests
 {
     [Fact]
     public async Task GetDistricts_Success()
     {
         var fakeApiService = new FakeApiService();
-        var districtService = new DistrictService(fakeApiService);
+        var districtService = new ExternalDistrictService(fakeApiService);
 
         var expectedAppointments = new List<District>
         {

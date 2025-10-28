@@ -5,15 +5,15 @@ using Xunit;
 
 namespace Infrastructure.Tests.ServicesTests;
 
-public class AppointmentServiceTests
+public class ExternalAppointmentServiceTests
 {
     private readonly FakeApiService _fakeApiService;
-    private readonly AppointmentService _appointmentService;
+    private readonly ExternalAppointmentService _externalAppointmentService;
 
-    public AppointmentServiceTests()
+    public ExternalAppointmentServiceTests()
     {
         _fakeApiService = new FakeApiService();
-        _appointmentService = new AppointmentService(_fakeApiService);
+        _externalAppointmentService = new ExternalAppointmentService(_fakeApiService);
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public class AppointmentServiceTests
         });
 
         // Act
-        var result = await _appointmentService.GetByDoctorAsync(lpuId, doctorId);
+        var result = await _externalAppointmentService.GetByDoctorAsync(lpuId, doctorId);
 
         // Assert
         Assert.Equal(expectedAppointments.Count, result.Count);
@@ -87,7 +87,7 @@ public class AppointmentServiceTests
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<HttpRequestException>(
-            () => _appointmentService.GetByDoctorAsync(lpuId, doctorId));
+            () => _externalAppointmentService.GetByDoctorAsync(lpuId, doctorId));
         
         Assert.Contains("Ошибка при получении номерков: Doctor not found", exception.Message);
     }
@@ -123,7 +123,7 @@ public class AppointmentServiceTests
         });
 
         // Act
-        var result = await _appointmentService.CreateAppointmentAsync(createRequest);
+        var result = await _externalAppointmentService.CreateAppointmentAsync(createRequest);
 
         // Assert
         Assert.True(result);
@@ -155,7 +155,7 @@ public class AppointmentServiceTests
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<HttpRequestException>(
-            () => _appointmentService.CreateAppointmentAsync(createRequest));
+            () => _externalAppointmentService.CreateAppointmentAsync(createRequest));
         
         Assert.Contains("Ошибка при выполнении записи: Appointment time is already taken", exception.Message);
     }
@@ -182,7 +182,7 @@ public class AppointmentServiceTests
         });
 
         // Act
-        var result = await _appointmentService.CancelAppointmentAsync(cancelRequest);
+        var result = await _externalAppointmentService.CancelAppointmentAsync(cancelRequest);
 
         // Assert
         Assert.True(result);
@@ -211,7 +211,7 @@ public class AppointmentServiceTests
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<HttpRequestException>(
-            () => _appointmentService.CancelAppointmentAsync(cancelRequest));
+            () => _externalAppointmentService.CancelAppointmentAsync(cancelRequest));
         
         Assert.Contains("Ошибка при отмене записи: Appointment not found", exception.Message);
     }
@@ -244,7 +244,7 @@ public class AppointmentServiceTests
         });
 
         // Act
-        var result = await _appointmentService.GetByDoctorAsync(lpuId, doctorId);
+        var result = await _externalAppointmentService.GetByDoctorAsync(lpuId, doctorId);
 
         // Assert
         Assert.Single(result);

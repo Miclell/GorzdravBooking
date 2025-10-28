@@ -1,8 +1,5 @@
-﻿using Application.Services;
-using Application.UseCases.Patient;
-using ConsoleUI.Core;
+﻿using ConsoleUI.Core;
 using ConsoleUI.Core.Interfaces;
-using ConsoleUI.Menus.Patient.CreatePatientFlow.Providers;
 using ConsoleUI.Menus.Patient.Providers;
 using ConsoleUI.Services;
 using ConsoleUI.Services.Interfaces;
@@ -31,18 +28,19 @@ public class CreatePatientCommand(IServiceProvider serviceProvider) : IMenuComma
         };
 
         var appSettingService = serviceProvider.GetRequiredService<AppSettingsService>();
-        var patientService = serviceProvider.GetRequiredService<IPatientService>();
+        var externalPatientService = serviceProvider.GetRequiredService<IExternalPatientService>();
         createPatientCommand = createPatientCommand! with
         {
             UserId = await appSettingService.GetDefaultUserIdAsync(),
             LpuId = navigation.GetSharedData<Lpu>(nameof(Lpu)).Id.ToString(),
             LpuShortName = navigation.GetSharedData<Lpu>(nameof(Lpu)).LpuShortName,
             LpuAddress = navigation.GetSharedData<Lpu>(nameof(Lpu)).Address,
-            PatientId = await patientService.GetPatientIdAsync(patientIdSearchRequest)
+            PatientId = await externalPatientService.GetPatientIdAsync(patientIdSearchRequest)
         };
 
         var createPatientUseCase = serviceProvider.GetRequiredService<CreatePatientUseCase>();
         await createPatientUseCase.ExecuteAsync(createPatientCommand);
+        
 
         Console.WriteLine("Пациент успешно создан! Нажмите клавишу чтобы продолжить");
         Console.ReadKey();

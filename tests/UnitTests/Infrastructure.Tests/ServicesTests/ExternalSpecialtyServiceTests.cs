@@ -6,13 +6,13 @@ using Xunit;
 
 namespace Infrastructure.Tests.ServicesTests;
 
-public class SpecialtyServiceTests
+public class ExternalSpecialtyServiceTests
 {
     [Fact]
     public async Task GetSpecialtiesByLpu_Success()
     {
         var fakeApiService = new FakeApiService();
-        var specialtyService = new SpecialtyService(fakeApiService);
+        var specialtyService = new ExternalSpecialtyService(fakeApiService);
 
         var expectedSpecialties = new List<MedicalSpeciality>
         {

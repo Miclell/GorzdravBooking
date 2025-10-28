@@ -2,7 +2,7 @@
 
 namespace Core.Interfaces.Services;
 
-public interface IAppointmentService
+public interface IExternalAppointmentService
 {
     Task<List<Appointment>> GetByDoctorAsync(int lpuId, string doctorId);
     Task<bool> CreateAppointmentAsync(AppointmentCreateRequest request);

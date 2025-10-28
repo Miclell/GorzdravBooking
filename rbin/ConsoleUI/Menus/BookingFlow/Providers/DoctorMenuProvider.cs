@@ -16,7 +16,7 @@ public class DoctorMenuProvider(IServiceProvider serviceProvider) : IMenuProvide
         var specialityId = navigation.GetSharedData<MedicalSpeciality>(nameof(MedicalSpeciality)).Id;
         var lpuId = navigation.GetSharedData<Lpu>(nameof(Lpu)).Id;
         
-        var doctorService = serviceProvider.GetRequiredService<IDoctorService>();
+        var doctorService = serviceProvider.GetRequiredService<IExternalDoctorService>();
         var doctors = await doctorService.GetBySpecialtyAsync(lpuId, specialityId);
         
         var commands = doctors

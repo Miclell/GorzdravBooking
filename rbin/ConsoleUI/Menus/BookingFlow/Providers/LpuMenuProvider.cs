@@ -13,7 +13,7 @@ public class LpuMenuProvider(IServiceProvider serviceProvider) : IMenuProvider
 {
     public async Task<MenuState> CreateMenuAsync()
     {
-        var lpuService = serviceProvider.GetRequiredService<ILpuService>();
+        var lpuService = serviceProvider.GetRequiredService<IExternalLpuService>();
         var navigation = serviceProvider.GetRequiredService<NavigationService>();
         
         var districtId = navigation.GetSharedData<District>(nameof(District)).Id;

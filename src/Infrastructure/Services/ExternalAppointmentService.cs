@@ -6,7 +6,7 @@ using Infrastructure.ApiClient.Models;
 
 namespace Infrastructure.Services;
 
-public class AppointmentService(IApiService apiService) : IAppointmentService
+public class ExternalAppointmentService(IApiService apiService) : IExternalAppointmentService
 {
     public async Task<List<Appointment>> GetByDoctorAsync(int lpuId, string doctorId)
     {

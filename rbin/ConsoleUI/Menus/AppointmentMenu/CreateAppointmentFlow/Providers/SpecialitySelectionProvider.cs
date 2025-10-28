@@ -15,7 +15,7 @@ public class SpecialitySelectionProvider(IServiceProvider serviceProvider) : IMe
         var navigation = serviceProvider.GetRequiredService<NavigationService>();
         var patient = navigation.GetSharedData<PatientProfile>(nameof(PatientProfile));
 
-        var specialityService = serviceProvider.GetRequiredService<ISpecialtyService>();
+        var specialityService = serviceProvider.GetRequiredService<IExternalSpecialtyService>();
         var specialities = await specialityService.GetByLpuAsync(int.Parse(patient.LpuId));
 
         var commands = specialities.Select(s => new SpecialitySelectionCommand(s, serviceProvider))

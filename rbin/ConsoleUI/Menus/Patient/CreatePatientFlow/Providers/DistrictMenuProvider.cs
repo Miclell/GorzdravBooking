@@ -10,7 +10,7 @@ public class DistrictMenuProvider(IServiceProvider serviceProvider) : IMenuProvi
 {
     public async Task<MenuState> CreateMenuAsync()
     {
-        var districtService = serviceProvider.GetRequiredService<IDistrictService>();
+        var districtService = serviceProvider.GetRequiredService<IExternalDistrictService>();
         var districts = await districtService.GetDistrictsAsync();
         
         var commands = districts

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Services.Implementation;
 
-public class AppointmentService(IAppointmentRepository appointmentRepository, IAppointmentService appointmentService,
+public class AppointmentService(IAppointmentRepository appointmentRepository, IExternalAppointmentService externalAppointmentService,
     ILogger<AppointmentService> logger) : IAppService, Interfaces.IAppointmentService
 {
     public async Task<Result<Guid>> CreateAsync(CreateAppointmentDto createDto, CancellationToken cancellationToken = default)
@@ -54,7 +54,7 @@ public class AppointmentService(IAppointmentRepository appointmentRepository, IA
                 AppointmentType = "" // TODO: уточнить тип записи
             };
 
-            var externalCancelSuccess = await appointmentService.CancelAppointmentAsync(cancelRequest);
+            var externalCancelSuccess = await externalAppointmentService.CancelAppointmentAsync(cancelRequest);
             
             if (!externalCancelSuccess)
             {

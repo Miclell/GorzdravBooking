@@ -13,7 +13,7 @@ public class SpecialityMenuProvider(IServiceProvider serviceProvider) : IMenuPro
 {
     public async Task<MenuState> CreateMenuAsync()
     {
-        var specialityService = serviceProvider.GetRequiredService<ISpecialtyService>();
+        var specialityService = serviceProvider.GetRequiredService<IExternalSpecialtyService>();
         var navigation = serviceProvider.GetRequiredService<NavigationService>();
         
         var districtId = navigation.GetSharedData<Lpu>(nameof(Lpu)).Id;

@@ -16,7 +16,7 @@ public class AppointmentMenuProvider(IServiceProvider serviceProvider) : IMenuPr
         var doctorId = navigation.GetSharedData<Doctor>(nameof(Doctor)).Id;
         var lpuId = navigation.GetSharedData<Lpu>(nameof(Lpu)).Id;
         
-        var appointmentService = serviceProvider.GetRequiredService<IAppointmentService>();
+        var appointmentService = serviceProvider.GetRequiredService<IExternalAppointmentService>();
         var appointments = await appointmentService.GetByDoctorAsync(lpuId, doctorId);
         
         var commands = appointments

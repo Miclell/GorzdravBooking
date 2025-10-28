@@ -7,7 +7,7 @@ using Infrastructure.ApiClient.Models;
 
 namespace Infrastructure.Services;
 
-public class DistrictService(IApiService apiService) : IDistrictService
+public class ExternalDistrictService(IApiService apiService) : IExternalDistrictService
 {
     public async Task<List<District>> GetDistrictsAsync()
     {

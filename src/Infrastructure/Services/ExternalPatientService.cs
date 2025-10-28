@@ -6,7 +6,7 @@ using Infrastructure.ApiClient.Models;
 
 namespace Infrastructure.Services;
 
-public class PatientService(IApiService apiService) : IPatientService
+public class ExternalPatientService(IApiService apiService) : IExternalPatientService
 {
     public async Task<string> GetPatientIdAsync(PatientIdSearchRequest request)
     {

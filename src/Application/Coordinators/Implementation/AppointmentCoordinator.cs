@@ -7,7 +7,7 @@ using Core.Models;
 
 namespace Application.Coordinators.Implementation;
 
-public class AppointmentCoordinator(Core.Interfaces.Services.IAppointmentService externalAppointmentService,
+public class AppointmentCoordinator(Core.Interfaces.Services.IExternalAppointmentService externalExternalAppointmentService,
     ITimePreferencesService timePreferencesService,
     IAppointmentService appointmentService) : IAppointmentCoordinator
 {
@@ -23,7 +23,7 @@ public class AppointmentCoordinator(Core.Interfaces.Services.IAppointmentService
             if (timePreferences.IsFailure)
                 return timePreferences.Error;
             
-            var appointments = await externalAppointmentService.GetByDoctorAsync(
+            var appointments = await externalExternalAppointmentService.GetByDoctorAsync(
                 int.Parse(request.PatientProfile.LpuId),
                 request.DoctorId);
             
@@ -52,7 +52,7 @@ public class AppointmentCoordinator(Core.Interfaces.Services.IAppointmentService
                 VisitDate = appointment.VisitStart
             };
 
-            var isSuccess = await externalAppointmentService.CreateAppointmentAsync(createRequest);
+            var isSuccess = await externalExternalAppointmentService.CreateAppointmentAsync(createRequest);
             if (!isSuccess && isSuccess) // TODO раскоментить после разбора 
             {
                 return Error.Conflict("Failed.Booking", "Failed to boking appointment in external service");

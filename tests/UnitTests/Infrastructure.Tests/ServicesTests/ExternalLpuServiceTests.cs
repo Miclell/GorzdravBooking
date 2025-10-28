@@ -6,13 +6,13 @@ using Xunit;
 
 namespace Infrastructure.Tests.ServicesTests;
 
-public class LpuServiceTests
+public class ExternalLpuServiceTests
 {
     [Fact]
     public async Task GetLpuByDistrict_Success()
     {
         var fakeApiService = new FakeApiService();
-        var lpuService = new LpuService(fakeApiService);
+        var lpuService = new ExternalLpuService(fakeApiService);
 
         var expectedLpus = new List<Lpu>
         {
