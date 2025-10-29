@@ -1,4 +1,5 @@
-﻿using Application.Coordinators.Interfaces;
+﻿using Application.Abstract;
+using Application.Coordinators.Interfaces;
 using Core.Enums;
 using Core.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
@@ -8,7 +9,7 @@ namespace Application.UseCases;
 public class CheckAppointmentSearchRequestsUseCase(
     IAppointmentSearchRequestRepository appointmentSearchRequestRepository,
     IAppointmentCoordinator appointmentCoordinator,
-    ILogger<CheckAppointmentSearchRequestsUseCase> logger)
+    ILogger<CheckAppointmentSearchRequestsUseCase> logger) : IAppUseCase
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken = default)
     {

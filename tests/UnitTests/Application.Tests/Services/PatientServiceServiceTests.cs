@@ -26,20 +26,19 @@ public class PatientServiceTests
     public async Task Create_WithValidData_CreatesPatient()
     {
         // Arrange
-        var createPatientDto = new CreatePatientDto()
-        {
-            UserId =  Guid.NewGuid(),
-            LpuId = "123",
-            PatientId = "patient123",
-            LpuShortName = "Test Hospital",
-            LpuAddress = "Test Address",
-            PatientLastName = "Ivanov",
-            PatientFirstName = "Ivan",
-            PatientMiddleName = "Ivanovich",
-            PatientBirthdate = new DateTime(1990, 1, 1),
-            RecipientEmail = "test@test.com",
-            MobilePhoneNumber = "+79991234567"
-        };
+        var createPatientDto = new CreatePatientDto(
+            UserId: Guid.NewGuid(),
+            LpuId: "123",
+            LpuShortName: "Test Hospital",
+            LpuAddress: "Test Address",
+            PatientId: "patient123",
+            PatientLastName: "Ivanov",
+            PatientFirstName: "Ivan",
+            PatientMiddleName: "Ivanovich",
+            PatientBirthdate: new DateTime(1990, 1, 1),
+            RecipientEmail: "test@test.com",
+            MobilePhoneNumber: "+79991234567"
+        );
 
         var expectedPatientId = Guid.NewGuid();
 
@@ -61,20 +60,19 @@ public class PatientServiceTests
     public async Task Create_WhenRepositoryThrowsException_ReturnsFailure()
     {
         // Arrange
-        var createPatientDto = new CreatePatientDto()
-        {
-            UserId =  Guid.NewGuid(),
-            LpuId = "123",
-            PatientId = "patient123",
-            LpuShortName = "Test Hospital",
-            LpuAddress = "Test Address",
-            PatientLastName = "Ivanov",
-            PatientFirstName = "Ivan",
-            PatientMiddleName = "Ivanovich",
-            PatientBirthdate = new DateTime(1990, 1, 1),
-            RecipientEmail = "test@test.com",
-            MobilePhoneNumber = "+79991234567"
-        };
+        var createPatientDto = new CreatePatientDto(
+            UserId: Guid.NewGuid(),
+            LpuId: "123",
+            LpuShortName: "Test Hospital",
+            LpuAddress: "Test Address",
+            PatientId: "patient123",
+            PatientLastName: "Ivanov",
+            PatientFirstName: "Ivan",
+            PatientMiddleName: "Ivanovich",
+            PatientBirthdate: new DateTime(1990, 1, 1),
+            RecipientEmail: "test@test.com",
+            MobilePhoneNumber: "+79991234567"
+        );
 
         var exception = new Exception("Database error");
 

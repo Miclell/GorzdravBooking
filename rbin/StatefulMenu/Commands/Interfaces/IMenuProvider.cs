@@ -4,5 +4,5 @@ namespace StatefulMenu.Commands.Interfaces;
 
 public interface IMenuProvider
 {
-    Task<MenuState> CreateMenuAsync(CancellationToken ct = default);
+    Task<MenuState> CreateMenuAsync(CancellationToken cancellationToken = default);
 }

@@ -14,7 +14,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Menus\PatientMenu\CreatePatientFlow\Providers\" />
       <Folder Include="Menus\PatientMenu\ShowPatientsFlow\" />
     </ItemGroup>
 

@@ -9,7 +9,7 @@ namespace CLI.Menus;
 
 public class MainMenuProvider(IServiceProvider serviceProvider) : IMenuProvider
 {
-    public Task<MenuState> CreateMenuAsync(CancellationToken ct = new CancellationToken())
+    public Task<MenuState> CreateMenuAsync(CancellationToken cancellationToken = default)
     {
         var commands = new IMenuCommand[]
         {
@@ -19,8 +19,8 @@ public class MainMenuProvider(IServiceProvider serviceProvider) : IMenuProvider
 
         var items = commands
             .Select(c => c is ExitCommand
-                ? new MenuItem(c.Title, _ => c.ExecuteAsync(ct), hotkey: ConsoleKey.E)
-                : new MenuItem(c.Title, _ => c.ExecuteAsync(ct)))
+                ? new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken), hotkey: ConsoleKey.E)
+                : new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken)))
             .ToList();
 
         return Task.FromResult(new MenuState("Главное меню", items));

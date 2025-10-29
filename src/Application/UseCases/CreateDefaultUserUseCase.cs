@@ -1,11 +1,13 @@
-﻿using Application.Common.Results;
+﻿using Application.Abstract;
+using Application.Common.Results;
 using Application.DTOs.User;
 using Application.Services;
 using Application.Services.Implementation;
+using Application.Services.Interfaces;
 
 namespace Application.UseCases;
 
-public class CreateDefaultUserUseCase(UserService userService)
+public class CreateDefaultUserUseCase(IUserService userService) : IAppUseCase
 {
     public async Task<Result<Guid>> ExecuteAsync()
     {

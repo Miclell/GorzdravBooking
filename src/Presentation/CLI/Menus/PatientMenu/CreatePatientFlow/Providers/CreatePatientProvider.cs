@@ -1,20 +1,18 @@
-﻿using CLI.Menus.PatientMenu.CreatePatientFlow;
-using CLI.Menus.PatientMenu.CreatePatientFlow.Commands;
+﻿using CLI.Menus.PatientMenu.CreatePatientFlow.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu.Commands.BuiltIn;
 using StatefulMenu.Commands.Interfaces;
-using StatefulMenu.Core.Interfaces;
 using StatefulMenu.Core.Models;
 
-namespace CLI.Menus.PatientMenu;
+namespace CLI.Menus.PatientMenu.CreatePatientFlow.Providers;
 
-public class ShowPatientMenuProvider(IServiceProvider serviceProvider) : IMenuProvider
+public class CreatePatientProvider(IServiceProvider serviceProvider) : IMenuProvider
 {
     public Task<MenuState> CreateMenuAsync(CancellationToken cancellationToken = default)
     {
         var commands = new IMenuCommand[]
         {
-            serviceProvider.GetRequiredService<RunCreatePatientFlowCommand>(),
+            serviceProvider.GetRequiredService<CreatePatientCommand>(),
             serviceProvider.GetRequiredService<BackCommand>()
         };
         
@@ -23,6 +21,6 @@ public class ShowPatientMenuProvider(IServiceProvider serviceProvider) : IMenuPr
                 new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken)))
             .ToList();
 
-        return Task.FromResult(new MenuState("Меню пациента", items));
+        return Task.FromResult(new MenuState("Ввод данных пациента", items));
     }
 }

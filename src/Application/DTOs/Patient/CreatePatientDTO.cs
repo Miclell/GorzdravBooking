@@ -2,38 +2,28 @@
 
 using StatefulMenu.Core.Attributes;
 
-public class CreatePatientDto
-{
-    [InputField("Пользователь Id")]
-    public Guid UserId { get; set; }
+public record CreatePatientDto(
+    Guid UserId,
+    string LpuId,
+    string LpuShortName,
+    string LpuAddress,
+    string PatientId,
     
-    [InputField("ЛПУ Id")]
-    public string LpuId { get; set; } = null!;
+    [property: InputField("Фамилия")]
+    string PatientLastName,
     
-    [InputField("ЛПУ краткое название")]
-    public string LpuShortName { get; set; } = null!;
+    [property: InputField("Имя")]
+    string PatientFirstName,
     
-    [InputField("Адрес ЛПУ")]
-    public string LpuAddress { get; set; } = null!;
+    [property: InputField("Отчество")]
+    string PatientMiddleName,
     
-    [InputField("Идентификатор пациента в ЛПУ")]
-    public string PatientId { get; set; } = null!;
+    [property: InputField("Дата рождения")]
+    DateTime PatientBirthdate,
     
-    [InputField("Фамилия")]
-    public string PatientLastName { get; set; } = null!;
+    [property: InputField("Email", IsRequired = false)]
+    string? RecipientEmail = null,
     
-    [InputField("Имя")]
-    public string PatientFirstName { get; set; } = null!;
-    
-    [InputField("Отчество")]
-    public string PatientMiddleName { get; set; } = null!;
-    
-    [InputField("Дата рождения")]
-    public DateTime PatientBirthdate { get; set; }
-    
-    [InputField("Email", IsRequired = false)]
-    public string? RecipientEmail { get; set; }
-    
-    [InputField("Телефон", IsRequired = false, Pattern = @"^\+?\d{10,15}$", ErrorMessage = "Телефон в формате +79991234567")]
-    public string? MobilePhoneNumber { get; set; }
-}
+    [property: InputField("Телефон", IsRequired = false, Pattern = @"^\+?\d{10,15}$", ErrorMessage = "Телефон в формате +79991234567")]
+    string? MobilePhoneNumber = null
+);
