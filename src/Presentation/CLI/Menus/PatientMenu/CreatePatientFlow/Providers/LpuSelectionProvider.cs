@@ -30,6 +30,8 @@ public class LpuSelectionProvider(IServiceProvider serviceProvider) : IMenuProvi
                 new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken)))
             .ToList();
 
+        dataService.Remove(nameof(District));
+
         return new MenuState("Выбор поликлиники", items);
     }
 }

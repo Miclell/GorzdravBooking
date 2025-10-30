@@ -37,10 +37,14 @@ public class AppSettingsService(IAppSettingRepository appSettingRepository, Crea
     private async Task CreateDefaultUser()
     {
         var userId = await createDefaultUserUseCase.ExecuteAsync();
+
+        if (userId.IsFailure)
+             throw new Exception(userId.Error.Description);
+        
         var appSetting = new AppSetting()
         {
             Key = "DefaultUserId",
-            Value = userId.ToString()
+            Value = userId.Value.ToString()
         };
         await appSettingRepository.AddAsync(appSetting);
     }

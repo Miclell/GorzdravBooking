@@ -1,4 +1,6 @@
-﻿using CLI.Menus.PatientMenu;
+﻿using CLI.Menus.AppointmentMenu;
+using CLI.Menus.PatientMenu;
+using CLI.Menus.TimePreferencesMenu;
 using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu.Commands.BuiltIn;
 using StatefulMenu.Commands.Interfaces;
@@ -13,7 +15,9 @@ public class MainMenuProvider(IServiceProvider serviceProvider) : IMenuProvider
     {
         var commands = new IMenuCommand[]
         {
+            serviceProvider.GetRequiredService<ShowAppointmentMenuCommand>(),
             serviceProvider.GetRequiredService<ShowPatientMenuCommand>(),
+            serviceProvider.GetRequiredService<ShowTimePreferencesMenuCommand>(),
             serviceProvider.GetRequiredService<ExitCommand>()
         };
 

@@ -47,6 +47,8 @@ public class CreatePatientCommand(IServiceProvider serviceProvider) : IMenuComma
         Console.WriteLine("Пациент успешно создан! Нажмите клавишу чтобы продолжить..");
         Console.ReadKey();
 
+        dataService.Remove(nameof(Lpu));
+
         var mainMenuProvider = serviceProvider.GetRequiredService<MainMenuProvider>();
         return MenuResult.Push(mainMenuProvider.CreateMenuAsync(cancellationToken).Result);
     }
