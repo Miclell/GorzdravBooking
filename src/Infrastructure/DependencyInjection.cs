@@ -5,6 +5,7 @@ using Infrastructure.Http;
 using Infrastructure.Repositories;
 using Infrastructure.Security;
 using Infrastructure.Services;
+using Infrastructure.Stubs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -19,7 +20,8 @@ public static class DependencyInjection
             options.UseSqlite("Data Source=GorzdravBooking.db"));
         
         // ApiClient
-        services.AddGorzdravClient(); 
+        services.AddGorzdravClient();
+        //services.AddFakeGorzdravClient();
 
         // Services
         services.AddScoped<IExternalAppointmentService, ExternalAppointmentService>();

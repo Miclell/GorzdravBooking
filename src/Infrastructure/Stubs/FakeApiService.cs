@@ -3,7 +3,7 @@ using Core.Models;
 
 namespace Infrastructure.Stubs;
 
-public class FakeApiService : IApiService
+public class FakeApiService : IApiService // TODO доделать сервис, используя фейковые данные
 {
     private readonly Dictionary<string, object> _getResponses = new();
     private readonly Dictionary<string, object> _postResponses = new();
@@ -55,5 +55,22 @@ public class FakeApiService : IApiService
     private void SetupDemoResponses()
     {
         // var моделька = _dataService.GetDemoМоделька
+        
+        // var appointments = _dataService.GetDemoAppointments();
+    
+        // GET endpoints
+        // SetupGetResponse($"schedule/lpu/1/doctor/doctor_1/appointments", 
+        //    new ApiResponse<List<Appointment>> { Success = true, Result = appointments });
+        
+        //SetupGetResponse($"schedule/lpu/1/doctor/doctor_2/appointments", 
+        //    new ApiResponse<List<Appointment>> { Success = true, Result = appointments });
+    
+        // POST endpoints - успешные сценарии
+        //SetupPostResponse<object, bool>("appointment/create", _dataService.GetSuccessResponse());
+        //SetupPostResponse<object, bool>("appointment/cancel", _dataService.GetSuccessResponse());
+    
+        // Можно добавить разные сценарии для тестирования
+        // SetupPostResponse<object, bool>("appointment/create", 
+        //     _dataService.GetFailureResponse("Время уже занято"));
     }
 }
