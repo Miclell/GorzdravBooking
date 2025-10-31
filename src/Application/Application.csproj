@@ -11,7 +11,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.9" />
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.10" />
       <PackageReference Include="Scrutor" Version="6.1.0" />
       <PackageReference Include="StatefulMenu" Version="1.0.0-preview.1" />
     </ItemGroup>

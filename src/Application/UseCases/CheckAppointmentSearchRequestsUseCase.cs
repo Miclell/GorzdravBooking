@@ -19,7 +19,7 @@ public class CheckAppointmentSearchRequestsUseCase(
             var requests = await appointmentSearchRequestRepository.GetActiveAsync(cancellationToken);
 
             var appointmentSearchRequests = requests.ToList();
-            logger.LogDebug("Найдено {Count} активных запросов", appointmentSearchRequests.Count());
+            logger.LogDebug("Найдено {Count} активных запросов", appointmentSearchRequests.Count);
 
             foreach (var request in appointmentSearchRequests
                          .Where(request => IsTimeToCheck(request, now)))

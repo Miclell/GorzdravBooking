@@ -59,11 +59,6 @@ public class PatientProfileConfiguration : IEntityTypeConfiguration<PatientProfi
             .HasForeignKey(p => p.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // builder.HasMany(p => p.TimePreferences)
-        //     .WithOne(tp => tp.PatientProfile)
-        //     .HasForeignKey(tp => tp.PatientProfileId)
-        //     .OnDelete(DeleteBehavior.Cascade);
-
         builder.HasMany(p => p.AppointmentSearchRequests)
             .WithOne(asr => asr.PatientProfile)
             .HasForeignKey(asr => asr.PatientProfileId)
