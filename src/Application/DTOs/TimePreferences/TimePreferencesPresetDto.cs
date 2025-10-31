@@ -2,7 +2,7 @@
 
 public record TimePreferencesPresetDto(
     string Name,
-    Guid PatientProfileId,
+    Guid UserId,
     bool AnyTime,
     IReadOnlyList<TimePreferenceDto> Preferences
 );

@@ -32,6 +32,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasForeignKey(p => p.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasMany(u => u.TimePreferences)
+            .WithOne(tp => tp.User)
+            .HasForeignKey(tp => tp.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         // Timestamps
         builder.Property(u => u.CreatedAt)
             .IsRequired();

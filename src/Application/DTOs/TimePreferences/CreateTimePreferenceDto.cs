@@ -9,7 +9,7 @@ public class CreateTimePreferenceDto
         bool anyTime)
     {
         Name = name;
-        PatientProfileId = id;
+        UserId = id;
         Day = day;
         PreferredTimeFrom = preferredTimeFrom;
         PreferredTimeTo = preferredTimeTo;
@@ -20,7 +20,7 @@ public class CreateTimePreferenceDto
     public string Name { get; set; } = null!;
     
     [InputField("Пациент Id")]
-    public Guid PatientProfileId { get; set; }
+    public Guid UserId { get; set; }
     
     [InputField("День недели", IsRequired = false)]
     public DayOfWeek? Day { get; set; }

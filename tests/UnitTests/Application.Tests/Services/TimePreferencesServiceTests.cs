@@ -1,5 +1,4 @@
-﻿using Application.Common.Results;
-using Application.DTOs.TimePreferences;
+﻿using Application.DTOs.TimePreferences;
 using Application.Services.Implementation;
 using Core.Entities;
 using Core.Interfaces.Repositories;
@@ -97,7 +96,7 @@ public class TimePreferencesServiceTests
         var dto = new DeleteTimePreferencesDto(Guid.NewGuid(), "TestPreset");
 
         _mockRepository
-            .Setup(x => x.DeleteByPresetAsync(dto.PatientProfileId, dto.Name, It.IsAny<CancellationToken>()))
+            .Setup(x => x.DeleteByPresetAsync(dto.UserId, dto.Name, It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -106,7 +105,7 @@ public class TimePreferencesServiceTests
         // Assert
         Assert.True(result.IsSuccess);
         
-        _mockRepository.Verify(x => x.DeleteByPresetAsync(dto.PatientProfileId, dto.Name, It.IsAny<CancellationToken>()), Times.Once);
+        _mockRepository.Verify(x => x.DeleteByPresetAsync(dto.UserId, dto.Name, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -117,7 +116,7 @@ public class TimePreferencesServiceTests
         var exception = new Exception("Database error");
 
         _mockRepository
-            .Setup(x => x.DeleteByPresetAsync(dto.PatientProfileId, dto.Name, It.IsAny<CancellationToken>()))
+            .Setup(x => x.DeleteByPresetAsync(dto.UserId, dto.Name, It.IsAny<CancellationToken>()))
             .ThrowsAsync(exception);
 
         // Act
@@ -130,7 +129,7 @@ public class TimePreferencesServiceTests
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при удалении пресета {dto.Name} для пациента {dto.PatientProfileId}")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при удалении пресета {dto.Name} для пользователя {dto.UserId}")),
                 exception,
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()),
             Times.Once);
@@ -141,13 +140,13 @@ public class TimePreferencesServiceTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var patientProfileId = Guid.NewGuid();
+        var UserId = Guid.NewGuid();
     
         var entities = new List<TimePreferences>
         {
-            new() { Name = "WorkDays", PatientProfileId = patientProfileId, AnyTime = false, Day = DayOfWeek.Monday, PreferredTimeFrom = TimeOnly.FromTimeSpan(TimeSpan.FromHours(9)), PreferredTimeTo = TimeOnly.FromTimeSpan(TimeSpan.FromHours(12)) },
-            new() { Name = "WorkDays", PatientProfileId = patientProfileId, AnyTime = false, Day = DayOfWeek.Tuesday, PreferredTimeFrom = TimeOnly.FromTimeSpan(TimeSpan.FromHours(9)), PreferredTimeTo = TimeOnly.FromTimeSpan(TimeSpan.FromHours(12)) },
-            new() { Name = "Weekend", PatientProfileId = patientProfileId, AnyTime = true }
+            new() { Name = "WorkDays", UserId = UserId, AnyTime = false, Day = DayOfWeek.Monday, PreferredTimeFrom = TimeOnly.FromTimeSpan(TimeSpan.FromHours(9)), PreferredTimeTo = TimeOnly.FromTimeSpan(TimeSpan.FromHours(12)) },
+            new() { Name = "WorkDays", UserId = UserId, AnyTime = false, Day = DayOfWeek.Tuesday, PreferredTimeFrom = TimeOnly.FromTimeSpan(TimeSpan.FromHours(9)), PreferredTimeTo = TimeOnly.FromTimeSpan(TimeSpan.FromHours(12)) },
+            new() { Name = "Weekend", UserId = UserId, AnyTime = true }
         };
 
         _mockRepository
@@ -168,13 +167,8 @@ public class TimePreferencesServiceTests
         Assert.False(workDaysPreset.AnyTime);
     
         var weekendPreset = presets.First(p => p.Name == "Weekend");
-        // Проблема: GetByUserAsync НЕ фильтрует AnyTime записи из Preferences!
-        // В текущей реализации все записи попадают в Preferences, даже AnyTime
-        // Assert.Empty(weekendPreset.Preferences); // ← Это не будет работать
-    
-        // Вместо этого проверь что AnyTime = true
+        
         Assert.True(weekendPreset.AnyTime);
-        // И что в Preferences есть запись (потому что текущая логика не фильтрует)
         Assert.NotEmpty(weekendPreset.Preferences);
     
         _mockRepository.Verify(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
@@ -231,52 +225,52 @@ public class TimePreferencesServiceTests
     public async Task GetByPresetAsync_WhenPreferencesExist_ReturnsPresetDto()
     {
         // Arrange
-        var patientProfileId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
         var presetName = "WorkDays";
         
         var preferences = new List<TimePreferences>
         {
-            new() { Name = presetName, PatientProfileId = patientProfileId, AnyTime = false, Day = DayOfWeek.Monday, PreferredTimeFrom = TimeOnly.FromTimeSpan(TimeSpan.FromHours(9)), PreferredTimeTo = TimeOnly.FromTimeSpan(TimeSpan.FromHours(12)) },
-            new() { Name = presetName, PatientProfileId = patientProfileId, AnyTime = false, Day = DayOfWeek.Tuesday, PreferredTimeFrom = TimeOnly.FromTimeSpan(TimeSpan.FromHours(14)), PreferredTimeTo = TimeOnly.FromTimeSpan(TimeSpan.FromHours(16)) }
+            new() { Name = presetName, UserId = userId, AnyTime = false, Day = DayOfWeek.Monday, PreferredTimeFrom = TimeOnly.FromTimeSpan(TimeSpan.FromHours(9)), PreferredTimeTo = TimeOnly.FromTimeSpan(TimeSpan.FromHours(12)) },
+            new() { Name = presetName, UserId = userId, AnyTime = false, Day = DayOfWeek.Tuesday, PreferredTimeFrom = TimeOnly.FromTimeSpan(TimeSpan.FromHours(14)), PreferredTimeTo = TimeOnly.FromTimeSpan(TimeSpan.FromHours(16)) }
         };
 
         _mockRepository
-            .Setup(x => x.GetByPresetAsync(patientProfileId, presetName, It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetByPresetAsync(userId, presetName, It.IsAny<CancellationToken>()))
             .ReturnsAsync(preferences);
 
         // Act
-        var result = await _service.GetByPresetAsync(patientProfileId, presetName, CancellationToken.None);
+        var result = await _service.GetByPresetAsync(userId, presetName, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
         var preset = result.Value;
         
         Assert.Equal(presetName, preset.Name);
-        Assert.Equal(patientProfileId, preset.PatientProfileId);
+        Assert.Equal(userId, preset.UserId);
         Assert.False(preset.AnyTime);
         Assert.Equal(2, preset.Preferences.Count);
         
-        _mockRepository.Verify(x => x.GetByPresetAsync(patientProfileId, presetName, It.IsAny<CancellationToken>()), Times.Once);
+        _mockRepository.Verify(x => x.GetByPresetAsync(userId, presetName, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
     public async Task GetByPresetAsync_WhenAnyTimePreferenceExists_ReturnsEmptyPreferences()
     {
         // Arrange
-        var patientProfileId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
         var presetName = "AnyTimePreset";
         
         var preferences = new List<TimePreferences>
         {
-            new() { Name = presetName, PatientProfileId = patientProfileId, AnyTime = true }
+            new() { Name = presetName, UserId = userId, AnyTime = true }
         };
 
         _mockRepository
-            .Setup(x => x.GetByPresetAsync(patientProfileId, presetName, It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetByPresetAsync(userId, presetName, It.IsAny<CancellationToken>()))
             .ReturnsAsync(preferences);
 
         // Act
-        var result = await _service.GetByPresetAsync(patientProfileId, presetName, CancellationToken.None);
+        var result = await _service.GetByPresetAsync(userId, presetName, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -286,45 +280,45 @@ public class TimePreferencesServiceTests
         Assert.True(preset.AnyTime);
         Assert.Empty(preset.Preferences); // Preferences должны быть пустыми для AnyTime
         
-        _mockRepository.Verify(x => x.GetByPresetAsync(patientProfileId, presetName, It.IsAny<CancellationToken>()), Times.Once);
+        _mockRepository.Verify(x => x.GetByPresetAsync(userId, presetName, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
     public async Task GetByPresetAsync_WhenPreferencesNotFound_ReturnsNotFound()
     {
         // Arrange
-        var patientProfileId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
         var presetName = "NonExistentPreset";
 
         _mockRepository
-            .Setup(x => x.GetByPresetAsync(patientProfileId, presetName, It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetByPresetAsync(userId, presetName, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<TimePreferences>());
 
         // Act
-        var result = await _service.GetByPresetAsync(patientProfileId, presetName, CancellationToken.None);
+        var result = await _service.GetByPresetAsync(userId, presetName, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal("Preferences.Not.Found", result.Error.Code);
         Assert.Equal("Preferences not found", result.Error.Description);
         
-        _mockRepository.Verify(x => x.GetByPresetAsync(patientProfileId, presetName, It.IsAny<CancellationToken>()), Times.Once);
+        _mockRepository.Verify(x => x.GetByPresetAsync(userId, presetName, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
     public async Task GetByPresetAsync_WhenRepositoryThrowsException_ReturnsFailure()
     {
         // Arrange
-        var patientProfileId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
         var presetName = "TestPreset";
         var exception = new Exception("Database error");
 
         _mockRepository
-            .Setup(x => x.GetByPresetAsync(patientProfileId, presetName, It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetByPresetAsync(userId, presetName, It.IsAny<CancellationToken>()))
             .ThrowsAsync(exception);
 
         // Act
-        var result = await _service.GetByPresetAsync(patientProfileId, presetName, CancellationToken.None);
+        var result = await _service.GetByPresetAsync(userId, presetName, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailure);
@@ -333,7 +327,7 @@ public class TimePreferencesServiceTests
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при получении пресета - {presetName} для пациента {patientProfileId}")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при получении пресета - {presetName} для пациента {userId}")),
                 exception,
                 It.IsAny<Func<It.IsAnyType, Exception, string>>()),
             Times.Once);

@@ -9,14 +9,14 @@ public class TimePreferencesRepository(AppDbContext context) : ITimePreferencesR
     public async Task<TimePreferences?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await context.TimePreferences
-            .Include(p => p.PatientProfile)
+            .Include(p => p.User)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
     public async Task<IEnumerable<TimePreferences>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await context.TimePreferences
-            .Where(t => t.PatientProfile.UserId == userId)
+            .Where(t => t.UserId == userId)
             .ToListAsync(cancellationToken);
     }
 
@@ -38,17 +38,17 @@ public class TimePreferencesRepository(AppDbContext context) : ITimePreferencesR
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<TimePreferences>> GetByPresetAsync(Guid patientProfileId, string name, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<TimePreferences>> GetByPresetAsync(Guid userId, string name, CancellationToken cancellationToken = default)
     { 
         return await context.TimePreferences
-            .Where(tp => tp.PatientProfileId == patientProfileId && tp.Name == name)
+            .Where(tp => tp.UserId == userId && tp.Name == name)
             .ToListAsync(cancellationToken);
     }
     
-    public async Task DeleteByPresetAsync(Guid patientProfileId, string name, CancellationToken cancellationToken = default)
+    public async Task DeleteByPresetAsync(Guid userId, string name, CancellationToken cancellationToken = default)
     {
         var preferences = context.TimePreferences
-            .Where(tp => tp.PatientProfileId == patientProfileId && tp.Name == name);
+            .Where(tp => tp.UserId == userId && tp.Name == name);
 
         context.TimePreferences.RemoveRange(preferences);
         await context.SaveChangesAsync(cancellationToken);

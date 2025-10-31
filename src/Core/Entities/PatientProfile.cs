@@ -7,7 +7,7 @@ public class PatientProfile
     public Guid UserId { get; set; }
     public User User { get; set; } = null!;
 
-    public ICollection<TimePreferences> TimePreferences { get; set; } = [];
+    // public ICollection<TimePreferences> TimePreferences { get; set; } = [];
     public ICollection<AppointmentSearchRequest> AppointmentSearchRequests { get; set; } = [];
     public ICollection<Appointment> Appointments { get; set; } = [];
 

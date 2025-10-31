@@ -18,7 +18,7 @@ public class TimePreferencesService(ITimePreferencesRepository timePreferencesRe
             var timePreferences = dtos.Select(dto => new TimePreferences
             {
                 Name = dto.Name,
-                PatientProfileId = dto.PatientProfileId,
+                UserId = dto.UserId,
                 Day = dto.Day,
                 PreferredTimeFrom = dto.PreferredTimeFrom,
                 PreferredTimeTo = dto.PreferredTimeTo,
@@ -41,7 +41,7 @@ public class TimePreferencesService(ITimePreferencesRepository timePreferencesRe
         try
         {
             await timePreferencesRepository.DeleteByPresetAsync(
-                dto.PatientProfileId,
+                dto.UserId,
                 dto.Name,
                 cancellationToken);
 
@@ -49,7 +49,7 @@ public class TimePreferencesService(ITimePreferencesRepository timePreferencesRe
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Ошибка при удалении пресета {PresetName} для пациента {PatientProfileId}", dto.Name, dto.PatientProfileId);
+            logger.LogError(e, "Ошибка при удалении пресета {PresetName} для пользователя {UserId}", dto.Name, dto.UserId);
 
             return Error.Failure(e.ToString(), "Failed to delete time preferences");
         }
@@ -65,7 +65,7 @@ public class TimePreferencesService(ITimePreferencesRepository timePreferencesRe
                 .GroupBy(tp => tp.Name)
                 .Select(group => new TimePreferencesPresetDto(
                     group.Key,
-                    group.First().PatientProfileId,
+                    group.First().UserId,
                     group.First().AnyTime,
                     group
                         .Select(tp => new TimePreferenceDto(
@@ -86,12 +86,12 @@ public class TimePreferencesService(ITimePreferencesRepository timePreferencesRe
         }
     }
 
-    public async Task<Result<TimePreferencesPresetDto>> GetByPresetAsync(Guid patientProfileId, string name, CancellationToken cancellationToken = default)
+    public async Task<Result<TimePreferencesPresetDto>> GetByPresetAsync(Guid userId, string name, CancellationToken cancellationToken = default)
     {
         try
         {
             var preferences = await timePreferencesRepository
-                .GetByPresetAsync(patientProfileId, name, cancellationToken);
+                .GetByPresetAsync(userId, name, cancellationToken);
 
             var timePreferencesEnumerable = preferences.ToList();
             if (timePreferencesEnumerable.Count == 0)
@@ -102,7 +102,7 @@ public class TimePreferencesService(ITimePreferencesRepository timePreferencesRe
     
             var presetDto = new TimePreferencesPresetDto(
                 Name: name,
-                PatientProfileId: patientProfileId,
+                UserId: userId,
                 AnyTime: hasAnyTime,
                 Preferences: hasAnyTime 
                     ? new List<TimePreferenceDto>().AsReadOnly()
@@ -120,7 +120,7 @@ public class TimePreferencesService(ITimePreferencesRepository timePreferencesRe
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Ошибка при получении пресета - {Name} для пациента {PatientProfileId}", name, patientProfileId);
+            logger.LogError(e, "Ошибка при получении пресета - {Name} для пациента {UserId}", name, userId);
             return Error.Failure(e.ToString(), "Failed to get time preferences");
         }
     }

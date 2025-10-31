@@ -6,9 +6,12 @@ public class TimePreferences
 
     public string Name { get; set; }
 
-    public Guid PatientProfileId { get; set; }
-    public PatientProfile PatientProfile { get; set; }
+    // public Guid PatientProfileId { get; set; }
+    // public PatientProfile PatientProfile { get; set; }
 
+    public Guid UserId { get; set; }
+    public User User { get; set; }
+    
     public DayOfWeek? Day { get; set; }
     public TimeOnly? PreferredTimeFrom { get; set; }
     public TimeOnly? PreferredTimeTo { get; set; }

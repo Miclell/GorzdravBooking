@@ -45,19 +45,19 @@ public class TimePreferencesConfiguration : IEntityTypeConfiguration<TimePrefere
             .HasDefaultValue(false);
 
         // Relationships
-        builder.HasOne(tp => tp.PatientProfile)
-            .WithMany(pp => pp.TimePreferences)
-            .HasForeignKey(tp => tp.PatientProfileId)
+        builder.HasOne(tp => tp.User)
+            .WithMany(u => u.TimePreferences)
+            .HasForeignKey(tp => tp.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Indexes
-        builder.HasIndex(tp => tp.PatientProfileId);
+        builder.HasIndex(tp => tp.UserId);
         
-        builder.HasIndex(tp => new { tp.PatientProfileId, tp.Name })
-            .HasDatabaseName("IX_TimePreferences_PatientId_Name");
+        builder.HasIndex(tp => new { tp.UserId, tp.Name })
+            .HasDatabaseName("IX_TimePreferences_UserId_Name");
 
-        builder.HasIndex(tp => new { tp.PatientProfileId, tp.Day })
-            .HasDatabaseName("IX_TimePreferences_PatientId_Day");
+        builder.HasIndex(tp => new { tp.UserId, tp.Day })
+            .HasDatabaseName("IX_TimePreferences_UserId_Day");
 
         // Check constraints
         builder.HasCheckConstraint("CK_TimePreferences_TimeRange", 

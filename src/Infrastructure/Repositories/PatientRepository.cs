@@ -10,7 +10,6 @@ public class PatientRepository(AppDbContext context) : IPatientRepository
     {
         return await context.PatientProfiles
             .Include(p => p.AppointmentSearchRequests)
-            .Include(p => p.TimePreferences)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
@@ -19,7 +18,6 @@ public class PatientRepository(AppDbContext context) : IPatientRepository
         return await context.PatientProfiles
             .Where(p => p.UserId == userId)
             .Include(p => p.AppointmentSearchRequests)
-            .Include(p => p.TimePreferences)
             .ToListAsync(cancellationToken);
     }
 
