@@ -1,12 +1,22 @@
 ﻿using Core.Interfaces.ApiClient;
 using Core.Models;
 
-namespace Infrastructure.Tests.Fakes;
+namespace Infrastructure.Stubs;
 
 public class FakeApiService : IApiService
 {
     private readonly Dictionary<string, object> _getResponses = new();
     private readonly Dictionary<string, object> _postResponses = new();
+    
+    private readonly FakeApiDataService _dataService = new();
+
+    public FakeApiService() { }
+
+    public FakeApiService(FakeApiDataService dataService)
+    {
+        _dataService = dataService;
+        SetupDemoResponses();
+    }
 
     public Task<ApiResponse<TResponse>> GetAsync<TResponse>(string additionalUri)
     {
@@ -40,5 +50,10 @@ public class FakeApiService : IApiService
     public void SetupPostResponse<TRequest, TResponse>(string uri, ApiResponse<TResponse> response)
     {
         _postResponses[uri] = response;
+    }
+    
+    private void SetupDemoResponses()
+    {
+        // var моделька = _dataService.GetDemoМоделька
     }
 }

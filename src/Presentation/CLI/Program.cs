@@ -1,12 +1,13 @@
-﻿using System.Reflection;
-using Application;
-using Application.Services.Implementation;
+﻿using Application;
 using Application.Services.Interfaces;
+using Application.Workers;
 using CLI.Menus;
 using Infrastructure;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using StatefulMenu;
 using StatefulMenu.Core.Interfaces;
 
@@ -16,32 +17,40 @@ public static class Program
 {
     private static async Task Main(string[] args)
     {
-        var services = new ServiceCollection();
+        var host = Host.CreateDefaultBuilder(args)
+            .ConfigureLogging(logging =>
+            {
+                logging.SetMinimumLevel(LogLevel.Information);
+            })
+            .ConfigureServices((hostContext, services) =>
+            {
+                services.AddInfrastructure();
+                services.AddApplication();
+                services.AddStatefulMenu();
+                services.AddHostedService<AppointmentSchedulerWorker>();
+            })
+            .Build();
 
-        services.AddInfrastructure();
-        services.AddApplication();
-        services.AddStatefulMenu();
-        
-        Console.WriteLine("=== ЗАРЕГИСТРИРОВАННЫЕ СЕРВИСЫ ===");
-        foreach (var service in services)
-        {
-            Console.WriteLine($"{service.Lifetime}: {service.ServiceType.Name} -> {service.ImplementationType?.Name ?? service.ImplementationInstance?.GetType().Name ?? service.ImplementationFactory?.ToString()}");
-        }
-        Console.WriteLine("===================================");
-
-        var provider = services.BuildServiceProvider();
-
-        using (var scope = provider.CreateScope())
+        using (var scope = host.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             await db.Database.MigrateAsync();
-            
+    
             var appSettingsService = scope.ServiceProvider.GetRequiredService<IAppSettingsService>();
             await appSettingsService.AppInitializeAsync();
         }
 
-        var nav = provider.GetRequiredService<INavigationService>();
-        var root = provider.GetRequiredService<MainMenuProvider>();
-        await nav.RunAsync(root);
+        var nav = host.Services.GetRequiredService<INavigationService>();
+        var root = host.Services.GetRequiredService<MainMenuProvider>();
+        await host.StartAsync();
+
+        try
+        {
+            await nav.RunAsync(root);
+        }
+        finally
+        {
+            await host.StopAsync();
+        }
     }
 }

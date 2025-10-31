@@ -1,6 +1,6 @@
 ﻿using Core.Models;
 using Infrastructure.Services;
-using Infrastructure.Tests.Fakes;
+using Infrastructure.Stubs;
 using Xunit;
 
 namespace Infrastructure.Tests.ServicesTests;
