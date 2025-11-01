@@ -13,8 +13,4 @@
       <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Menus\TimePreferencesMenu\CreateTimePreferencesFlow\Commands\" />
-    </ItemGroup>
-
 </Project>

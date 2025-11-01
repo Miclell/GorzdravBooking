@@ -42,7 +42,7 @@ public static class Program
 
         var nav = host.Services.GetRequiredService<INavigationService>();
         var root = host.Services.GetRequiredService<MainMenuProvider>();
-        await host.StartAsync();
+        // await host.StartAsync();
 
         try
         {

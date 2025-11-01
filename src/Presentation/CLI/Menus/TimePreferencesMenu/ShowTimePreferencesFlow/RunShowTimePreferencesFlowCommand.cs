@@ -1,13 +1,12 @@
-﻿using StatefulMenu.Commands.Interfaces;
+﻿using CLI.Menus.TimePreferencesMenu.ShowTimePreferencesFlow.Providers;
+using StatefulMenu.Commands.Interfaces;
 using StatefulMenu.Core.Models;
 
 namespace CLI.Menus.TimePreferencesMenu.ShowTimePreferencesFlow;
 
-public class RunShowTimePreferencesFlowCommand : IMenuCommand
+public class RunShowTimePreferencesFlowCommand(ShowTimePreferencesProvider showTimePreferencesProvider) : IMenuCommand
 {
     public string Title { get; } = "Показать пресеты";
-    public Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default) =>
+        MenuResult.Push(await showTimePreferencesProvider.CreateMenuAsync(cancellationToken));
 }

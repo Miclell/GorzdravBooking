@@ -2,6 +2,7 @@
 
 using StatefulMenu.Core.Attributes;
 
+// TODO to record
 public class CreateTimePreferenceDto
 {
     public CreateTimePreferenceDto(string name, Guid id, DayOfWeek day,
@@ -16,21 +17,18 @@ public class CreateTimePreferenceDto
         AnyTime = anyTime;
     }
     
-    [InputField("Название пресета")]
-    public string Name { get; set; } = null!;
+    public CreateTimePreferenceDto() { }
     
-    [InputField("Пациент Id")]
+    public string Name { get; set; }
     public Guid UserId { get; set; }
     
-    [InputField("День недели", IsRequired = false)]
     public DayOfWeek? Day { get; set; }
     
-    [InputField("Время с", IsRequired = false)]
+    [InputField("Время с")]
     public TimeOnly? PreferredTimeFrom { get; set; }
     
-    [InputField("Время до", IsRequired = false)]
+    [InputField("Время до")]
     public TimeOnly? PreferredTimeTo { get; set; }
     
-    [InputField("Любое время")]
     public bool AnyTime { get; set; } = false;
 }
