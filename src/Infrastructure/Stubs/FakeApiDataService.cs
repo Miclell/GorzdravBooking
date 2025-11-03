@@ -35,6 +35,7 @@ public class FakeApiDataService
 
     // Doctors
     public List<Doctor> GetDoctorsBySpecialty(int lpuId, string specialtyId) => _doctors;
+    public List<Doctor> GetDoctors() => _doctors; // Добавил этот метод
     public Doctor? GetDoctor(string doctorId) => _doctors.FirstOrDefault(d => d.Id == doctorId);
 
     // Appointments
@@ -69,146 +70,225 @@ public class FakeApiDataService
     // Private methods for demo data generation
     private List<District> GenerateDistricts()
     {
-        return new List<District>
-        {
-            new District { Id = "1", Name = "Адмиралтейский", Okato = 40262 },
-            new District { Id = "2", Name = "Василеостровский", Okato = 40263 },
-            new District { Id = "3", Name = "Выборгский", Okato = 40265 },
-            new District { Id = "4", Name = "Калининский", Okato = 40267 },
-            new District { Id = "5", Name = "Кировский", Okato = 40269 },
-            new District { Id = "6", Name = "Колпинский", Okato = 40275 },
-            new District { Id = "7", Name = "Красногвардейский", Okato = 40279 },
-            new District { Id = "8", Name = "Красносельский", Okato = 40295 },
-            new District { Id = "9", Name = "Кронштадтский", Okato = 40305 },
-            new District { Id = "10", Name = "Курортный", Okato = 40385 },
-            new District { Id = "11", Name = "Московский", Okato = 40390 },
-            new District { Id = "12", Name = "Невский", Okato = 40395 },
-            new District { Id = "13", Name = "Петроградский", Okato = 40296 },
-            new District { Id = "14", Name = "Петродворцовый", Okato = 40390 },
-            new District { Id = "15", Name = "Приморский", Okato = 40397 },
-            new District { Id = "16", Name = "Пушкинский", Okato = 40395 },
-            new District { Id = "17", Name = "Фрунзенский", Okato = 40398 },
-            new District { Id = "18", Name = "Центральный", Okato = 40301 }
-        };
+        return
+        [
+            new District { Id = "1", Name = "Балалайковский", Okato = 1 },
+            new District { Id = "2", Name = "Оркестровый", Okato = 2 }
+        ];
     }
 
     private List<Lpu> GenerateLpus()
     {
-        return new List<Lpu>
-        {
-            new Lpu 
-            { 
-                Id = 187,
-                Description = "Ариадна",
-                District = 17,
-                DistrictId = 17,
-                DistrictName = "Фрунзенский",
+        return
+        [
+            new Lpu
+            {
+                Id = 1,
+                Description = "Центральная поликлиника района",
+                District = 1,
+                DistrictId = 1,
+                DistrictName = "Балалайковский",
                 IsActive = true,
-                LpuFullName = "СПб ГБУЗ \"Городская поликлиника №44\" Женская консультация №19",
-                LpuShortName = "ГП №44 ЖК №19", 
-                LpuType = "Женская консультация",
-                HeadOrganization = "d536347b-4105-49a1-bae6-0b3114e89aa0",
-                Organization = "03c5c829-3e51-4098-9966-5e7a443001c7",
-                Address = "192241, Санкт-Петербург, ул. Пражская, д. 12, к. 1",
-                Phone = "(812) 246-25-66",
-                Email = "p44@zdrav.spb.ru",
-                Longitude = "30.3854",
-                Latitude = "59.8782",
-                CovidVaccination = false,
+                LpuFullName = "СПб ГБУЗ \"Городская поликлиника №101\"",
+                LpuShortName = "ГП №101",
+                LpuType = "Поликлиника",
+                HeadOrganization = "a536347b-4105-49a1-bae6-0b3114e89aa1",
+                Organization = "13c5c829-3e51-4098-9966-5e7a443001c8",
+                Address = "111111, Санкт-Петербург, ул. Центральная, д. 15, лит. А",
+                Phone = "(812) 111-22-33",
+                Email = "gp101@med.spb.ru",
+                Longitude = "30.315644",
+                Latitude = "59.938784",
+                CovidVaccination = true,
+                InDepthExamination = true
+            },
+
+
+            new Lpu
+            {
+                Id = 2,
+                Description = "Современный медицинский комплекс",
+                District = 1,
+                DistrictId = 1,
+                DistrictName = "Балалайковский",
+                IsActive = true,
+                LpuFullName = "СПб ГБУЗ \"Районная поликлиника №205\"",
+                LpuShortName = "РП №205",
+                LpuType = "Поликлиника",
+                HeadOrganization = "b536347b-4105-49a1-bae6-0b3114e89aa2",
+                Organization = "23c5c829-3e51-4098-9966-5e7a443001c9",
+                Address = "111112, Санкт-Петербург, пр. Медицинский, д. 42, к. 3",
+                Phone = "(812) 111-44-55",
+                Email = "rp205@med.spb.ru",
+                Longitude = "30.325644",
+                Latitude = "59.948784",
+                CovidVaccination = true,
                 InDepthExamination = false
             },
-            new Lpu 
-            { 
-                Id = 268,
-                Description = "Будапештская",
-                District = 17, 
-                DistrictId = 17,
-                DistrictName = "Фрунзенский",
+
+            // Поликлиники для Оркестрового района
+
+            new Lpu
+            {
+                Id = 3,
+                Description = "Поликлиника с детским отделением",
+                District = 2,
+                DistrictId = 2,
+                DistrictName = "Оркестровый",
                 IsActive = true,
-                LpuFullName = "СПб ГБУЗ \"Городская поликлиника №44\"",
-                LpuShortName = "ГП №44",
+                LpuFullName = "СПб ГБУЗ \"Городская поликлиника №76\"",
+                LpuShortName = "ГП №76",
                 LpuType = "Поликлиника",
-                HeadOrganization = "d536347b-4105-49a1-bae6-0b3114e89aa0", 
-                Organization = "03c5c829-3e51-4098-9966-5e7a443001c7",
-                Address = "192239, Санкт-Петербург, ул. Будапештская, д. 63, к. 2",
-                Phone = "(812) 246-25-66",
-                Email = "p44@zdrav.spb.ru",
-                Longitude = "30.3854",
-                Latitude = "59.8782",
+                HeadOrganization = "c536347b-4105-49a1-bae6-0b3114e89aa3",
+                Organization = "33c5c829-3e51-4098-9966-5e7a443001d0",
+                Address = "222111, Санкт-Петербург, ул. Музыкальная, д. 28, лит. Б",
+                Phone = "(812) 222-33-44",
+                Email = "gp76@med.spb.ru",
+                Longitude = "30.335644",
+                Latitude = "59.958784",
                 CovidVaccination = false,
-                InDepthExamination = false
+                InDepthExamination = true
+            },
+
+
+            new Lpu
+            {
+                Id = 4,
+                Description = "Многопрофильный медицинский центр",
+                District = 2,
+                DistrictId = 2,
+                DistrictName = "Оркестровый",
+                IsActive = true,
+                LpuFullName = "СПб ГБУЗ \"Клинико-диагностический центр №5\"",
+                LpuShortName = "КДЦ №5",
+                LpuType = "Поликлиника",
+                HeadOrganization = "d536347b-4105-49a1-bae6-0b3114e89aa4",
+                Organization = "43c5c829-3e51-4098-9966-5e7a443001d1",
+                Address = "222112, Санкт-Петербург, пр. Оркестровый, д. 57, к. 2",
+                Phone = "(812) 222-55-66",
+                Email = "kdc5@med.spb.ru",
+                Longitude = "30.345644",
+                Latitude = "59.968784",
+                CovidVaccination = true,
+                InDepthExamination = true
             }
-        };
+        ];
     }
 
     private List<MedicalSpeciality> GenerateSpecialties()
     {
-        return new List<MedicalSpeciality>
-        {
-            new MedicalSpeciality 
-            { 
-                Id = "92134141", 
-                FerId = "77", 
+        return
+        [
+            new MedicalSpeciality
+            {
+                Id = "92134141",
+                FerId = "77",
                 Name = "Аллергология и иммунология",
                 CountFreeParticipant = 25,
                 CountFreeTicket = 25,
                 LastDate = "2025-08-26T19:00:00",
                 NearestDate = "2025-08-22T10:00:00"
             },
-            new MedicalSpeciality 
-            { 
-                Id = "92137183", 
-                FerId = "55", 
+
+            new MedicalSpeciality
+            {
+                Id = "92137183",
+                FerId = "55",
                 Name = "Вакцинация от COVID-19",
                 CountFreeParticipant = 126,
-                CountFreeTicket = 126, 
+                CountFreeTicket = 126,
                 LastDate = "2025-08-26T13:55:00",
                 NearestDate = "2025-08-12T15:15:00"
             },
-            new MedicalSpeciality 
-            { 
-                Id = "92134142", 
-                FerId = "78", 
+
+            new MedicalSpeciality
+            {
+                Id = "92134142",
+                FerId = "78",
                 Name = "Терапия",
                 CountFreeParticipant = 150,
                 CountFreeTicket = 150,
-                LastDate = "2025-08-30T18:00:00", 
+                LastDate = "2025-08-30T18:00:00",
                 NearestDate = "2025-08-15T09:00:00"
             }
-        };
+        ];
     }
 
     private List<Doctor> GenerateDoctors()
-    {
-        return new List<Doctor>
+{
+    return
+    [
+        new Doctor
         {
-            new Doctor
-            {
-                AriaNumber = "23, 26, 27, 28, 35, 36, 37, 38, 41, 42, 43, 44, 45",
-                Comment = "28.07.2025-17.08.2025: Приём временно не ведётся.",
-                FreeParticipantCount = 0,
-                FreeTicketCount = 0,
-                Id = "518", 
-                Name = "Арутюнян Арпине Араиковна",
-                LastName = "Арутюнян",
-                FirstName = "Арпине", 
-                MiddleName = "Араиковна"
-            },
-            new Doctor
-            {
-                AriaNumber = "101, 102, 103",
-                Comment = "",
-                FreeParticipantCount = 15,
-                FreeTicketCount = 15, 
-                Id = "519",
-                Name = "Иванов Иван Иванович",
-                LastName = "Иванов",
-                FirstName = "Иван",
-                MiddleName = "Иванович",
-                NearestDate = DateTime.Today.AddDays(1)
-            }
-        };
-    }
+            AriaNumber = "15, 16, 17, 18, 25, 26, 27, 28, 31, 32, 33, 34, 35",
+            Comment = "01.09.2025-15.09.2025: Врач в учебном отпуске.",
+            FreeParticipantCount = 0,
+            FreeTicketCount = 0,
+            Id = "701",
+            Name = "Соколова Анна Михайловна",
+            LastName = "Соколова",
+            FirstName = "Анна",
+            MiddleName = "Михайловна",
+            NearestDate = DateTime.Today.AddDays(1)
+        },
+
+        new Doctor
+        {
+            AriaNumber = "201, 202, 203",
+            Comment = "",
+            FreeParticipantCount = 12,
+            FreeTicketCount = 12,
+            Id = "702",
+            Name = "Лебедев Дмитрий Сергеевич",
+            LastName = "Лебедев",
+            FirstName = "Дмитрий",
+            MiddleName = "Сергеевич",
+            NearestDate = DateTime.Today.AddDays(1)
+        },
+
+        new Doctor
+        {
+            AriaNumber = "45, 46, 47, 48, 49, 50",
+            Comment = "Работает только с хроническими пациентами",
+            FreeParticipantCount = 8,
+            FreeTicketCount = 8,
+            Id = "703",
+            Name = "Воронцов Алексей Петрович",
+            LastName = "Воронцов",
+            FirstName = "Алексей",
+            MiddleName = "Петрович",
+            NearestDate = DateTime.Today.AddDays(3)
+        },
+
+        new Doctor
+        {
+            AriaNumber = "301, 302, 303, 304",
+            Comment = "Ведёт приём в хирургическом корпусе",
+            FreeParticipantCount = 20,
+            FreeTicketCount = 20,
+            Id = "704",
+            Name = "Морозова Ольга Викторовна",
+            LastName = "Морозова",
+            FirstName = "Ольга",
+            MiddleName = "Викторовна",
+            NearestDate = DateTime.Today.AddDays(1)
+        },
+
+        new Doctor
+        {
+            AriaNumber = "77, 78, 79, 80",
+            Comment = "Специалист высшей категории",
+            FreeParticipantCount = 5,
+            FreeTicketCount = 5,
+            Id = "705",
+            Name = "Зайцева Марина Игоревна",
+            LastName = "Зайцева",
+            FirstName = "Марина",
+            MiddleName = "Игоревна",
+            NearestDate = DateTime.Today.AddDays(2)
+        }
+    ];
+}
 
     private List<Appointment> GenerateAppointments()
     {
