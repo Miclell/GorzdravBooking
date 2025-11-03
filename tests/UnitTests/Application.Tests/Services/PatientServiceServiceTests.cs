@@ -249,6 +249,7 @@ public class PatientServiceTests
         var patientId = Guid.NewGuid();
         var basePatientProfileDto = new BasePatientProfileDto(
             Id: patientId,
+            LpuId: "1",
             LpuShortName: "Updated Hospital",
             PatientLastName: "UpdatedLastName",
             PatientFirstName: "UpdatedFirstName", 
@@ -304,6 +305,7 @@ public class PatientServiceTests
         var patientId = Guid.NewGuid();
         var basePatientProfileDto = new BasePatientProfileDto(
             Id: patientId,
+            LpuId: "1",
             LpuShortName: "Updated Hospital",
             PatientLastName: "UpdatedLastName",
             PatientFirstName: "UpdatedFirstName",
@@ -335,6 +337,7 @@ public class PatientServiceTests
         var patientId = Guid.NewGuid();
         var basePatientProfileDto = new BasePatientProfileDto(
             Id: patientId,
+            LpuId: "1",
             LpuShortName: "Updated Hospital",
             PatientLastName: "UpdatedLastName",
             PatientFirstName: "UpdatedFirstName",

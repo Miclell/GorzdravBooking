@@ -4,16 +4,9 @@ using StatefulMenu.Core.Attributes;
 
 public class CreateAppointmentSearchRequestDto
 {
-    [InputField("Профиль пациента Id")]
     public Guid PatientProfileId { get; set; }
-
-    [InputField("ЛПУ название")]
     public string LpuName { get; set; } = null!;
-
-    [InputField("Идентификатор врача")]
     public string DoctorId { get; set; } = null!;
-
-    [InputField("Имя врача")]
     public string DoctorName { get; set; } = null!;
 
     [InputField("Интервал поиска (мин)")]
@@ -21,8 +14,6 @@ public class CreateAppointmentSearchRequestDto
 
     [InputField("Конкретные моменты запуска", IsRequired = false)]
     public List<DateTime> SpecificStartPoints { get; set; } = [];
-
-    [InputField("Профиль временных предпочтений")]
     public string TimePreferencesPresetName { get; set; } = null!;
 
     [InputField("Только просмотр")]

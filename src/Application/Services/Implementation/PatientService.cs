@@ -64,6 +64,7 @@ public class PatientService(IPatientRepository patientRepository,
             var dto = patientProfiles.Select(patient => new BasePatientProfileDto(
                 Id: patient.Id,
                 LpuShortName: patient.LpuShortName,
+                LpuId: patient.LpuId,
                 PatientLastName: patient.PatientLastName,
                 PatientFirstName: patient.PatientFirstName,
                 PatientMiddleName: patient.PatientMiddleName,
@@ -90,6 +91,7 @@ public class PatientService(IPatientRepository patientRepository,
                 return Error.NotFound("Patient.Not.Found","Patient not found");
             
             existingPatient.LpuShortName = patientProfile.LpuShortName;
+            existingPatient.LpuId = patientProfile.LpuId;
             existingPatient.PatientLastName = patientProfile.PatientLastName;
             existingPatient.PatientFirstName = patientProfile.PatientFirstName;
             existingPatient.PatientMiddleName = patientProfile.PatientMiddleName;

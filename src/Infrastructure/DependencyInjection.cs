@@ -20,8 +20,8 @@ public static class DependencyInjection
             options.UseSqlite("Data Source=GorzdravBooking.db"));
         
         // ApiClient
-        services.AddGorzdravClient();
-        //services.AddFakeGorzdravClient();
+        //services.AddGorzdravClient();
+        services.AddFakeGorzdravClient();
 
         // Services
         services.AddScoped<IExternalAppointmentService, ExternalAppointmentService>();

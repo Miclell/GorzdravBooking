@@ -3,11 +3,9 @@ using StatefulMenu.Core.Models;
 
 namespace CLI.Menus.AppointmentMenu;
 
-public class ShowAppointmentMenuCommand : IMenuCommand
+public class ShowAppointmentMenuCommand(ShowAppointmentMenuProvider showAppointmentMenuProvider) : IMenuCommand
 {
-    public string Title { get; } = "Создание и просмотр записей";
-    public Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
+    public string Title { get; } = "Меню записи";
+    public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default) =>
+        MenuResult.Push(await showAppointmentMenuProvider.CreateMenuAsync(cancellationToken));
 }
