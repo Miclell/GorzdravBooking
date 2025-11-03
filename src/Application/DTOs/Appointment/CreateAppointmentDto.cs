@@ -24,4 +24,7 @@ public class CreateAppointmentDto
     
     [InputField("Кабинет", IsRequired = false)]
     public string? Room { get; set; }
+    
+    public string Speciality { get; set; } = null!;
+    public string Doctor { get; set; } = null!;
 }

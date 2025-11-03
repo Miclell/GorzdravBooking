@@ -17,7 +17,6 @@ public class AppointmentSearchRequest
     public TimeSpan SearchInterval { get; set; }
     public List<DateTime> SpecificStartPoints { get; set; } = [];
     
-    // TODO сучкааа дрючка иеднтпотехуябля сучка чекнуть потом
     public string TimePreferencesPresetName { get; set; } = null!;
 
     public bool ViewOnly { get; set; } = false;

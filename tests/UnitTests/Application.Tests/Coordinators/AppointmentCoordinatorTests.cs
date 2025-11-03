@@ -4,6 +4,7 @@ using Application.DTOs.Appointment;
 using Application.DTOs.TimePreferences;
 using Application.Services.Interfaces;
 using Core.Models;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using IAppointmentService = Application.Services.Interfaces.IAppointmentService;
@@ -15,6 +16,7 @@ public class AppointmentCoordinatorTests
     private readonly Mock<Core.Interfaces.Services.IExternalAppointmentService> _mockExternalService;
     private readonly Mock<ITimePreferencesService> _mockTimePreferencesService;
     private readonly Mock<IAppointmentService> _mockAppointmentService;
+    private readonly Mock<ILogger<AppointmentCoordinator>> _mockLogger;
     private readonly AppointmentCoordinator _coordinator;
 
     public AppointmentCoordinatorTests()
@@ -22,11 +24,13 @@ public class AppointmentCoordinatorTests
         _mockExternalService = new Mock<Core.Interfaces.Services.IExternalAppointmentService>();
         _mockTimePreferencesService = new Mock<ITimePreferencesService>();
         _mockAppointmentService = new Mock<IAppointmentService>();
+        _mockLogger = new Mock<ILogger<AppointmentCoordinator>>();
         
         _coordinator = new AppointmentCoordinator(
             _mockExternalService.Object,
             _mockTimePreferencesService.Object,
-            _mockAppointmentService.Object);
+            _mockAppointmentService.Object,
+            _mockLogger.Object);
     }
 
     [Fact]

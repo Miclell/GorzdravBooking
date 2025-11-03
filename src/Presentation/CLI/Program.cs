@@ -20,9 +20,19 @@ public static class Program
         var host = Host.CreateDefaultBuilder(args)
             .ConfigureLogging(logging =>
             {
-                logging.SetMinimumLevel(LogLevel.Information);
+                logging.ClearProviders();
+    
+                logging.AddConsole(_ => { })
+                    .AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning) // Только предупреждения и ошибки для EF
+                    .AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning)
+                    .AddFilter("System.Net.Http", LogLevel.Warning)
+                    .AddFilter("Default", LogLevel.Information)
+                    .AddFilter("Infrastructure", LogLevel.Debug)
+                    .AddFilter("Core", LogLevel.Debug)
+                    .AddFilter("Application", LogLevel.Debug)
+                    .AddFilter("CLI", LogLevel.Debug);
             })
-            .ConfigureServices((hostContext, services) =>
+            .ConfigureServices((_, services) =>
             {
                 services.AddInfrastructure();
                 services.AddApplication();
@@ -42,11 +52,12 @@ public static class Program
 
         var nav = host.Services.GetRequiredService<INavigationService>();
         var root = host.Services.GetRequiredService<MainMenuProvider>();
-        // await host.StartAsync();
+        await host.StartAsync();
 
         try
         {
             await nav.RunAsync(root);
+            //await Task.Delay(TimeSpan.FromMinutes(15)); 
         }
         finally
         {

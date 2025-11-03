@@ -36,7 +36,9 @@ public class AppointmentSearchRequestRepository(AppDbContext context) : IAppoint
     public async Task<IEnumerable<AppointmentSearchRequest>> GetActiveAsync(CancellationToken cancellationToken = default)
     {
         return await context.AppointmentSearchRequests
-            .Where(r => r.Status == SearchRequestStatus.InProgress)
+            .Where(r => r.Status == SearchRequestStatus.InProgress 
+                        || r.Status == SearchRequestStatus.Pending)
+            .Include(r => r.PatientProfile)
             .ToListAsync(cancellationToken);
     }
 

@@ -3,6 +3,7 @@ using Infrastructure.ApiClient.Models;
 using Infrastructure.Services;
 using Infrastructure.Stubs;
 using Xunit;
+using FakeApiService = Infrastructure.Tests.Fakes.FakeApiService;
 
 namespace Infrastructure.Tests.ServicesTests;
 

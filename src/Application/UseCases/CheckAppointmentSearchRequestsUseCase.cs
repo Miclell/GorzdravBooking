@@ -17,12 +17,12 @@ public class CheckAppointmentSearchRequestsUseCase(
         {
             var now = DateTime.UtcNow;
             var requests = await appointmentSearchRequestRepository.GetActiveAsync(cancellationToken);
-
+    
             var appointmentSearchRequests = requests.ToList();
             logger.LogDebug("Найдено {Count} активных запросов", appointmentSearchRequests.Count);
 
             foreach (var request in appointmentSearchRequests
-                         .Where(request => IsTimeToCheck(request, now)))
+                         .Where(request => IsTimeToCheck(request, now) || true))
             {
                 try
                 {
@@ -34,6 +34,8 @@ public class CheckAppointmentSearchRequestsUseCase(
 
                     request.LastSearchAttempt = now;
                     request.AttemptCount++;
+                    if (request.Status == SearchRequestStatus.Pending)
+                        request.Status = SearchRequestStatus.InProgress;
 
                     if (result is { IsSuccess: true, Value: true })
                         request.Status = SearchRequestStatus.Completed;

@@ -3,36 +3,61 @@ using Application.Coordinators.Interfaces;
 using Application.DTOs.Appointment;
 using Application.DTOs.TimePreferences;
 using Application.Services.Interfaces;
+using Core.Entities;
+using Core.Interfaces.Services;
 using Core.Models;
+using Microsoft.Extensions.Logging;
+using Appointment = Core.Models.Appointment;
 
 namespace Application.Coordinators.Implementation;
 
-public class AppointmentCoordinator(Core.Interfaces.Services.IExternalAppointmentService externalExternalAppointmentService,
+public class AppointmentCoordinator(
+    IExternalAppointmentService externalExternalAppointmentService,
     ITimePreferencesService timePreferencesService,
-    IAppointmentService appointmentService) : IAppointmentCoordinator
+    IAppointmentService appointmentService,
+    ILogger<AppointmentCoordinator> logger) : IAppointmentCoordinator
 {
-    public async Task<Result<bool>> CreateCompleteAppointmentAsync(Core.Entities.AppointmentSearchRequest request, CancellationToken cancellationToken)
+    public async Task<Result<bool>> CreateCompleteAppointmentAsync(AppointmentSearchRequest request, CancellationToken cancellationToken)
     {
         try
         {
+            logger.LogDebug("Начало создания записи для пациента {PatientId}", request.PatientProfile.PatientId);
+            
             var timePreferences = await timePreferencesService.GetByPresetAsync(
-                request.PatientProfileId,
+                request.PatientProfile.UserId,
                 request.TimePreferencesPresetName,
                 cancellationToken);
+            
+            logger.LogDebug("Получены временные предпочтения: {Success}", timePreferences.IsSuccess);
             
             if (timePreferences.IsFailure)
                 return timePreferences.Error;
             
+            logger.LogDebug("Поиск номерков для LPU: {LpuId}, врача: {DoctorId}", request.PatientProfile.LpuId, request.DoctorId);
+            
             var appointments = await externalExternalAppointmentService.GetByDoctorAsync(
                 int.Parse(request.PatientProfile.LpuId),
                 request.DoctorId);
+            
+            logger.LogDebug("Получено {count} номерков", appointments.Count);
             
             var appointment = TryGetPreferAppointment(
                 appointments, 
                 timePreferences.Value);
         
             if (appointment == null)
+            {
+                logger.LogDebug("Не найдено подходящих номерков");
                 return Result.Success(false);
+            }
+
+            if (request.ViewOnly)
+            {
+                logger.LogDebug("Номерок найден в режиме только для просмотра");
+                return Result.Success(false);
+            }
+            
+            logger.LogDebug("Номерок найден");
 
             var createRequest = new AppointmentCreateRequest
             { 
@@ -66,7 +91,9 @@ public class AppointmentCoordinator(Core.Interfaces.Services.IExternalAppointmen
                 VisitEnd = appointment.VisitEnd,
                 Address = appointment.Address,
                 Number = appointment.Number,
-                Room = appointment.Room
+                Room = appointment.Room,
+                Speciality = "1", // TODO достать эту хуйню 
+                Doctor = "2"
             };
             
             await appointmentService.CreateAsync(dto, cancellationToken);
@@ -74,13 +101,15 @@ public class AppointmentCoordinator(Core.Interfaces.Services.IExternalAppointmen
         }
         catch(Exception e)
         {
+            logger.LogError("Booking appointment error - {e}", e.ToString());
             return Error.Failure(e.ToString(), "Booking appointment error");
         }
     }
 
     private static Appointment? TryGetPreferAppointment(List<Appointment> appointments, TimePreferencesPresetDto timePreferences)
     {
-        if (timePreferences.Preferences.Count == 0 || appointments.Count == 0)
+        if ((timePreferences.Preferences.Count == 0 && !timePreferences.AnyTime) 
+            || appointments.Count == 0)
             return null;
     
         if (timePreferences.AnyTime)

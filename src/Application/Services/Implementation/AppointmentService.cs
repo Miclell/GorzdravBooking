@@ -23,7 +23,9 @@ public class AppointmentService(IAppointmentRepository appointmentRepository, IE
                 VisitEnd = createDto.VisitEnd,
                 Address = createDto.Address,
                 Number = createDto.Number,
-                Room = createDto.Room
+                Room = createDto.Room,
+                Speciality = createDto.Speciality,
+                Doctor = createDto.Doctor
             };
 
             await appointmentRepository.AddAsync(appointment, cancellationToken);
