@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.AppointmentSearchRequest;
 using Application.DTOs.Patient;
+using CLI.Helpers;
 using CLI.Menus.AppointmentMenu.CreateAppointmentFlow.Commands;
 using Core.Models;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +22,7 @@ public class CreateAppointmentProvider(IServiceProvider serviceProvider) : IMenu
         dataService.TryGet<CreateAppointmentSearchRequestDto>(nameof(CreateAppointmentSearchRequestDto),
             out var createAppointmentSearchRequestDto);
 
-        createAppointmentSearchRequestDto = new CreateAppointmentSearchRequestDto()
+        createAppointmentSearchRequestDto = new CreateAppointmentSearchRequestDto
         {
             PatientProfileId = patient!.Id,
             LpuName = patient.LpuShortName,
@@ -34,18 +35,19 @@ public class CreateAppointmentProvider(IServiceProvider serviceProvider) : IMenu
             ViewOnly = createAppointmentSearchRequestDto.ViewOnly,
             MaxDaysToSearch = createAppointmentSearchRequestDto.MaxDaysToSearch
         };
-        
-        var commands = new List<IMenuCommand>()
+
+        var commands = new List<IMenuCommand>
         {
             new CreateAppointmentCommand(createAppointmentSearchRequestDto, serviceProvider),
             serviceProvider.GetRequiredService<BackCommand>()
         };
-        
+
         var items = commands
-            .Select(c => 
+            .Select(c =>
                 new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken)))
             .ToList();
 
-        return Task.FromResult(new MenuState("Подтвердите создание запроса", items));
+        return Task.FromResult(new MenuState("Подтвердите создание запроса", items,
+            header: HeaderFactorySetup.SetupHeader()));
     }
 }

@@ -8,6 +8,8 @@ public class RunCreatePatientFlowCommand(DistrictSelectionProvider districtSelec
 {
     public string Title { get; } = "Создать пациента";
 
-    public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default) =>
-        MenuResult.Push(await districtSelectionProvider.CreateMenuAsync(cancellationToken));
+    public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default)
+    {
+        return MenuResult.Push(await districtSelectionProvider.CreateMenuAsync(cancellationToken));
+    }
 }

@@ -7,6 +7,9 @@ namespace CLI.Menus.PatientMenu.ShowPatientsFlow;
 public class RunShowPatientsFlowCommand(ShowPatientsProvider showPatientsProvider) : IMenuCommand
 {
     public string Title { get; } = "Просмотр и редактирование";
-    public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default) =>
-        MenuResult.Push(await showPatientsProvider.CreateMenuAsync(cancellationToken));
+
+    public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default)
+    {
+        return MenuResult.Push(await showPatientsProvider.CreateMenuAsync(cancellationToken));
+    }
 }

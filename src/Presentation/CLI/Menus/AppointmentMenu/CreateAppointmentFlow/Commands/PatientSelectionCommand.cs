@@ -8,18 +8,18 @@ using StatefulMenu.Core.Models;
 namespace CLI.Menus.AppointmentMenu.CreateAppointmentFlow.Commands;
 
 public class PatientSelectionCommand(
-    BasePatientProfileDto patient, 
+    BasePatientProfileDto patient,
     IServiceProvider serviceProvider) : IMenuCommand
 {
     public string Title { get; } = $"{patient.LpuShortName} | {patient.PatientFirstName} {patient.PatientLastName}";
-    
+
     public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default)
     {
         var dataService = serviceProvider.GetRequiredService<IDataService>();
         dataService.Set(nameof(BasePatientProfileDto), patient);
-        
+
         var specialitySelectionProvider = serviceProvider.GetRequiredService<SpecialitySelectionProvider>();
-        
+
         return MenuResult.Push(await specialitySelectionProvider.CreateMenuAsync(cancellationToken));
     }
 }

@@ -1,4 +1,5 @@
-﻿using CLI.Menus.AppointmentMenu.CreateAppointmentFlow;
+﻿using CLI.Helpers;
+using CLI.Menus.AppointmentMenu.CreateAppointmentFlow;
 using CLI.Menus.AppointmentMenu.ShowActiveAppointmentsFlow;
 using CLI.Menus.AppointmentMenu.ShowAppointmentsFlow;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,12 +20,12 @@ public class ShowAppointmentMenuProvider(IServiceProvider serviceProvider) : IMe
             serviceProvider.GetRequiredService<RunShowActiveAppointmentsFlowCommand>(),
             serviceProvider.GetRequiredService<BackCommand>()
         };
-        
+
         var items = commands
-            .Select(c => 
+            .Select(c =>
                 new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken)))
             .ToList();
 
-        return Task.FromResult(new MenuState("Меню записи", items));
+        return Task.FromResult(new MenuState("Меню записи", items, header: HeaderFactorySetup.SetupHeader()));
     }
 }

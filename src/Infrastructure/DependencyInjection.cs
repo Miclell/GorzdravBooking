@@ -1,7 +1,8 @@
-﻿using Core.Interfaces.Repositories;
+﻿using Core.Events.Common;
+using Core.Interfaces.Repositories;
 using Core.Interfaces.Security;
 using Core.Interfaces.Services;
-using Infrastructure.Http;
+using Infrastructure.Events;
 using Infrastructure.Repositories;
 using Infrastructure.Security;
 using Infrastructure.Services;
@@ -40,6 +41,9 @@ public static class DependencyInjection
 
         // Security
         services.AddScoped<IPasswordHasher, PasswordHasher>();
+
+        // Events
+        services.AddSingleton<IEventBus, InMemoryEventBus>();
 
         return services;
     }

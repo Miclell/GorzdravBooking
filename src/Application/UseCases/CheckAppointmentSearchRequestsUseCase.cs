@@ -2,6 +2,8 @@
 using Application.Coordinators.Interfaces;
 using Core.Entities;
 using Core.Enums;
+using Core.Events;
+using Core.Events.Common;
 using Core.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
 
@@ -10,7 +12,8 @@ namespace Application.UseCases;
 public class CheckAppointmentSearchRequestsUseCase(
     IAppointmentSearchRequestRepository appointmentSearchRequestRepository,
     IAppointmentCoordinator appointmentCoordinator,
-    ILogger<CheckAppointmentSearchRequestsUseCase> logger) : IAppUseCase
+    ILogger<CheckAppointmentSearchRequestsUseCase> logger,
+    IEventBus eventBus) : IAppUseCase
 {
     public async Task ExecuteAsync(CancellationToken cancellationToken = default)
     {
@@ -29,6 +32,8 @@ public class CheckAppointmentSearchRequestsUseCase(
                     logger.LogDebug("Обработка запроса {RequestId} для пациента {PatientId}", request.Id,
                         request.PatientProfileId);
 
+                    await eventBus.PublishAsync(new SearchRequestStarted(request.Id), cancellationToken);
+
                     var result =
                         await appointmentCoordinator.CreateCompleteAppointmentAsync(request, cancellationToken);
 
@@ -39,6 +44,9 @@ public class CheckAppointmentSearchRequestsUseCase(
 
                     if (result is { IsSuccess: true, Value: true })
                         request.Status = SearchRequestStatus.Completed;
+
+                    await eventBus.PublishAsync(new SearchRequestCompleted(request.Id, result.IsSuccess),
+                        cancellationToken);
 
                     await appointmentSearchRequestRepository.UpdateAsync(request, cancellationToken);
                 }

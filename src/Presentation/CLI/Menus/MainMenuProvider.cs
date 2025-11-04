@@ -1,11 +1,11 @@
-﻿using CLI.Menus.AppointmentMenu;
+﻿using CLI.Helpers;
+using CLI.Menus.AppointmentMenu;
 using CLI.Menus.PatientMenu;
 using CLI.Menus.TimePreferencesMenu;
 using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu.Commands.BuiltIn;
 using StatefulMenu.Commands.Interfaces;
 using StatefulMenu.Core.Models;
-using StatefulMenu.Infrastructure.Services;
 
 namespace CLI.Menus;
 
@@ -23,10 +23,10 @@ public class MainMenuProvider(IServiceProvider serviceProvider) : IMenuProvider
 
         var items = commands
             .Select(c => c is ExitCommand
-                ? new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken), hotkey: ConsoleKey.E)
+                ? new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken), ConsoleKey.E)
                 : new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken)))
             .ToList();
 
-        return new MenuState("Главное меню", items, header: await HeaderFactorySetup.SetupHeader());
+        return new MenuState("Главное меню", items, header: HeaderFactorySetup.SetupHeader());
     }
 }

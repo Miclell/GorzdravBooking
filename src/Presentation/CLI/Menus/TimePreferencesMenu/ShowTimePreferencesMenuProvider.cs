@@ -1,4 +1,5 @@
-﻿using CLI.Menus.TimePreferencesMenu.CreateTimePreferencesFlow;
+﻿using CLI.Helpers;
+using CLI.Menus.TimePreferencesMenu.CreateTimePreferencesFlow;
 using CLI.Menus.TimePreferencesMenu.ShowTimePreferencesFlow;
 using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu.Commands.BuiltIn;
@@ -17,12 +18,13 @@ public class ShowTimePreferencesMenuProvider(IServiceProvider serviceProvider) :
             serviceProvider.GetRequiredService<RunShowTimePreferencesFlowCommand>(),
             serviceProvider.GetRequiredService<BackCommand>()
         };
-        
+
         var items = commands
-            .Select(c => 
+            .Select(c =>
                 new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken)))
             .ToList();
 
-        return Task.FromResult(new MenuState("Меню временных предпочтений", items));
+        return Task.FromResult(new MenuState("Меню временных предпочтений", items,
+            header: HeaderFactorySetup.SetupHeader()));
     }
 }

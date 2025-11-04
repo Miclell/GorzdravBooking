@@ -1,10 +1,9 @@
-﻿using CLI.Menus.PatientMenu.CreatePatientFlow;
-using CLI.Menus.PatientMenu.CreatePatientFlow.Commands;
+﻿using CLI.Helpers;
+using CLI.Menus.PatientMenu.CreatePatientFlow;
 using CLI.Menus.PatientMenu.ShowPatientsFlow;
 using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu.Commands.BuiltIn;
 using StatefulMenu.Commands.Interfaces;
-using StatefulMenu.Core.Interfaces;
 using StatefulMenu.Core.Models;
 
 namespace CLI.Menus.PatientMenu;
@@ -19,12 +18,12 @@ public class ShowPatientMenuProvider(IServiceProvider serviceProvider) : IMenuPr
             serviceProvider.GetRequiredService<RunShowPatientsFlowCommand>(),
             serviceProvider.GetRequiredService<BackCommand>()
         };
-        
+
         var items = commands
-            .Select(c => 
+            .Select(c =>
                 new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken)))
             .ToList();
 
-        return Task.FromResult(new MenuState("Меню пациента", items));
+        return Task.FromResult(new MenuState("Меню пациента", items, header: HeaderFactorySetup.SetupHeader()));
     }
 }

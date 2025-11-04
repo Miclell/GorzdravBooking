@@ -1,6 +1,6 @@
 ﻿using Application.Services.Interfaces;
+using CLI.Helpers;
 using CLI.Menus.AppointmentMenu.CreateAppointmentFlow.Commands;
-using Core.Interfaces.Repositories;
 using StatefulMenu.Commands.BuiltIn;
 using StatefulMenu.Commands.Interfaces;
 using StatefulMenu.Core.Models;
@@ -14,22 +14,23 @@ public class SelectTimePreferencesProvider(
 {
     public async Task<MenuState> CreateMenuAsync(CancellationToken cancellationToken = default)
     {
-        var tps = await timePreferencesService.GetByUserAsync(await appSettingsService.GetDefaultUserIdAsync(), cancellationToken);
-        
+        var tps = await timePreferencesService.GetByUserAsync(await appSettingsService.GetDefaultUserIdAsync(),
+            cancellationToken);
+
         if (!tps.Value.Any())
             Console.WriteLine("Не найдено ни одного пресета, создайте пресеты!");
-        
+
         var commands = tps.Value
             .Select(tp => new SelectTimePreferencesCommand(tp, serviceProvider))
             .Cast<IMenuCommand>()
             .Append(new BackCommand())
             .ToList();
-        
+
         var items = commands
-            .Select(c => 
+            .Select(c =>
                 new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken)))
             .ToList();
 
-        return new MenuState("Выберите временные предпочтения", items);
+        return new MenuState("Выберите временные предпочтения", items, header: HeaderFactorySetup.SetupHeader());
     }
 }

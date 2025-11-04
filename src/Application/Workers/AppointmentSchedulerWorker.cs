@@ -1,4 +1,6 @@
 ﻿using Application.UseCases;
+using Core.Events;
+using Core.Events.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -7,10 +9,15 @@ namespace Application.Workers;
 
 public class AppointmentSchedulerWorker(
     IServiceProvider serviceProvider,
-    ILogger<AppointmentSchedulerWorker> logger) : BackgroundService
+    ILogger<AppointmentSchedulerWorker> logger,
+    IEventBus eventBus) : BackgroundService
 {
+    private static readonly TimeSpan SearchInterval = TimeSpan.FromMinutes(1);
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await eventBus.PublishAsync(new SearchServiceStatusChanged(true, true), stoppingToken);
+
         logger.LogDebug("Сервис запущен в {Time}", DateTime.Now);
 
         while (!stoppingToken.IsCancellationRequested)
@@ -35,7 +42,8 @@ public class AppointmentSchedulerWorker(
                 logger.LogError(e, "Ошибка в планировщике");
             }
 
-            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+            await eventBus.PublishAsync(new NextSearchScheduled(DateTime.UtcNow + SearchInterval), stoppingToken);
+            await Task.Delay(SearchInterval, stoppingToken);
         }
     }
 }

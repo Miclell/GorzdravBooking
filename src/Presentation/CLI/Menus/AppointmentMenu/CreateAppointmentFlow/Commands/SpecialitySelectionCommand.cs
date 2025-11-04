@@ -8,10 +8,11 @@ using StatefulMenu.Core.Models;
 namespace CLI.Menus.AppointmentMenu.CreateAppointmentFlow.Commands;
 
 public class SpecialitySelectionCommand(
-    MedicalSpeciality speciality, 
+    MedicalSpeciality speciality,
     IServiceProvider serviceProvider) : IMenuCommand
 {
     public string Title { get; } = $"{speciality.Name}";
+
     public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default)
     {
         var dataService = serviceProvider.GetRequiredService<IDataService>();

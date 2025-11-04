@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.TimePreferences;
+using CLI.Helpers;
 using CLI.Menus.TimePreferencesMenu.ShowTimePreferencesFlow.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu.Commands.BuiltIn;
@@ -17,14 +18,16 @@ public class TimePreferencesSelectionProvider(IServiceProvider serviceProvider) 
             serviceProvider.GetRequiredService<DeleteTimePreferencesCommand>(),
             serviceProvider.GetRequiredService<BackCommand>()
         };
-        
+
         var items = commands
-            .Select(c => 
+            .Select(c =>
                 new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken)))
             .ToList();
 
         var dataService = serviceProvider.GetRequiredService<IDataService>();
-        dataService.TryGet<TimePreferencesPresetDto>(nameof(TimePreferencesPresetDto), out var timePreferencesPresetDto);
-        return Task.FromResult(new MenuState($"Выберите действие для пресета {timePreferencesPresetDto!.Name}", items));
+        dataService.TryGet<TimePreferencesPresetDto>(nameof(TimePreferencesPresetDto),
+            out var timePreferencesPresetDto);
+        return Task.FromResult(new MenuState($"Выберите действие для пресета {timePreferencesPresetDto!.Name}", items,
+            header: HeaderFactorySetup.SetupHeader()));
     }
 }

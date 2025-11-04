@@ -1,4 +1,5 @@
-﻿using CLI.Menus.PatientMenu.CreatePatientFlow.Commands;
+﻿using CLI.Helpers;
+using CLI.Menus.PatientMenu.CreatePatientFlow.Commands;
 using Core.Interfaces.Services;
 using Core.Models;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,23 +16,23 @@ public class LpuSelectionProvider(IServiceProvider serviceProvider) : IMenuProvi
     {
         var dataService = serviceProvider.GetRequiredService<IDataService>();
         dataService.TryGet<District>(nameof(District), out var district);
-        
+
         var lpuService = serviceProvider.GetRequiredService<IExternalLpuService>();
         var lpus = await lpuService.GetByDistrictAsync(district!.Id);
-        
+
         var commands = lpus
             .Select(l => new LpuSelectionCommand(l, serviceProvider))
             .Cast<IMenuCommand>()
             .Append(new BackCommand())
             .ToList();
-        
+
         var items = commands
-            .Select(c => 
+            .Select(c =>
                 new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken)))
             .ToList();
 
         dataService.Remove(nameof(District));
 
-        return new MenuState("Выбор поликлиники", items);
+        return new MenuState("Выбор поликлиники", items, header: HeaderFactorySetup.SetupHeader());
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Patient;
+using CLI.Helpers;
 using CLI.Menus.AppointmentMenu.CreateAppointmentFlow.Commands;
 using Core.Interfaces.Services;
 using StatefulMenu.Commands.BuiltIn;
@@ -18,18 +19,18 @@ public class SpecialitySelectionProvider(
         dataService.TryGet<BasePatientProfileDto>(nameof(BasePatientProfileDto), out var patient);
 
         var specalties = await specialtyService.GetByLpuAsync(int.Parse(patient!.LpuId));
-        
+
         var commands = specalties
             .Select(s => new SpecialitySelectionCommand(s, serviceProvider))
             .Cast<IMenuCommand>()
             .Append(new BackCommand())
             .ToList();
-        
+
         var items = commands
-            .Select(c => 
+            .Select(c =>
                 new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken)))
             .ToList();
 
-        return new MenuState("Выберите специальность", items);
+        return new MenuState("Выберите специальность", items, header: HeaderFactorySetup.SetupHeader());
     }
 }

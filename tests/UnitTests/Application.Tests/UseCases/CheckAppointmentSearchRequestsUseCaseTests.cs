@@ -3,6 +3,7 @@ using Application.Coordinators.Interfaces;
 using Application.UseCases;
 using Core.Entities;
 using Core.Enums;
+using Core.Events.Common;
 using Core.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -15,6 +16,7 @@ public class CheckAppointmentSearchRequestsUseCaseTests
     private readonly Mock<IAppointmentSearchRequestRepository> _mockRepo;
     private readonly Mock<IAppointmentCoordinator> _mockCoordinator;
     private readonly Mock<ILogger<CheckAppointmentSearchRequestsUseCase>> _mockLogger;
+    private readonly Mock<IEventBus> _mockEventBus;
     private readonly CheckAppointmentSearchRequestsUseCase _useCase;
 
     public CheckAppointmentSearchRequestsUseCaseTests()
@@ -22,11 +24,13 @@ public class CheckAppointmentSearchRequestsUseCaseTests
         _mockRepo = new Mock<IAppointmentSearchRequestRepository>();
         _mockCoordinator = new Mock<IAppointmentCoordinator>();
         _mockLogger = new Mock<ILogger<CheckAppointmentSearchRequestsUseCase>>();
+        _mockEventBus = new Mock<IEventBus>();
         
         _useCase = new CheckAppointmentSearchRequestsUseCase(
             _mockRepo.Object, 
             _mockCoordinator.Object, 
-            _mockLogger.Object);
+            _mockLogger.Object,
+            _mockEventBus.Object);
     }
 
     [Fact]

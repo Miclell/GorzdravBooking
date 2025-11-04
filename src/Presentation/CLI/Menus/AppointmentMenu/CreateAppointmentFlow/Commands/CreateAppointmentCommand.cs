@@ -2,7 +2,6 @@
 using Application.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu.Commands.Interfaces;
-using StatefulMenu.Core.Interfaces;
 using StatefulMenu.Core.Models;
 
 namespace CLI.Menus.AppointmentMenu.CreateAppointmentFlow.Commands;
@@ -14,11 +13,13 @@ public class CreateAppointmentCommand(
     public string Title { get; } = $"{createAppointmentSearchRequestDto.LpuName} " +
                                    $"{createAppointmentSearchRequestDto.DoctorName} | " +
                                    $"{createAppointmentSearchRequestDto.TimePreferencesPresetName}";
+
     public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default)
     {
         var appointmentSearchRequestService = serviceProvider.GetRequiredService<IAppointmentSearchRequestService>();
-        var result = await appointmentSearchRequestService.CreateAsync(createAppointmentSearchRequestDto, cancellationToken);
-        
+        var result =
+            await appointmentSearchRequestService.CreateAsync(createAppointmentSearchRequestDto, cancellationToken);
+
         if (result.IsSuccess)
         {
             Console.WriteLine("Запрос успешно создан!\nНажмите любую клавишу чтобы продолжить..");
@@ -28,7 +29,7 @@ public class CreateAppointmentCommand(
         {
             Console.WriteLine("Ошибка при создании запроса!");
         }
-        
+
         var mainMenuProvider = serviceProvider.GetRequiredService<MainMenuProvider>();
         return MenuResult.Push(mainMenuProvider.CreateMenuAsync(cancellationToken).Result);
     }

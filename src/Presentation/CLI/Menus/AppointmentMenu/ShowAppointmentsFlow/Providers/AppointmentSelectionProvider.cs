@@ -1,5 +1,5 @@
 ﻿using Application.DTOs.Appointment;
-using Application.DTOs.AppointmentSearchRequest;
+using CLI.Helpers;
 using CLI.Menus.AppointmentMenu.ShowActiveAppointmentsFlow.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu.Commands.BuiltIn;
@@ -18,9 +18,9 @@ public class AppointmentSelectionProvider(IServiceProvider serviceProvider) : IM
             serviceProvider.GetRequiredService<CancelAppointmentCommand>(),
             serviceProvider.GetRequiredService<BackCommand>()
         };
-        
+
         var items = commands
-            .Select(c => 
+            .Select(c =>
                 new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken)))
             .ToList();
 
@@ -29,6 +29,7 @@ public class AppointmentSelectionProvider(IServiceProvider serviceProvider) : IM
         return Task.FromResult(new MenuState($"Выберите действие для записи " +
                                              $"{appointment!.LpuShortName} " +
                                              $"{appointment.PatientFullName} | " +
-                                             $"{appointment.VisitStart}", items));
+                                             $"{appointment.VisitStart}", items,
+            header: HeaderFactorySetup.SetupHeader()));
     }
 }

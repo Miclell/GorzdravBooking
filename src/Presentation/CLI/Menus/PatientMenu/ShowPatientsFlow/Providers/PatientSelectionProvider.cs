@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Patient;
+using CLI.Helpers;
 using CLI.Menus.PatientMenu.ShowPatientsFlow.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu.Commands.BuiltIn;
@@ -17,9 +18,9 @@ public class PatientSelectionProvider(IServiceProvider serviceProvider) : IMenuP
             serviceProvider.GetRequiredService<DeletePatientCommand>(),
             serviceProvider.GetRequiredService<BackCommand>()
         };
-        
+
         var items = commands
-            .Select(c => 
+            .Select(c =>
                 new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken)))
             .ToList();
 
@@ -27,6 +28,7 @@ public class PatientSelectionProvider(IServiceProvider serviceProvider) : IMenuP
         dataService.TryGet<BasePatientProfileDto>(nameof(BasePatientProfileDto), out var patient);
         return Task.FromResult(new MenuState($"Выберите действие для пациента " +
                                              $"{patient!.LpuShortName} | {patient.PatientFirstName} " +
-                                             $"{patient.PatientLastName}", items));
+                                             $"{patient.PatientLastName}", items,
+            header: HeaderFactorySetup.SetupHeader()));
     }
 }

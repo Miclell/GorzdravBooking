@@ -1,5 +1,4 @@
 ﻿using Application.DTOs.Patient;
-using Application.Services.Implementation;
 using Application.Services.Interfaces;
 using Core.Interfaces.Services;
 using Core.Models;
@@ -13,6 +12,7 @@ namespace CLI.Menus.PatientMenu.CreatePatientFlow.Commands;
 public class CreatePatientCommand(IServiceProvider serviceProvider) : IMenuCommand
 {
     public string Title { get; } = "Ввести данные пациента";
+
     public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default)
     {
         var inputService = serviceProvider.GetRequiredService<IConsoleInputService>();
@@ -21,9 +21,9 @@ public class CreatePatientCommand(IServiceProvider serviceProvider) : IMenuComma
 
         var createPatientDto = await inputService.ReadModelAsync<CreatePatientDto>(cancellationToken);
         dataService.TryGet<Lpu>(nameof(Lpu), out var lpu);
-        
+
         var externalPatientService = serviceProvider.GetRequiredService<IExternalPatientService>();
-        var patientIdSearchRequest = new PatientIdSearchRequest()
+        var patientIdSearchRequest = new PatientIdSearchRequest
         {
             LpuId = lpu!.Id.ToString(),
             LastName = createPatientDto!.PatientLastName,
@@ -31,7 +31,7 @@ public class CreatePatientCommand(IServiceProvider serviceProvider) : IMenuComma
             MiddleName = createPatientDto.PatientMiddleName,
             BirthDate = createPatientDto.PatientBirthdate
         };
-        
+
         var appSettingService = serviceProvider.GetRequiredService<IAppSettingsService>();
         createPatientDto = createPatientDto! with
         {
@@ -41,9 +41,9 @@ public class CreatePatientCommand(IServiceProvider serviceProvider) : IMenuComma
             LpuAddress = lpu!.Address,
             PatientId = await externalPatientService.GetPatientIdAsync(patientIdSearchRequest)
         };
-        
+
         await patientService.Create(createPatientDto!, cancellationToken);
-        
+
         Console.WriteLine("Пациент успешно создан! Нажмите клавишу чтобы продолжить..");
         Console.ReadKey();
 

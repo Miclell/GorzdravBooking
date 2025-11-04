@@ -1,9 +1,8 @@
 ﻿using Application.Services.Interfaces;
-using CLI.Menus.AppointmentMenu.ShowActiveAppointmentsFlow.Commands;
+using CLI.Helpers;
 using CLI.Menus.AppointmentMenu.ShowAppointmentsFlow.Commands;
 using StatefulMenu.Commands.BuiltIn;
 using StatefulMenu.Commands.Interfaces;
-using StatefulMenu.Core.Interfaces;
 using StatefulMenu.Core.Models;
 
 namespace CLI.Menus.AppointmentMenu.ShowAppointmentsFlow.Providers;
@@ -15,19 +14,21 @@ public class ShowAppointmentsProvider(
 {
     public async Task<MenuState> CreateMenuAsync(CancellationToken cancellationToken = default)
     {
-        var appointments = await appointmentService.GetByUserAsync(await appSettingsService.GetDefaultUserIdAsync(), cancellationToken);
-        
+        var appointments =
+            await appointmentService.GetByUserAsync(await appSettingsService.GetDefaultUserIdAsync(),
+                cancellationToken);
+
         var commands = appointments.Value
             .Select(asr => new AppointmentSelectionCommand(asr, serviceProvider))
             .Cast<IMenuCommand>()
             .Append(new BackCommand())
             .ToList();
-        
+
         var items = commands
-            .Select(c => 
+            .Select(c =>
                 new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken)))
             .ToList();
 
-        return new MenuState("Выберите запипсь для отмены", items);
+        return new MenuState("Выберите запипсь для отмены", items, header: HeaderFactorySetup.SetupHeader());
     }
 }

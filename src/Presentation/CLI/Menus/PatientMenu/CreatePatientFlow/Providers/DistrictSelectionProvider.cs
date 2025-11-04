@@ -1,4 +1,5 @@
-﻿using CLI.Menus.PatientMenu.CreatePatientFlow.Commands;
+﻿using CLI.Helpers;
+using CLI.Menus.PatientMenu.CreatePatientFlow.Commands;
 using Core.Interfaces.Services;
 using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu.Commands.BuiltIn;
@@ -13,18 +14,18 @@ public class DistrictSelectionProvider(IServiceProvider serviceProvider) : IMenu
     {
         var districtService = serviceProvider.GetRequiredService<IExternalDistrictService>();
         var districts = await districtService.GetDistrictsAsync();
-        
+
         var commands = districts
             .Select(d => new DistrictSelectionCommand(d, serviceProvider))
             .Cast<IMenuCommand>()
             .Append(new BackCommand())
             .ToList();
-        
+
         var items = commands
-            .Select(c => 
+            .Select(c =>
                 new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken)))
             .ToList();
 
-        return new MenuState("Выбор района", items);
+        return new MenuState("Выбор района", items, header: HeaderFactorySetup.SetupHeader());
     }
 }

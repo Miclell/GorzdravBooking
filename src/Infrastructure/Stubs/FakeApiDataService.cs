@@ -4,13 +4,13 @@ namespace Infrastructure.Stubs;
 
 public class FakeApiDataService
 {
+    private readonly Dictionary<string, List<Appointment>> _appointmentsByDoctor;
     private readonly List<District> _districts;
     private readonly List<Doctor> _doctors;
     private readonly List<Lpu> _lpus;
     private readonly Dictionary<string, string> _patientIds;
     private readonly Random _random;
     private readonly List<MedicalSpeciality> _specialties;
-    private readonly Dictionary<string, List<Appointment>> _appointmentsByDoctor;
 
     public FakeApiDataService()
     {

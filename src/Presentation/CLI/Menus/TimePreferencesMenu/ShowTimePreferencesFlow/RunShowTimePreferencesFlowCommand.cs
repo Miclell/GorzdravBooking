@@ -7,6 +7,9 @@ namespace CLI.Menus.TimePreferencesMenu.ShowTimePreferencesFlow;
 public class RunShowTimePreferencesFlowCommand(ShowTimePreferencesProvider showTimePreferencesProvider) : IMenuCommand
 {
     public string Title { get; } = "Показать пресеты";
-    public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default) =>
-        MenuResult.Push(await showTimePreferencesProvider.CreateMenuAsync(cancellationToken));
+
+    public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default)
+    {
+        return MenuResult.Push(await showTimePreferencesProvider.CreateMenuAsync(cancellationToken));
+    }
 }
