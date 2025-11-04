@@ -8,6 +8,7 @@ using StatefulMenu.Core.Models;
 
 namespace CLI.Menus.TimePreferencesMenu.CreateTimePreferencesFlow.Providers;
 
+// TODO сделать нормальный ввод
 public class CreateTimePreferencesProvider(
     ITimePreferencesService timePreferencesService,
     IAppSettingsService appSettingsService,

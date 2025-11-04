@@ -8,9 +8,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\rbin\StatefulMenu\StatefulMenu.csproj" />
       <ProjectReference Include="..\..\Application\Application.csproj" />
       <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="StatefulMenu" Version="1.0.0" />
     </ItemGroup>
 
 </Project>

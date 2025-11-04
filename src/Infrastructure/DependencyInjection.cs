@@ -1,6 +1,7 @@
 ﻿using Core.Interfaces.Repositories;
 using Core.Interfaces.Security;
 using Core.Interfaces.Services;
+using Infrastructure.Http;
 using Infrastructure.Repositories;
 using Infrastructure.Security;
 using Infrastructure.Services;
@@ -18,7 +19,7 @@ public static class DependencyInjection
             options.UseSqlite("Data Source=GorzdravBooking.db"));
 
         // ApiClient
-        // services.AddGorzdravClient();
+        //services.AddGorzdravClient();
         services.AddFakeGorzdravClient();
 
         // Services
