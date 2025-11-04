@@ -9,10 +9,10 @@ public class TimePreferencesConfiguration : IEntityTypeConfiguration<TimePrefere
     public void Configure(EntityTypeBuilder<TimePreferences> builder)
     {
         builder.ToTable("TimePreferences");
-        
+
         // Primary Key
         builder.HasKey(tp => tp.Id);
-        
+
         // Properties
         builder.Property(tp => tp.Id)
             .IsRequired()
@@ -30,14 +30,14 @@ public class TimePreferencesConfiguration : IEntityTypeConfiguration<TimePrefere
             .IsRequired(false)
             .HasConversion(
                 time => time.HasValue ? time.Value.ToTimeSpan() : (TimeSpan?)null,
-                ts => ts.HasValue ? TimeOnly.FromTimeSpan(ts.Value) : (TimeOnly?)null
+                ts => ts.HasValue ? TimeOnly.FromTimeSpan(ts.Value) : null
             );
 
         builder.Property(tp => tp.PreferredTimeTo)
             .IsRequired(false)
             .HasConversion(
                 time => time.HasValue ? time.Value.ToTimeSpan() : (TimeSpan?)null,
-                ts => ts.HasValue ? TimeOnly.FromTimeSpan(ts.Value) : (TimeOnly?)null
+                ts => ts.HasValue ? TimeOnly.FromTimeSpan(ts.Value) : null
             );
 
         builder.Property(tp => tp.AnyTime)
@@ -52,7 +52,7 @@ public class TimePreferencesConfiguration : IEntityTypeConfiguration<TimePrefere
 
         // Indexes
         builder.HasIndex(tp => tp.UserId);
-        
+
         builder.HasIndex(tp => new { tp.UserId, tp.Name })
             .HasDatabaseName("IX_TimePreferences_UserId_Name");
 
@@ -60,12 +60,12 @@ public class TimePreferencesConfiguration : IEntityTypeConfiguration<TimePrefere
             .HasDatabaseName("IX_TimePreferences_UserId_Day");
 
         // Check constraints
-        builder.HasCheckConstraint("CK_TimePreferences_TimeRange", 
-            @$"(""AnyTime"" = true OR (""PreferredTimeFrom"" IS NOT NULL AND 
+        builder.HasCheckConstraint("CK_TimePreferences_TimeRange",
+            @"(""AnyTime"" = true OR (""PreferredTimeFrom"" IS NOT NULL AND 
             ""PreferredTimeTo"" IS NOT NULL AND 
             ""PreferredTimeFrom"" < ""PreferredTimeTo""))");
 
         builder.HasCheckConstraint("CK_TimePreferences_Day_Required",
-            @$"(""AnyTime"" = true OR ""Day"" IS NOT NULL)");
+            @"(""AnyTime"" = true OR ""Day"" IS NOT NULL)");
     }
 }

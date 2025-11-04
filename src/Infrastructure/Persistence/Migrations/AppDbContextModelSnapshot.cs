@@ -141,6 +141,10 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(36000000000L);
 
+                    b.Property<string>("Speciality")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.PrimitiveCollection<string>("SpecificStartPoints")
                         .IsRequired()
                         .HasColumnType("TEXT");

@@ -2,7 +2,6 @@
 using Core.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Persistence.Configurations;
 
@@ -11,16 +10,16 @@ public class AppointmentSearchRequestConfiguration : IEntityTypeConfiguration<Ap
     public void Configure(EntityTypeBuilder<AppointmentSearchRequest> builder)
     {
         builder.ToTable("AppointmentSearchRequests");
-        
+
         // Primary Key
         builder.HasKey(asr => asr.Id);
-        
+
         // Relationships
         builder.HasOne(asr => asr.PatientProfile)
             .WithMany(pp => pp.AppointmentSearchRequests)
             .HasForeignKey(asr => asr.PatientProfileId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         // Properties
         builder.Property(asr => asr.Id)
             .IsRequired()
@@ -37,7 +36,7 @@ public class AppointmentSearchRequestConfiguration : IEntityTypeConfiguration<Ap
         builder.Property(asr => asr.DoctorName)
             .IsRequired()
             .HasMaxLength(200);
-        
+
         builder.Property(asr => asr.SearchInterval)
             .IsRequired()
             .HasConversion(
@@ -89,7 +88,7 @@ public class AppointmentSearchRequestConfiguration : IEntityTypeConfiguration<Ap
             .HasDatabaseName("IX_AppointmentSearchRequests_Doctor_Lpu");
 
         // Check constraints
-        builder.HasCheckConstraint("CK_AppointmentSearchRequests_AttemptCount", 
-            @$"""AttemptCount"" >= 0");
+        builder.HasCheckConstraint("CK_AppointmentSearchRequests_AttemptCount",
+            @"""AttemptCount"" >= 0");
     }
 }

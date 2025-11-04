@@ -13,14 +13,16 @@ public class AppointmentRepository(AppDbContext context) : IAppointmentRepositor
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<Appointment>> GetByPatientProfileIdAsync(Guid patientProfileId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Appointment>> GetByPatientProfileIdAsync(Guid patientProfileId,
+        CancellationToken cancellationToken = default)
     {
         return await context.Appointments
             .Where(r => r.PatientProfileId == patientProfileId)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Appointment>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Appointment>> GetByUserIdAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await context.Appointments
             .Include(a => a.PatientProfile)

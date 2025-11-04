@@ -11,8 +11,9 @@ namespace CLI.Menus.AppointmentMenu.ShowAppointmentsFlow.Commands;
 
 public class AppointmentSelectionCommand(AppointmentListItemDto appointment, IServiceProvider serviceProvider) : IMenuCommand
 {
-    public string Title { get; } = $"{appointment.LpuShortName} " + // TODO добавить доктора
+    public string Title { get; } = $"{appointment.LpuShortName} " +
                                    $"{appointment.PatientFullName} | " +
+                                   $"{appointment.Doctor} - " +
                                    $"{appointment.VisitStart}";
     public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default)
     {

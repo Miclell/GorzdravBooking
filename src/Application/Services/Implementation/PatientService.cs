@@ -8,10 +8,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Services.Implementation;
 
-public class PatientService(IPatientRepository patientRepository, 
+public class PatientService(
+    IPatientRepository patientRepository,
     ILogger<PatientService> logger) : IAppService, IPatientService
 {
-    public async Task<Result<Guid>> Create(CreatePatientDto createPatientDto, CancellationToken cancellationToken = default)
+    public async Task<Result<Guid>> Create(CreatePatientDto createPatientDto,
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -36,7 +38,8 @@ public class PatientService(IPatientRepository patientRepository,
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Ошибка при добавлении PatientProfile для User с id {UserId} - {e}", createPatientDto.UserId, e);
+            logger.LogError(e, "Ошибка при добавлении PatientProfile для User с id {UserId} - {e}",
+                createPatientDto.UserId, e);
             return Error.Failure($"{e}", "Ошибка");
         }
     }
@@ -54,25 +57,26 @@ public class PatientService(IPatientRepository patientRepository,
             return Error.Failure(e.ToString(), "Ошибка");
         }
     }
-    
-    public async Task<Result<IEnumerable<BasePatientProfileDto>>> GetByUser(Guid userId, CancellationToken cancellationToken = default)
+
+    public async Task<Result<IEnumerable<BasePatientProfileDto>>> GetByUser(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         try
         {
             var patientProfiles = await patientRepository.GetByUserIdAsync(userId, cancellationToken);
-        
+
             var dto = patientProfiles.Select(patient => new BasePatientProfileDto(
-                Id: patient.Id,
-                LpuShortName: patient.LpuShortName,
-                LpuId: patient.LpuId,
-                PatientLastName: patient.PatientLastName,
-                PatientFirstName: patient.PatientFirstName,
-                PatientMiddleName: patient.PatientMiddleName,
-                PatientBirthdate: patient.PatientBirthdate,
-                RecipientEmail: patient.RecipientEmail,
-                MobilePhoneNumber: patient.MobilePhoneNumber
+                patient.Id,
+                patient.LpuShortName,
+                patient.LpuId,
+                patient.PatientLastName,
+                patient.PatientFirstName,
+                patient.PatientMiddleName,
+                patient.PatientBirthdate,
+                patient.RecipientEmail,
+                patient.MobilePhoneNumber
             ));
-        
+
             return Result.Success(dto);
         }
         catch (Exception e)
@@ -82,14 +86,15 @@ public class PatientService(IPatientRepository patientRepository,
         }
     }
 
-    public async Task<Result> Update(BasePatientProfileDto patientProfile, CancellationToken cancellationToken = default)
+    public async Task<Result> Update(BasePatientProfileDto patientProfile,
+        CancellationToken cancellationToken = default)
     {
         try
         {
             var existingPatient = await patientRepository.GetByIdAsync(patientProfile.Id, cancellationToken);
             if (existingPatient == null)
-                return Error.NotFound("Patient.Not.Found","Patient not found");
-            
+                return Error.NotFound("Patient.Not.Found", "Patient not found");
+
             existingPatient.LpuShortName = patientProfile.LpuShortName;
             existingPatient.LpuId = patientProfile.LpuId;
             existingPatient.PatientLastName = patientProfile.PatientLastName;
@@ -100,7 +105,7 @@ public class PatientService(IPatientRepository patientRepository,
             existingPatient.MobilePhoneNumber = patientProfile.MobilePhoneNumber;
 
             await patientRepository.UpdateAsync(existingPatient, cancellationToken);
-            
+
             return Result.Success();
         }
         catch (Exception e)

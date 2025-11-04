@@ -16,7 +16,7 @@ public class AppSettingRepository(AppDbContext context) : IAppSettingRepository
         await context.AppSettings.AddAsync(setting, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
     }
-    
+
     public async Task UpdateAsync(AppSetting setting, CancellationToken cancellationToken = default)
     {
         context.AppSettings.Update(setting);
@@ -33,4 +33,3 @@ public class AppSettingRepository(AppDbContext context) : IAppSettingRepository
         }
     }
 }
-

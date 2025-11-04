@@ -1,5 +1,6 @@
 ﻿using Application.Abstract;
 using Application.Coordinators.Interfaces;
+using Core.Entities;
 using Core.Enums;
 using Core.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
@@ -17,13 +18,12 @@ public class CheckAppointmentSearchRequestsUseCase(
         {
             var now = DateTime.UtcNow;
             var requests = await appointmentSearchRequestRepository.GetActiveAsync(cancellationToken);
-    
+
             var appointmentSearchRequests = requests.ToList();
             logger.LogDebug("Найдено {Count} активных запросов", appointmentSearchRequests.Count);
 
             foreach (var request in appointmentSearchRequests
                          .Where(request => IsTimeToCheck(request, now) || true))
-            {
                 try
                 {
                     logger.LogDebug("Обработка запроса {RequestId} для пациента {PatientId}", request.Id,
@@ -46,7 +46,6 @@ public class CheckAppointmentSearchRequestsUseCase(
                 {
                     logger.LogError(ex, "Ошибка при обработке запроса {RequestId}", request.Id);
                 }
-            }
         }
         catch (Exception ex)
         {
@@ -54,7 +53,7 @@ public class CheckAppointmentSearchRequestsUseCase(
         }
     }
 
-    private static bool IsTimeToCheck(Core.Entities.AppointmentSearchRequest request, DateTime now)
+    private static bool IsTimeToCheck(AppointmentSearchRequest request, DateTime now)
     {
         if (request.SpecificStartPoints.Count != 0)
         {

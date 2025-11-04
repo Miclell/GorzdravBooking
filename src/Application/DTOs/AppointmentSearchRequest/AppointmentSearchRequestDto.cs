@@ -14,5 +14,5 @@ public record AppointmentSearchRequestDto(
     DateTime? LastSearchAttempt,
     int AttemptCount,
     string Status,
-    string PatientFullName  // Для удобства UI
+    string PatientFullName
 );

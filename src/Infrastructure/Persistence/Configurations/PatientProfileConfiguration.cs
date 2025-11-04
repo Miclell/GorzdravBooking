@@ -9,10 +9,10 @@ public class PatientProfileConfiguration : IEntityTypeConfiguration<PatientProfi
     public void Configure(EntityTypeBuilder<PatientProfile> builder)
     {
         builder.ToTable("PatientProfiles");
-        
+
         // Primary Key
         builder.HasKey(p => p.Id);
-        
+
         // Properties
         builder.Property(p => p.Id)
             .IsRequired()
@@ -20,7 +20,7 @@ public class PatientProfileConfiguration : IEntityTypeConfiguration<PatientProfi
 
         builder.Property(p => p.UserId)
             .IsRequired();
-        
+
         builder.Property(p => p.LpuId)
             .IsRequired()
             .HasMaxLength(50);
@@ -81,10 +81,10 @@ public class PatientProfileConfiguration : IEntityTypeConfiguration<PatientProfi
             .HasDatabaseName("IX_PatientProfiles_UserId_PatientId_Unique");
 
         // Check constraints
-        builder.HasCheckConstraint("CK_PatientProfiles_Email_Format", 
-            @$"""RecipientEmail"" IS NULL OR ""RecipientEmail"" LIKE '%@%.%'");
+        builder.HasCheckConstraint("CK_PatientProfiles_Email_Format",
+            @"""RecipientEmail"" IS NULL OR ""RecipientEmail"" LIKE '%@%.%'");
 
-        builder.HasCheckConstraint("CK_PatientProfiles_Birthdate", 
-            @$"""PatientBirthdate"" <= CURRENT_DATE");
+        builder.HasCheckConstraint("CK_PatientProfiles_Birthdate",
+            @"""PatientBirthdate"" <= CURRENT_DATE");
     }
 }

@@ -10,7 +10,7 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
     {
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
         optionsBuilder.UseSqlite("Data Source=GorzdravBooking.db");
-        
+
         return new AppDbContext(optionsBuilder.Options);
     }
 }

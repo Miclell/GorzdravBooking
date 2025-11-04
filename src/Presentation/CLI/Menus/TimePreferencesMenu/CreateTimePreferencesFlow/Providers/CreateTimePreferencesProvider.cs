@@ -36,11 +36,14 @@ public class CreateTimePreferencesProvider(
         if (baseFields!.AnyTime)
         {
             var preference = new CreateTimePreferenceDto
-            {
-                UserId = userId,
-                Name = baseFields.Name,
-                AnyTime = baseFields.AnyTime
-            };
+            (
+                UserId: userId,
+                Name: baseFields.Name,
+                AnyTime: baseFields.AnyTime,
+                Day: null,
+                PreferredTimeFrom: null,
+                PreferredTimeTo: null
+            );
             result.Add(preference);
         }
         else
@@ -58,12 +61,14 @@ public class CreateTimePreferencesProvider(
                     input = Console.ReadLine()?.Trim().ToLower();
                 }
             }
-            // TODO переделать через with когда будет record
-            foreach (var tp in result)
+            for (var i = 0; i < result.Count; i++)
             {
-                tp.UserId = userId;
-                tp.Name = baseFields.Name;
-                tp.AnyTime = baseFields.AnyTime;
+                result[i] = result[i] with
+                {
+                    UserId = userId,
+                    Name = baseFields.Name,
+                    AnyTime = baseFields.AnyTime
+                };
             }
         }
     

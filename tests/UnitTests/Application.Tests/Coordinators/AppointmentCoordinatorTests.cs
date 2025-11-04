@@ -25,6 +25,26 @@ public class AppointmentCoordinatorTests
         _mockTimePreferencesService = new Mock<ITimePreferencesService>();
         _mockAppointmentService = new Mock<IAppointmentService>();
         _mockLogger = new Mock<ILogger<AppointmentCoordinator>>();
+        _mockLogger
+            .Setup(x => x.Log(
+                It.IsAny<LogLevel>(),
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception, string>>()))
+            .Callback(new InvocationAction(invocation =>
+            {
+                var logLevel = (LogLevel)invocation.Arguments[0];
+                var eventId = (EventId)invocation.Arguments[1];
+                var state = invocation.Arguments[2];
+                var exception = (Exception)invocation.Arguments[3];
+                var formatter = invocation.Arguments[4];
+            
+                var formattedMessage = formatter.GetType().GetMethod("Invoke")?
+                    .Invoke(formatter, new[] { state, exception }) as string;
+                
+                Console.WriteLine($"{DateTime.Now:HH:mm:ss} [{logLevel}] {formattedMessage}");
+            }));
         
         _coordinator = new AppointmentCoordinator(
             _mockExternalService.Object,
@@ -61,7 +81,7 @@ public class AppointmentCoordinatorTests
         var appointments = new List<Appointment> { CreateTestAppointment() };
 
         _mockTimePreferencesService
-            .Setup(x => x.GetByPresetAsync(request.PatientProfileId, request.TimePreferencesPresetName, It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetByPresetAsync(request.PatientProfile.UserId, request.TimePreferencesPresetName, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result.Success(timePreferences));
 
         _mockExternalService

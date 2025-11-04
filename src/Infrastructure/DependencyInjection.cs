@@ -1,14 +1,12 @@
 ﻿using Core.Interfaces.Repositories;
 using Core.Interfaces.Security;
 using Core.Interfaces.Services;
-using Infrastructure.Http;
 using Infrastructure.Repositories;
 using Infrastructure.Security;
 using Infrastructure.Services;
 using Infrastructure.Stubs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Infrastructure;
 
@@ -18,9 +16,9 @@ public static class DependencyInjection
     {
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite("Data Source=GorzdravBooking.db"));
-        
+
         // ApiClient
-        //services.AddGorzdravClient();
+        // services.AddGorzdravClient();
         services.AddFakeGorzdravClient();
 
         // Services
@@ -30,7 +28,7 @@ public static class DependencyInjection
         services.AddScoped<IExternalLpuService, ExternalLpuService>();
         services.AddScoped<IExternalSpecialtyService, ExternalSpecialtyService>();
         services.AddScoped<IExternalPatientService, ExternalPatientService>();
-        
+
         // Repositories
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IPatientRepository, PatientRepository>();

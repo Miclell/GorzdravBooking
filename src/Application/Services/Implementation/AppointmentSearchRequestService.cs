@@ -25,6 +25,7 @@ public class AppointmentSearchRequestService(
                 LpuName = createDto.LpuName,
                 DoctorId = createDto.DoctorId,
                 DoctorName = createDto.DoctorName,
+                Speciality = createDto.Speciality,
                 SearchInterval = createDto.SearchInterval,
                 SpecificStartPoints = createDto.SpecificStartPoints,
                 TimePreferencesPresetName = createDto.TimePreferencesPresetName,
@@ -39,7 +40,8 @@ public class AppointmentSearchRequestService(
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Ошибка при создании запроса на поиск записи для пациента {PatientProfileId}", createDto.PatientProfileId);
+            logger.LogError(e, "Ошибка при создании запроса на поиск записи для пациента {PatientProfileId}",
+                createDto.PatientProfileId);
             return Error.Failure(e.ToString(), "Failed to create search request");
         }
     }
@@ -75,7 +77,8 @@ public class AppointmentSearchRequestService(
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Ошибка при обновлении временных предпочтений для запроса {RequestId}", updateDto.RequestId);
+            logger.LogError(e, "Ошибка при обновлении временных предпочтений для запроса {RequestId}",
+                updateDto.RequestId);
             return Error.Failure(e.ToString(), "Failed to update time preferences");
         }
     }
@@ -89,20 +92,20 @@ public class AppointmentSearchRequestService(
             var requests = await appointmentSearchRequestRepository.GetActiveByUserIdAsync(userId, cancellationToken);
 
             var dtos = requests.Select(request => new AppointmentSearchRequestDto(
-                Id: request.Id,
-                PatientProfileId: request.PatientProfileId,
-                LpuName: request.LpuName,
-                DoctorName: request.DoctorName,
-                SearchInterval: request.SearchInterval,
-                SpecificStartPoints: request.SpecificStartPoints,
-                TimePreferencesPresetName: request.TimePreferencesPresetName,
-                ViewOnly: request.ViewOnly,
-                MaxDaysToSearch: request.MaxDaysToSearch,
-                CreatedAt: request.CreatedAt,
-                LastSearchAttempt: request.LastSearchAttempt,
-                AttemptCount: request.AttemptCount,
-                Status: request.Status.ToString(),
-                PatientFullName: $"{request.PatientProfile.PatientLastName} {request.PatientProfile.PatientFirstName} {request.PatientProfile.PatientMiddleName}"
+                request.Id,
+                request.PatientProfileId,
+                request.LpuName,
+                request.DoctorName,
+                request.SearchInterval,
+                request.SpecificStartPoints,
+                request.TimePreferencesPresetName,
+                request.ViewOnly,
+                request.MaxDaysToSearch,
+                request.CreatedAt,
+                request.LastSearchAttempt,
+                request.AttemptCount,
+                request.Status.ToString(),
+                $"{request.PatientProfile.PatientLastName} {request.PatientProfile.PatientFirstName} {request.PatientProfile.PatientMiddleName}"
             ));
 
             return Result.Success(dtos);
@@ -121,23 +124,25 @@ public class AppointmentSearchRequestService(
     {
         try
         {
-            var requests = await appointmentSearchRequestRepository.GetByPatientProfileIdAsync(patientProfileId, cancellationToken);
+            var requests =
+                await appointmentSearchRequestRepository.GetByPatientProfileIdAsync(patientProfileId,
+                    cancellationToken);
 
             var dtos = requests.Select(request => new AppointmentSearchRequestDto(
-                Id: request.Id,
-                PatientProfileId: request.PatientProfileId,
-                LpuName: request.LpuName,
-                DoctorName: request.DoctorName,
-                SearchInterval: request.SearchInterval,
-                SpecificStartPoints: request.SpecificStartPoints,
-                TimePreferencesPresetName: request.TimePreferencesPresetName,
-                ViewOnly: request.ViewOnly,
-                MaxDaysToSearch: request.MaxDaysToSearch,
-                CreatedAt: request.CreatedAt,
-                LastSearchAttempt: request.LastSearchAttempt,
-                AttemptCount: request.AttemptCount,
-                Status: request.Status.ToString(),
-                PatientFullName: $"{request.PatientProfile.PatientLastName} {request.PatientProfile.PatientFirstName} {request.PatientProfile.PatientMiddleName}"
+                request.Id,
+                request.PatientProfileId,
+                request.LpuName,
+                request.DoctorName,
+                request.SearchInterval,
+                request.SpecificStartPoints,
+                request.TimePreferencesPresetName,
+                request.ViewOnly,
+                request.MaxDaysToSearch,
+                request.CreatedAt,
+                request.LastSearchAttempt,
+                request.AttemptCount,
+                request.Status.ToString(),
+                $"{request.PatientProfile.PatientLastName} {request.PatientProfile.PatientFirstName} {request.PatientProfile.PatientMiddleName}"
             ));
 
             return Result.Success(dtos);

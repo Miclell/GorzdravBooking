@@ -1,3 +1,5 @@
 ﻿namespace Application.Abstract;
 
-public interface IAppService { }
+public interface IAppService
+{
+}

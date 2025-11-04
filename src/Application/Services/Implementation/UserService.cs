@@ -2,14 +2,16 @@
 using Application.Common.Results;
 using Application.DTOs.User;
 using Application.Services.Interfaces;
+using Core.Entities;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Security;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services.Implementation;
 
-public class UserService(IUserRepository userRepository, 
-    IPasswordHasher passwordHasher, 
+public class UserService(
+    IUserRepository userRepository,
+    IPasswordHasher passwordHasher,
     ILogger<UserService> logger) : IAppService, IUserService
 {
     public async Task<Result<Guid>> Create(BaseUserDto baseUserDto, CancellationToken cancellationToken = default)
@@ -17,11 +19,11 @@ public class UserService(IUserRepository userRepository,
         try
         {
             var existing = await userRepository.GetByUsernameAsync(baseUserDto.Username, cancellationToken);
-        
+
             if (existing != null)
                 return Error.Conflict("User.Username.Exists", "Пользователь с таким именем уже существует");
-            
-            var user = new Core.Entities.User
+
+            var user = new User
             {
                 Username = baseUserDto.Username.Trim(),
                 PasswordHash = passwordHasher.HashPassword(baseUserDto.Password)
@@ -51,7 +53,8 @@ public class UserService(IUserRepository userRepository,
         }
     }
 
-    public async Task<Result> UpdatePassword(Guid userId, string newPassword, CancellationToken cancellationToken = default)
+    public async Task<Result> UpdatePassword(Guid userId, string newPassword,
+        CancellationToken cancellationToken = default)
     {
         try
         {

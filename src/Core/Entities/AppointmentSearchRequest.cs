@@ -1,5 +1,4 @@
 ﻿using Core.Enums;
-using Microsoft.VisualBasic;
 
 namespace Core.Entities;
 
@@ -13,10 +12,11 @@ public class AppointmentSearchRequest
     public string LpuName { get; set; } = null!;
     public string DoctorId { get; set; } = null!;
     public string DoctorName { get; set; } = null!;
+    public string Speciality { get; set; } = null!;
 
     public TimeSpan SearchInterval { get; set; }
     public List<DateTime> SpecificStartPoints { get; set; } = [];
-    
+
     public string TimePreferencesPresetName { get; set; } = null!;
 
     public bool ViewOnly { get; set; } = false;

@@ -1,6 +1,6 @@
-﻿namespace Application.DTOs.AppointmentSearchRequest;
+﻿using StatefulMenu.Core.Attributes;
 
-using StatefulMenu.Core.Attributes;
+namespace Application.DTOs.AppointmentSearchRequest;
 
 public class CreateAppointmentSearchRequestDto
 {
@@ -8,17 +8,16 @@ public class CreateAppointmentSearchRequestDto
     public string LpuName { get; set; } = null!;
     public string DoctorId { get; set; } = null!;
     public string DoctorName { get; set; } = null!;
+    public string Speciality { get; set; } = null!;
 
-    [InputField("Интервал поиска (мин)")]
-    public TimeSpan SearchInterval { get; set; }
+    [InputField("Интервал поиска (мин)")] public TimeSpan SearchInterval { get; set; }
 
     [InputField("Конкретные моменты запуска", IsRequired = false)]
     public List<DateTime> SpecificStartPoints { get; set; } = [];
+
     public string TimePreferencesPresetName { get; set; } = null!;
 
-    [InputField("Только просмотр")]
-    public bool ViewOnly { get; set; } = false;
+    [InputField("Только просмотр")] public bool ViewOnly { get; set; } = false;
 
-    [InputField("Макс. дней для поиска")]
-    public int MaxDaysToSearch { get; set; } = 30;
+    [InputField("Макс. дней для поиска")] public int MaxDaysToSearch { get; set; } = 30;
 }

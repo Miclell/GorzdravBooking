@@ -13,7 +13,8 @@ public class TimePreferencesRepository(AppDbContext context) : ITimePreferencesR
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<TimePreferences>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<TimePreferences>> GetByUserIdAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await context.TimePreferences
             .Where(t => t.UserId == userId)
@@ -25,8 +26,9 @@ public class TimePreferencesRepository(AppDbContext context) : ITimePreferencesR
         await context.TimePreferences.AddAsync(preferences, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
     }
-    
-    public async Task AddRangeAsync(IEnumerable<TimePreferences> preferences, CancellationToken cancellationToken = default)
+
+    public async Task AddRangeAsync(IEnumerable<TimePreferences> preferences,
+        CancellationToken cancellationToken = default)
     {
         await context.TimePreferences.AddRangeAsync(preferences, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
@@ -38,13 +40,14 @@ public class TimePreferencesRepository(AppDbContext context) : ITimePreferencesR
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<TimePreferences>> GetByPresetAsync(Guid userId, string name, CancellationToken cancellationToken = default)
-    { 
+    public async Task<IEnumerable<TimePreferences>> GetByPresetAsync(Guid userId, string name,
+        CancellationToken cancellationToken = default)
+    {
         return await context.TimePreferences
             .Where(tp => tp.UserId == userId && tp.Name == name)
             .ToListAsync(cancellationToken);
     }
-    
+
     public async Task DeleteByPresetAsync(Guid userId, string name, CancellationToken cancellationToken = default)
     {
         var preferences = context.TimePreferences
@@ -53,7 +56,4 @@ public class TimePreferencesRepository(AppDbContext context) : ITimePreferencesR
         context.TimePreferences.RemoveRange(preferences);
         await context.SaveChangesAsync(cancellationToken);
     }
-    
-    
-
 }

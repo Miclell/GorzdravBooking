@@ -1,21 +1,26 @@
 ﻿using Application.Abstract;
 using Application.Common.Results;
 using Application.DTOs.Appointment;
+using Application.Services.Interfaces;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Services;
 using Core.Models;
 using Microsoft.Extensions.Logging;
+using Appointment = Core.Entities.Appointment;
 
 namespace Application.Services.Implementation;
 
-public class AppointmentService(IAppointmentRepository appointmentRepository, IExternalAppointmentService externalAppointmentService,
-    ILogger<AppointmentService> logger) : IAppService, Interfaces.IAppointmentService
+public class AppointmentService(
+    IAppointmentRepository appointmentRepository,
+    IExternalAppointmentService externalAppointmentService,
+    ILogger<AppointmentService> logger) : IAppService, IAppointmentService
 {
-    public async Task<Result<Guid>> CreateAsync(CreateAppointmentDto createDto, CancellationToken cancellationToken = default)
+    public async Task<Result<Guid>> CreateAsync(CreateAppointmentDto createDto,
+        CancellationToken cancellationToken = default)
     {
         try
         {
-            var appointment = new Core.Entities.Appointment
+            var appointment = new Appointment
             {
                 PatientProfileId = createDto.PatientProfileId,
                 AppointmentId = createDto.AppointmentId,
@@ -34,7 +39,8 @@ public class AppointmentService(IAppointmentRepository appointmentRepository, IE
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Ошибка при создании записи на прием для пациента {PatientProfileId}", createDto.PatientProfileId);
+            logger.LogError(e, "Ошибка при создании записи на прием для пациента {PatientProfileId}",
+                createDto.PatientProfileId);
             return Error.Failure(e.ToString(), "Failed to create appointment");
         }
     }
@@ -57,7 +63,7 @@ public class AppointmentService(IAppointmentRepository appointmentRepository, IE
             };
 
             var externalCancelSuccess = await externalAppointmentService.CancelAppointmentAsync(cancelRequest);
-            
+
             if (!externalCancelSuccess)
             {
                 logger.LogWarning(
@@ -78,20 +84,22 @@ public class AppointmentService(IAppointmentRepository appointmentRepository, IE
         }
     }
 
-    public async Task<Result<IEnumerable<AppointmentListItemDto>>> GetByUserAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<Result<IEnumerable<AppointmentListItemDto>>> GetByUserAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         try
         {
             var appointments = await appointmentRepository.GetByUserIdAsync(userId, cancellationToken);
 
             var dtos = appointments.Select(appointment => new AppointmentListItemDto(
-                Id: appointment.Id,
-                VisitStart: appointment.VisitStart,
-                VisitEnd: appointment.VisitEnd,
-                Address: appointment.Address,
-                Number: appointment.Number,
-                PatientFullName: $"{appointment.PatientProfile.PatientLastName} {appointment.PatientProfile.PatientFirstName} {appointment.PatientProfile.PatientMiddleName}",
-                LpuShortName: appointment.PatientProfile.LpuShortName
+                appointment.Id,
+                appointment.VisitStart,
+                appointment.VisitEnd,
+                appointment.Address,
+                appointment.Number,
+                $"{appointment.PatientProfile.PatientLastName} {appointment.PatientProfile.PatientFirstName} {appointment.PatientProfile.PatientMiddleName}",
+                appointment.PatientProfile.LpuShortName,
+                appointment.Doctor
             ));
 
             return Result.Success(dtos);
@@ -103,23 +111,25 @@ public class AppointmentService(IAppointmentRepository appointmentRepository, IE
         }
     }
 
-    public async Task<Result<IEnumerable<AppointmentDto>>> GetByPatientAsync(Guid patientProfileId, CancellationToken cancellationToken = default)
+    public async Task<Result<IEnumerable<AppointmentDto>>> GetByPatientAsync(Guid patientProfileId,
+        CancellationToken cancellationToken = default)
     {
         try
         {
-            var appointments = await appointmentRepository.GetByPatientProfileIdAsync(patientProfileId, cancellationToken);
+            var appointments =
+                await appointmentRepository.GetByPatientProfileIdAsync(patientProfileId, cancellationToken);
 
             var dtos = appointments.Select(appointment => new AppointmentDto(
-                Id: appointment.Id,
-                PatientProfileId: appointment.PatientProfileId,
-                AppointmentId: appointment.AppointmentId,
-                VisitStart: appointment.VisitStart,
-                VisitEnd: appointment.VisitEnd,
-                Address: appointment.Address,
-                Number: appointment.Number,
-                Room: appointment.Room,
-                PatientFullName: $"{appointment.PatientProfile.PatientLastName} {appointment.PatientProfile.PatientFirstName} {appointment.PatientProfile.PatientMiddleName}",
-                LpuShortName: appointment.PatientProfile.LpuShortName
+                appointment.Id,
+                appointment.PatientProfileId,
+                appointment.AppointmentId,
+                appointment.VisitStart,
+                appointment.VisitEnd,
+                appointment.Address,
+                appointment.Number,
+                appointment.Room,
+                $"{appointment.PatientProfile.PatientLastName} {appointment.PatientProfile.PatientFirstName} {appointment.PatientProfile.PatientMiddleName}",
+                appointment.PatientProfile.LpuShortName
             ));
 
             return Result.Success(dtos);
@@ -132,7 +142,8 @@ public class AppointmentService(IAppointmentRepository appointmentRepository, IE
     }
 
     // Дополнительный метод для получения конкретной записи
-    public async Task<Result<AppointmentDto>> GetByIdAsync(Guid appointmentId, CancellationToken cancellationToken = default)
+    public async Task<Result<AppointmentDto>> GetByIdAsync(Guid appointmentId,
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -141,16 +152,16 @@ public class AppointmentService(IAppointmentRepository appointmentRepository, IE
                 return Error.Failure("Appointment.NotFound", "Appointment not found");
 
             var dto = new AppointmentDto(
-                Id: appointment.Id,
-                PatientProfileId: appointment.PatientProfileId,
-                AppointmentId: appointment.AppointmentId,
-                VisitStart: appointment.VisitStart,
-                VisitEnd: appointment.VisitEnd,
-                Address: appointment.Address,
-                Number: appointment.Number,
-                Room: appointment.Room,
-                PatientFullName: $"{appointment.PatientProfile.PatientLastName} {appointment.PatientProfile.PatientFirstName} {appointment.PatientProfile.PatientMiddleName}",
-                LpuShortName: appointment.PatientProfile.LpuShortName
+                appointment.Id,
+                appointment.PatientProfileId,
+                appointment.AppointmentId,
+                appointment.VisitStart,
+                appointment.VisitEnd,
+                appointment.Address,
+                appointment.Number,
+                appointment.Room,
+                $"{appointment.PatientProfile.PatientLastName} {appointment.PatientProfile.PatientFirstName} {appointment.PatientProfile.PatientMiddleName}",
+                appointment.PatientProfile.LpuShortName
             );
 
             return Result.Success(dto);

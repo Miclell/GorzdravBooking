@@ -10,4 +10,4 @@ public record BasePatientProfileDto(
     DateTime PatientBirthdate,
     string? RecipientEmail,
     string? MobilePhoneNumber
-    );
+);

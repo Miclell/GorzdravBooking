@@ -9,10 +9,10 @@ public class AppSettingConfiguration : IEntityTypeConfiguration<AppSetting>
     public void Configure(EntityTypeBuilder<AppSetting> builder)
     {
         builder.ToTable("AppConfiguration");
-        
+
         // Primary Key
         builder.HasKey(a => a.Key);
-        
+
         // Properties
         builder.Property(a => a.Value)
             .IsRequired()

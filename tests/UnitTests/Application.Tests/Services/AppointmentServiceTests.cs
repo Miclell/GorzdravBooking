@@ -31,16 +31,17 @@ public class AppointmentServiceTests
     public async Task CreateAsync_WithValidData_CreatesAppointment()
     {
         // Arrange
-        var createDto = new CreateAppointmentDto
-        {
-            PatientProfileId = Guid.NewGuid(),
-            AppointmentId = "ext123",
-            VisitStart = new DateTime(2024, 1, 1, 10, 0, 0),
-            VisitEnd = new DateTime(2024, 1, 1, 11, 0, 0),
-            Address = "Test Address",
-            Number = "A101",
-            Room = "101"
-        };
+        var createDto = new CreateAppointmentDto(
+            PatientProfileId: Guid.NewGuid(),
+            AppointmentId: "ext123",
+            VisitStart: new DateTime(2024, 1, 1, 10, 0, 0),
+            VisitEnd: new DateTime(2024, 1, 1, 11, 0, 0),
+            Address: "Test Address",
+            Number: "A101",
+            Room: "101",
+            Speciality: "Test Speciality",
+            Doctor: "Test Doctor"
+        );
 
         var expectedAppointmentId = Guid.NewGuid();
 
@@ -62,16 +63,17 @@ public class AppointmentServiceTests
     public async Task CreateAsync_WhenRepositoryThrowsException_ReturnsFailure()
     {
         // Arrange
-        var createDto = new CreateAppointmentDto
-        {
-            PatientProfileId = Guid.NewGuid(),
-            AppointmentId = "ext123",
-            VisitStart = DateTime.Now,
-            VisitEnd = DateTime.Now.AddHours(1),
-            Address = "Test Address",
-            Number = "A101",
-            Room = "101"
-        };
+        var createDto = new CreateAppointmentDto(
+            PatientProfileId: Guid.NewGuid(),
+            AppointmentId: "ext123",
+            VisitStart: DateTime.Now,
+            VisitEnd: DateTime.Now.AddHours(1),
+            Address: "Test Address",
+            Number: "A101",
+            Room: "101",
+            Speciality: "Test Speciality",
+            Doctor: "Test Doctor"
+        );
 
         var exception = new Exception("Database error");
 

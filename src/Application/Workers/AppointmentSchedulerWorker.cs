@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace Application.Workers;
 
 public class AppointmentSchedulerWorker(
-    IServiceProvider serviceProvider, 
+    IServiceProvider serviceProvider,
     ILogger<AppointmentSchedulerWorker> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -29,7 +29,6 @@ public class AppointmentSchedulerWorker(
 
                 var elapsed = DateTime.UtcNow - startTime;
                 logger.LogDebug("Проверка записей завершена за {ElapsedMs}ms", elapsed.TotalMilliseconds);
-
             }
             catch (Exception e)
             {

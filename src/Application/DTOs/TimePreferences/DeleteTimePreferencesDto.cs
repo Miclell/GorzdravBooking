@@ -1,18 +1,10 @@
-﻿namespace Application.DTOs.TimePreferences;
+﻿using StatefulMenu.Core.Attributes;
 
-using StatefulMenu.Core.Attributes;
+namespace Application.DTOs.TimePreferences;
 
-public class DeleteTimePreferencesDto
-{
-    public DeleteTimePreferencesDto(Guid id, string name) // TODO сделать record
-    {
-        UserId = id;
-        Name = name;
-    }
-
-    [InputField("Профиль пациента Id")]
-    public Guid UserId { get; set; }
-
-    [InputField("Название пресета")]
-    public string Name { get; set; } = null!;
-}
+public record DeleteTimePreferencesDto(
+    [property: InputField("Профиль пациента Id")]
+    Guid UserId,
+    [property: InputField("Название пресета")]
+    string Name
+);

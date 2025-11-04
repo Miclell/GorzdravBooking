@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -20,9 +21,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         optionsBuilder
             .EnableSensitiveDataLogging() // Показывает значения параметров
             .LogTo(Console.WriteLine, LogLevel.Trace) // Логи в консоль
-            .LogTo(message => System.Diagnostics.Debug.WriteLine(message), LogLevel.Trace); // Логи в Debug output
-        
-        
+            .LogTo(message => Debug.WriteLine(message), LogLevel.Trace); // Логи в Debug output
+
+
         base.OnConfiguring(optionsBuilder);
     }
 

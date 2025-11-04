@@ -9,6 +9,6 @@ public record AppointmentDto(
     string? Address,
     string? Number,
     string? Room,
-    string PatientFullName,      // "Иванов Иван Иванович"
-    string LpuShortName          // "Городская больница №1"
+    string PatientFullName,
+    string LpuShortName
 );

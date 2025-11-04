@@ -1,17 +1,16 @@
 ﻿using Core.Models;
-using System.Text.RegularExpressions;
 
 namespace Infrastructure.Stubs;
 
 public class FakeApiDataService
 {
     private readonly List<District> _districts;
-    private readonly List<Lpu> _lpus;
-    private readonly List<MedicalSpeciality> _specialties;
     private readonly List<Doctor> _doctors;
-    private Dictionary<string, List<Appointment>> _appointmentsByDoctor;
+    private readonly List<Lpu> _lpus;
     private readonly Dictionary<string, string> _patientIds;
     private readonly Random _random;
+    private readonly List<MedicalSpeciality> _specialties;
+    private readonly Dictionary<string, List<Appointment>> _appointmentsByDoctor;
 
     public FakeApiDataService()
     {
@@ -26,37 +25,65 @@ public class FakeApiDataService
     }
 
     // Districts
-    public List<District> GetDistricts() => _districts;
-    public List<Lpu> GetLpusByDistrict(string districtId) => 
-        _lpus.Where(l => l.DistrictId.ToString() == districtId).ToList();
+    public List<District> GetDistricts()
+    {
+        return _districts;
+    }
+
+    public List<Lpu> GetLpusByDistrict(string districtId)
+    {
+        return _lpus.Where(l => l.DistrictId.ToString() == districtId).ToList();
+    }
 
     // Lpus
-    public List<Lpu> GetLpus() => _lpus;
-    public Lpu? GetLpu(int lpuId) => _lpus.FirstOrDefault(l => l.Id == lpuId);
+    public List<Lpu> GetLpus()
+    {
+        return _lpus;
+    }
+
+    public Lpu? GetLpu(int lpuId)
+    {
+        return _lpus.FirstOrDefault(l => l.Id == lpuId);
+    }
 
     // Specialties
-    public List<MedicalSpeciality> GetSpecialtiesByLpu(int lpuId) => _specialties;
-    public MedicalSpeciality? GetSpecialty(string specialtyId) => 
-        _specialties.FirstOrDefault(s => s.Id == specialtyId);
+    public List<MedicalSpeciality> GetSpecialtiesByLpu(int lpuId)
+    {
+        return _specialties;
+    }
+
+    public MedicalSpeciality? GetSpecialty(string specialtyId)
+    {
+        return _specialties.FirstOrDefault(s => s.Id == specialtyId);
+    }
 
     // Doctors
-    public List<Doctor> GetDoctorsBySpecialty(int lpuId, string specialtyId) => _doctors;
-    public List<Doctor> GetDoctors() => _doctors;
-    public Doctor? GetDoctor(string doctorId) => _doctors.FirstOrDefault(d => d.Id == doctorId);
+    public List<Doctor> GetDoctorsBySpecialty(int lpuId, string specialtyId)
+    {
+        return _doctors;
+    }
+
+    public List<Doctor> GetDoctors()
+    {
+        return _doctors;
+    }
+
+    public Doctor? GetDoctor(string doctorId)
+    {
+        return _doctors.FirstOrDefault(d => d.Id == doctorId);
+    }
 
     // Appointments - основная логика
     public List<Appointment> GetAppointmentsByDoctor(int lpuId, string doctorId)
     {
         var key = $"{lpuId}_{doctorId}";
-        
+
         // 70% вероятность обновить номерки
         if (_random.Next(100) < 70 || !_appointmentsByDoctor.ContainsKey(key))
-        {
             GenerateAppointmentsForDoctor(lpuId, doctorId);
-        }
 
-        return _appointmentsByDoctor.TryGetValue(key, out var appointments) 
-            ? appointments 
+        return _appointmentsByDoctor.TryGetValue(key, out var appointments)
+            ? appointments
             : new List<Appointment>();
     }
 
@@ -64,7 +91,7 @@ public class FakeApiDataService
     {
         if (!_appointmentsByDoctor.ContainsKey(doctorKey))
             _appointmentsByDoctor[doctorKey] = new List<Appointment>();
-        
+
         _appointmentsByDoctor[doctorKey].Add(appointment);
     }
 
@@ -79,6 +106,7 @@ public class FakeApiDataService
                 return true;
             }
         }
+
         return false;
     }
 
@@ -86,7 +114,7 @@ public class FakeApiDataService
     public string GetPatientId(PatientIdSearchRequest request)
     {
         var key = $"{request.LpuId}_{request.LastName}_{request.FirstName}_{request.BirthDate:yyyyMMdd}";
-        
+
         if (!_patientIds.TryGetValue(key, out var patientId))
         {
             patientId = $"{request.LpuId}{_random.Next(10000, 99999)}";
@@ -95,51 +123,50 @@ public class FakeApiDataService
 
         return patientId;
     }
-    
+
     // Appointment operations
     public ApiResponse<bool> CreateAppointment(AppointmentCreateRequest request)
     {
         // 10% вероятность ошибки "уже есть запись"
         if (_random.Next(100) < 10)
-        {
-            return new ApiResponse<bool> 
-            { 
-                Success = false, 
+            return new ApiResponse<bool>
+            {
+                Success = false,
                 ErrorCode = 751,
                 Message = "Запись к врачу возможна при отсутствии активной записи к аналогичному специалисту"
             };
-        }
 
         // Удаляем номерок из доступных
         if (!RemoveAppointment(request.AppointmentId))
-        {
-            return new ApiResponse<bool> 
-            { 
-                Success = false, 
+            return new ApiResponse<bool>
+            {
+                Success = false,
                 ErrorCode = 404,
                 Message = "Талон не найден"
             };
-        }
 
         return new ApiResponse<bool> { Success = true, Result = true };
     }
-    
+
     public ApiResponse<bool> CancelAppointment(AppointmentСancelRequest request)
     {
         // В реальном API при отмене нам не нужно возвращать номерок в пул,
         // т.к. это уже обработанное время, которое может быть занято другими пациентами
-    
+
         // Просто удаляем запись из системы (если бы у нас была история записей)
         // и возвращаем успех
-    
+
         // В нашем фейковом сервисе просто логируем отмену
-        Console.WriteLine($"Отменена запись: AppointmentId={request.AppointmentId}, LpuId={request.LpuId}, PatientId={request.PatientId}");
-    
+        Console.WriteLine(
+            $"Отменена запись: AppointmentId={request.AppointmentId}, LpuId={request.LpuId}, PatientId={request.PatientId}");
+
         return new ApiResponse<bool> { Success = true, Result = true };
     }
-    
-    public ApiResponse<bool> UpdatePatientPhone(PatientPhoneUpdateRequest request) => 
-        new ApiResponse<bool> { Success = true, Result = true };
+
+    public ApiResponse<bool> UpdatePatientPhone(PatientPhoneUpdateRequest request)
+    {
+        return new ApiResponse<bool> { Success = true, Result = true };
+    }
 
     // Private methods
     private void InitializePatientIds()
@@ -155,9 +182,9 @@ public class FakeApiDataService
         var key = $"{lpuId}_{doctorId}";
         var appointments = new List<Appointment>();
         var now = DateTime.Now;
-        
+
         // Генерируем на 7 дней вперед, только рабочие дни
-        for (int i = 0; i < 7; i++)
+        for (var i = 0; i < 7; i++)
         {
             var date = now.AddDays(i);
             if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
@@ -178,25 +205,25 @@ public class FakeApiDataService
     {
         var appointments = new List<Appointment>();
         var startHour = date.Date == now.Date ? Math.Max(8, now.Hour + 1) : 8;
-        
+
         // λ = 0.3 - в среднем 30% слотов заполнены
         var expectedAppointments = _random.Next(5, 12); // 5-12 номерков в день
-        
-        for (int i = 0; i < expectedAppointments; i++)
+
+        for (var i = 0; i < expectedAppointments; i++)
         {
             var hour = _random.Next(startHour, 20);
             var minute = _random.Next(0, 3) * 20; // 0, 20, 40 минут
-            
+
             var visitStart = new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
-            
+
             // Пропускаем если время уже прошло
             if (visitStart <= now)
                 continue;
 
             var visitEnd = visitStart.AddMinutes(20);
-            
-            appointments.Add(new Appointment 
-            { 
+
+            appointments.Add(new Appointment
+            {
                 Id = GenerateAppointmentId(),
                 VisitStart = visitStart,
                 VisitEnd = visitEnd,
@@ -209,14 +236,17 @@ public class FakeApiDataService
         return appointments.OrderBy(a => a.VisitStart).ToList();
     }
 
-    private string GenerateAppointmentId() => _random.Next(10000000, 99999999).ToString();
+    private string GenerateAppointmentId()
+    {
+        return _random.Next(10000000, 99999999).ToString();
+    }
 
     private string GetRandomAddress()
     {
         var addresses = new[]
         {
             "111111, Санкт-Петербург, ул. Центральная, д. 15, лит. А",
-            "111112, Санкт-Петербург, пр. Медицинский, д. 42, к. 3", 
+            "111112, Санкт-Петербург, пр. Медицинский, д. 42, к. 3",
             "222111, Санкт-Петербург, ул. Музыкальная, д. 28, лит. Б",
             "222112, Санкт-Петербург, пр. Оркестровый, д. 57, к. 2"
         };
@@ -229,8 +259,8 @@ public class FakeApiDataService
     {
         return new List<District>
         {
-            new District { Id = "1", Name = "Балалайковский", Okato = 1 },
-            new District { Id = "2", Name = "Оркестровый", Okato = 2 }
+            new() { Id = "1", Name = "Балалайковский", Okato = 1 },
+            new() { Id = "2", Name = "Оркестровый", Okato = 2 }
         };
     }
 
@@ -238,7 +268,7 @@ public class FakeApiDataService
     {
         return new List<Lpu>
         {
-            new Lpu
+            new()
             {
                 Id = 1,
                 Description = "Центральная поликлиника района",
@@ -259,7 +289,7 @@ public class FakeApiDataService
                 CovidVaccination = true,
                 InDepthExamination = true
             },
-            new Lpu
+            new()
             {
                 Id = 2,
                 Description = "Современный медицинский комплекс",
@@ -280,7 +310,7 @@ public class FakeApiDataService
                 CovidVaccination = true,
                 InDepthExamination = false
             },
-            new Lpu
+            new()
             {
                 Id = 3,
                 Description = "Поликлиника с детским отделением",
@@ -301,7 +331,7 @@ public class FakeApiDataService
                 CovidVaccination = false,
                 InDepthExamination = true
             },
-            new Lpu
+            new()
             {
                 Id = 4,
                 Description = "Многопрофильный медицинский центр",
@@ -329,7 +359,7 @@ public class FakeApiDataService
     {
         return new List<MedicalSpeciality>
         {
-            new MedicalSpeciality
+            new()
             {
                 Id = "92134141",
                 FerId = "77",
@@ -339,7 +369,7 @@ public class FakeApiDataService
                 LastDate = "2025-08-26T19:00:00",
                 NearestDate = "2025-08-22T10:00:00"
             },
-            new MedicalSpeciality
+            new()
             {
                 Id = "92137183",
                 FerId = "55",
@@ -349,7 +379,7 @@ public class FakeApiDataService
                 LastDate = "2025-08-26T13:55:00",
                 NearestDate = "2025-08-12T15:15:00"
             },
-            new MedicalSpeciality
+            new()
             {
                 Id = "92134142",
                 FerId = "78",
@@ -366,7 +396,7 @@ public class FakeApiDataService
     {
         return new List<Doctor>
         {
-            new Doctor
+            new()
             {
                 AriaNumber = "15, 16, 17, 18, 25, 26, 27, 28, 31, 32, 33, 34, 35",
                 Comment = "01.09.2025-15.09.2025: Врач в учебном отпуске.",
@@ -379,7 +409,7 @@ public class FakeApiDataService
                 MiddleName = "Михайловna",
                 NearestDate = DateTime.Today.AddDays(1)
             },
-            new Doctor
+            new()
             {
                 AriaNumber = "201, 202, 203",
                 Comment = "",
@@ -392,7 +422,7 @@ public class FakeApiDataService
                 MiddleName = "Сергеевич",
                 NearestDate = DateTime.Today.AddDays(1)
             },
-            new Doctor
+            new()
             {
                 AriaNumber = "45, 46, 47, 48, 49, 50",
                 Comment = "Работает только с хроническими пациентами",

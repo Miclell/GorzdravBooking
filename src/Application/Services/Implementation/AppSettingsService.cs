@@ -6,7 +6,9 @@ using Core.Interfaces.Repositories;
 
 namespace Application.Services.Implementation;
 
-public class AppSettingsService(IAppSettingRepository appSettingRepository, CreateDefaultUserUseCase createDefaultUserUseCase)
+public class AppSettingsService(
+    IAppSettingRepository appSettingRepository,
+    CreateDefaultUserUseCase createDefaultUserUseCase)
     : IAppSettingsService, IAppService
 {
     public async Task AppInitializeAsync()
@@ -15,7 +17,7 @@ public class AppSettingsService(IAppSettingRepository appSettingRepository, Crea
         if (isFirstInit)
         {
             await CreateDefaultUser();
-            await appSettingRepository.AddAsync(new AppSetting()
+            await appSettingRepository.AddAsync(new AppSetting
             {
                 Key = "IsInit",
                 Value = "true"
@@ -28,7 +30,7 @@ public class AppSettingsService(IAppSettingRepository appSettingRepository, Crea
         var appSetting = await appSettingRepository.GetAsync("DefaultUserId");
 
         if (appSetting != null) return Guid.Parse(appSetting.Value);
-        
+
         await CreateDefaultUser();
 
         return await GetDefaultUserIdAsync();
@@ -39,9 +41,9 @@ public class AppSettingsService(IAppSettingRepository appSettingRepository, Crea
         var userId = await createDefaultUserUseCase.ExecuteAsync();
 
         if (userId.IsFailure)
-             throw new Exception(userId.Error.Description);
-        
-        var appSetting = new AppSetting()
+            throw new Exception(userId.Error.Description);
+
+        var appSetting = new AppSetting
         {
             Key = "DefaultUserId",
             Value = userId.Value.ToString()

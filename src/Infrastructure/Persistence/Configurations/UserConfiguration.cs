@@ -9,10 +9,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.ToTable("Users");
-        
+
         // Primary Key
         builder.HasKey(u => u.Id);
-        
+
         // Properties
         builder.Property(u => u.Id)
             .IsRequired()
@@ -50,12 +50,12 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasIndex(u => u.Username)
             .IsUnique()
             .HasDatabaseName("IX_Users_Username");
-            
+
         builder.HasIndex(u => u.CreatedAt)
             .HasDatabaseName("IX_Users_CreatedAt");
 
         // Optional: Check constraints
-        builder.HasCheckConstraint("CK_Users_Username_Length", 
+        builder.HasCheckConstraint("CK_Users_Username_Length",
             @"LENGTH(""username"") >= 3");
     }
 }

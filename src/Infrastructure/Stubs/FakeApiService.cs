@@ -1,6 +1,7 @@
-﻿using Core.Interfaces.ApiClient;
-using Core.Models;
+﻿using System.Collections.Specialized;
 using System.Text.RegularExpressions;
+using Core.Interfaces.ApiClient;
+using Core.Models;
 
 namespace Infrastructure.Stubs;
 
@@ -48,8 +49,13 @@ public class FakeApiService : IApiService
     }
 
     // Для тестов - пустые реализации
-    public void SetupGetResponse<TResponse>(string uri, ApiResponse<TResponse> response) { }
-    public void SetupPostResponse<TRequest, TResponse>(string uri, ApiResponse<TResponse> response) { }
+    public void SetupGetResponse<TResponse>(string uri, ApiResponse<TResponse> response)
+    {
+    }
+
+    public void SetupPostResponse<TRequest, TResponse>(string uri, ApiResponse<TResponse> response)
+    {
+    }
 
     private ApiResponse<TResponse> HandleGetRequest<TResponse>(string additionalUri)
     {
@@ -58,22 +64,22 @@ public class FakeApiService : IApiService
 
         return uri switch
         {
-            "shared/districts" => 
+            "shared/districts" =>
                 SuccessResponse<TResponse>(_dataService.GetDistricts()),
 
-            string s when Regex.IsMatch(s, @"^shared/district/(\d+)/lpus$") => 
+            string s when Regex.IsMatch(s, @"^shared/district/(\d+)/lpus$") =>
                 HandleLpusByDistrict<TResponse>(s),
 
-            string s when Regex.IsMatch(s, @"^schedule/lpu/(\d+)/specialties$") => 
+            string s when Regex.IsMatch(s, @"^schedule/lpu/(\d+)/specialties$") =>
                 HandleSpecialtiesByLpu<TResponse>(s),
 
-            string s when Regex.IsMatch(s, @"^schedule/lpu/(\d+)/speciality/([^/]+)/doctors$") => 
+            string s when Regex.IsMatch(s, @"^schedule/lpu/(\d+)/speciality/([^/]+)/doctors$") =>
                 HandleDoctorsBySpecialty<TResponse>(s),
 
-            string s when Regex.IsMatch(s, @"^schedule/lpu/(\d+)/doctor/([^/]+)/appointments$") => 
+            string s when Regex.IsMatch(s, @"^schedule/lpu/(\d+)/doctor/([^/]+)/appointments$") =>
                 HandleAppointmentsByDoctor<TResponse>(s),
 
-            string s when s.StartsWith("patient/search") => 
+            string s when s.StartsWith("patient/search") =>
                 HandlePatientSearch<TResponse>(s),
 
             _ => ErrorResponse<TResponse>($"URL '{additionalUri}' not configured in fake service")
@@ -83,28 +89,28 @@ public class FakeApiService : IApiService
     private ApiResponse<TResponse> HandlePostRequest<TRequest, TResponse>(string additionalUri, TRequest data)
     {
         var uri = additionalUri.TrimStart('/');
-    
+
         return uri switch
         {
-            "appointment/create" when data is AppointmentCreateRequest request => 
+            "appointment/create" when data is AppointmentCreateRequest request =>
                 HandleAppointmentCreate<TResponse>(request),
-    
-            "appointment/cancel" when data is AppointmentСancelRequest request => 
+
+            "appointment/cancel" when data is AppointmentСancelRequest request =>
                 HandleAppointmentCancel<TResponse>(request),
-    
-            "patient/update" when data is PatientPhoneUpdateRequest request => 
+
+            "patient/update" when data is PatientPhoneUpdateRequest request =>
                 HandlePatientUpdate<TResponse>(request),
-    
+
             _ => new ApiResponse<TResponse> { Success = false, Message = $"URL '{additionalUri}' not found" }
         };
     }
-    
+
     // Обработчики POST запросов
-    
+
     private ApiResponse<TResponse> HandleAppointmentCreate<TResponse>(AppointmentCreateRequest request)
     {
         var result = _dataService.CreateAppointment(request);
-        
+
         return new ApiResponse<TResponse>
         {
             Success = result.Success,
@@ -113,7 +119,7 @@ public class FakeApiService : IApiService
             ErrorCode = result.ErrorCode
         };
     }
-    
+
     private ApiResponse<TResponse> HandleAppointmentCancel<TResponse>(AppointmentСancelRequest request)
     {
         var result = _dataService.CancelAppointment(request);
@@ -125,7 +131,7 @@ public class FakeApiService : IApiService
             ErrorCode = result.ErrorCode
         };
     }
-    
+
     private ApiResponse<TResponse> HandlePatientUpdate<TResponse>(PatientPhoneUpdateRequest request)
     {
         var result = _dataService.UpdatePatientPhone(request);
@@ -148,6 +154,7 @@ public class FakeApiService : IApiService
             var lpus = _dataService.GetLpusByDistrict(districtId);
             return SuccessResponse<TResponse>(lpus);
         }
+
         return ErrorResponse<TResponse>("Invalid district URL");
     }
 
@@ -160,6 +167,7 @@ public class FakeApiService : IApiService
             var specialties = _dataService.GetSpecialtiesByLpu(lpuId);
             return SuccessResponse<TResponse>(specialties);
         }
+
         return ErrorResponse<TResponse>("Invalid specialties URL");
     }
 
@@ -173,6 +181,7 @@ public class FakeApiService : IApiService
             var doctors = _dataService.GetDoctorsBySpecialty(lpuId, specialtyId);
             return SuccessResponse<TResponse>(doctors);
         }
+
         return ErrorResponse<TResponse>("Invalid doctors URL");
     }
 
@@ -186,6 +195,7 @@ public class FakeApiService : IApiService
             var appointments = _dataService.GetAppointmentsByDoctor(lpuId, doctorId);
             return SuccessResponse<TResponse>(appointments);
         }
+
         return ErrorResponse<TResponse>("Invalid appointments URL");
     }
 
@@ -193,14 +203,15 @@ public class FakeApiService : IApiService
     {
         var queryString = uri.Contains('?') ? uri.Split('?')[1] : "";
         var queryParams = ParseQueryString(queryString);
-        
+
         var request = new PatientIdSearchRequest
         {
             LpuId = queryParams["lpuId"] ?? "1",
             LastName = queryParams["lastName"] ?? "",
             FirstName = queryParams["firstName"] ?? "",
             MiddleName = queryParams["middleName"] ?? "",
-            BirthDate = DateTime.Parse(queryParams["birthdateValue"] ?? DateTime.Now.AddYears(-30).ToString("yyyy-MM-dd"))
+            BirthDate = DateTime.Parse(queryParams["birthdateValue"] ??
+                                       DateTime.Now.AddYears(-30).ToString("yyyy-MM-dd"))
         };
 
         var patientId = _dataService.GetPatientId(request);
@@ -210,33 +221,31 @@ public class FakeApiService : IApiService
     // Вспомогательные методы
     private ApiResponse<TResponse> SuccessResponse<TResponse>(object result)
     {
-        return new ApiResponse<TResponse> 
-        { 
-            Success = true, 
-            Result = (TResponse)result 
+        return new ApiResponse<TResponse>
+        {
+            Success = true,
+            Result = (TResponse)result
         };
     }
 
     private ApiResponse<TResponse> ErrorResponse<TResponse>(string message)
     {
-        return new ApiResponse<TResponse> 
-        { 
-            Success = false, 
-            Message = message 
+        return new ApiResponse<TResponse>
+        {
+            Success = false,
+            Message = message
         };
     }
 
-    private System.Collections.Specialized.NameValueCollection ParseQueryString(string query)
+    private NameValueCollection ParseQueryString(string query)
     {
-        var collection = new System.Collections.Specialized.NameValueCollection();
+        var collection = new NameValueCollection();
         foreach (var pair in query.Split('&'))
         {
             var parts = pair.Split('=');
-            if (parts.Length == 2)
-            {
-                collection[parts[0]] = Uri.UnescapeDataString(parts[1]);
-            }
+            if (parts.Length == 2) collection[parts[0]] = Uri.UnescapeDataString(parts[1]);
         }
+
         return collection;
     }
 }

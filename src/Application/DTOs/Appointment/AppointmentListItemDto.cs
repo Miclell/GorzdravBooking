@@ -6,6 +6,7 @@ public record AppointmentListItemDto(
     DateTime VisitEnd,
     string? Address,
     string? Number,
-    string PatientFullName,      // Для списка - сразу видно к кому запись
-    string LpuShortName          // Для списка - где запись
+    string PatientFullName,
+    string LpuShortName,
+    string Doctor
 );

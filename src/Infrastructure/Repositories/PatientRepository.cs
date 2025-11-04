@@ -13,7 +13,8 @@ public class PatientRepository(AppDbContext context) : IPatientRepository
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<PatientProfile>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<PatientProfile>> GetByUserIdAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await context.PatientProfiles
             .Where(p => p.UserId == userId)

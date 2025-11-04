@@ -9,16 +9,16 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
     public void Configure(EntityTypeBuilder<Appointment> builder)
     {
         builder.ToTable("Appointments");
-        
+
         // Primary Key
         builder.HasKey(a => a.Id);
-        
+
         // Relationships
         builder.HasOne(a => a.PatientProfile)
             .WithMany(pp => pp.Appointments)
             .HasForeignKey(a => a.PatientProfileId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         // Properties
         builder.Property(a => a.AppointmentId)
             .IsRequired()
@@ -44,10 +44,10 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
 
         builder.Property(a => a.Doctor)
             .IsRequired();
-        
+
         builder.Property(a => a.Speciality)
             .IsRequired();
-        
+
         // Indexes
         builder.HasIndex(a => a.PatientProfileId)
             .HasDatabaseName("IX_Appointments_PatientProfileId");

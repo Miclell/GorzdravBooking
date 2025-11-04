@@ -1,9 +1,10 @@
 ﻿using Application.Common.Results;
-using Application.DTOs.Appointment;
+using Core.Entities;
 
 namespace Application.Coordinators.Interfaces;
 
 public interface IAppointmentCoordinator
 {
-    Task<Result<bool>> CreateCompleteAppointmentAsync(Core.Entities.AppointmentSearchRequest request, CancellationToken cancellationToken = default);
+    Task<Result<bool>> CreateCompleteAppointmentAsync(AppointmentSearchRequest request,
+        CancellationToken cancellationToken = default);
 }

@@ -17,6 +17,7 @@ public class CreateAppointmentProvider(IServiceProvider serviceProvider) : IMenu
         var dataService = serviceProvider.GetRequiredService<IDataService>();
         dataService.TryGet<BasePatientProfileDto>(nameof(BasePatientProfileDto), out var patient);
         dataService.TryGet<Doctor>(nameof(Doctor), out var doctor);
+        dataService.TryGet<MedicalSpeciality>(nameof(MedicalSpeciality), out var speciality);
         dataService.TryGet<CreateAppointmentSearchRequestDto>(nameof(CreateAppointmentSearchRequestDto),
             out var createAppointmentSearchRequestDto);
 
@@ -26,6 +27,7 @@ public class CreateAppointmentProvider(IServiceProvider serviceProvider) : IMenu
             LpuName = patient.LpuShortName,
             DoctorId = doctor!.Id,
             DoctorName = doctor.Name,
+            Speciality = speciality!.Name,
             SearchInterval = createAppointmentSearchRequestDto!.SearchInterval,
             SpecificStartPoints = createAppointmentSearchRequestDto.SpecificStartPoints,
             TimePreferencesPresetName = createAppointmentSearchRequestDto.TimePreferencesPresetName,
