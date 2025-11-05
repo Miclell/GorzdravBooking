@@ -2,6 +2,7 @@
 
 namespace Application.DTOs.Patient;
 
+[InputModel("профиля пациента")]
 public record CreatePatientDto(
     Guid UserId,
     string LpuId,

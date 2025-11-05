@@ -69,7 +69,6 @@ public class AppointmentService(
                 logger.LogWarning(
                     "Не удалось отменить запись во внешней системе. AppointmentId: {AppointmentId}, ExternalId: {ExternalAppointmentId}",
                     appointmentId, appointment.AppointmentId);
-                // TODO: решить, нужно ли падать здесь или просто логировать и продолжать
                 return Error.Failure("External.Cancel.Failed", "Failed to cancel appointment in external system");
             }
 

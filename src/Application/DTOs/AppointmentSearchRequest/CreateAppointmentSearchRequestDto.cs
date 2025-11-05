@@ -2,6 +2,7 @@
 
 namespace Application.DTOs.AppointmentSearchRequest;
 
+[InputModel("создания записи")]
 public class CreateAppointmentSearchRequestDto
 {
     public Guid PatientProfileId { get; set; }
@@ -12,7 +13,6 @@ public class CreateAppointmentSearchRequestDto
 
     [InputField("Интервал поиска (мин)")] public TimeSpan SearchInterval { get; set; }
 
-    [InputField("Конкретные моменты запуска", IsRequired = false)]
     public List<DateTime> SpecificStartPoints { get; set; } = [];
 
     public string TimePreferencesPresetName { get; set; } = null!;

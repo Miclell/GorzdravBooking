@@ -14,7 +14,7 @@ public class InMemoryEventBus : IEventBus
         {
             var eventType = typeof(T);
             if (!_handlers.ContainsKey(eventType))
-                _handlers[eventType] = new List<object>();
+                _handlers[eventType] = [];
 
             _handlers[eventType].Add(handler);
         }
@@ -27,21 +27,20 @@ public class InMemoryEventBus : IEventBus
     public async Task PublishAsync<T>(T @event, CancellationToken cancellationToken = default) where T : IEvent
     {
         List<object> handlers;
-        _semaphore.Wait();
+        await _semaphore.WaitAsync(cancellationToken);
         try
         {
             var eventType = typeof(T);
-            if (!_handlers.ContainsKey(eventType))
+            if (!_handlers.TryGetValue(eventType, out var handler))
                 return;
 
-            handlers = new List<object>(_handlers[eventType]);
+            handlers = new List<object>(handler);
         }
         finally
         {
             _semaphore.Release();
         }
 
-        // Выполняем обработчики без блокировки
         var tasks = handlers.Select(handler =>
             ((IEventHandler<T>)handler).Handle(@event, cancellationToken));
 

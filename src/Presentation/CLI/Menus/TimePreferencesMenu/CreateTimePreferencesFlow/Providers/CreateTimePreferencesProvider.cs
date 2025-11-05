@@ -8,7 +8,6 @@ using StatefulMenu.Core.Models;
 
 namespace CLI.Menus.TimePreferencesMenu.CreateTimePreferencesFlow.Providers;
 
-// TODO сделать нормальный ввод
 public class CreateTimePreferencesProvider(
     ITimePreferencesService timePreferencesService,
     IAppSettingsService appSettingsService,
@@ -18,7 +17,7 @@ public class CreateTimePreferencesProvider(
     {
         var createTimePreferenceDto = await ReadTimePreferences(await appSettingsService.GetDefaultUserIdAsync());
         var dto = createTimePreferenceDto.ToList();
-        Console.WriteLine(dto.First().UserId);
+        
         await timePreferencesService.CreateRangeAsync(dto, cancellationToken);
 
         Console.WriteLine("Пресет успешно создан! Нажмите клавишу для продолжения..");
@@ -58,28 +57,27 @@ public class CreateTimePreferencesProvider(
                 while (input == "да")
                 {
                     var preference = await inputService.ReadModelAsync<CreateTimePreferenceDto>();
-                    result.Add(preference!);
+                    result.Add(preference! with
+                    {
+                        UserId = userId,
+                        Name = baseFields.Name,
+                        AnyTime = baseFields.AnyTime,
+                        Day = day
+                    });
                     Console.WriteLine($"Добавить еще одно предпочтение для {day}? (да/нет)");
                     input = Console.ReadLine()?.Trim().ToLower();
                 }
             }
-
-            for (var i = 0; i < result.Count; i++)
-                result[i] = result[i] with
-                {
-                    UserId = userId,
-                    Name = baseFields.Name,
-                    AnyTime = baseFields.AnyTime
-                };
         }
 
         return result;
     }
 
-    private class TimePreferencesInputHelperDto
-    {
-        [InputField("Имя")] public string Name { get; } = null!;
-
-        [InputField("Любое время? (да/нет)")] public bool AnyTime { get; } = false;
-    }
+    [InputModel("временных предпочтений")]
+    private record TimePreferencesInputHelperDto(
+        [property: InputField("Имя")]
+        string Name,
+        [property: InputField("Любое время? (да/нет)")]
+        bool AnyTime
+    );
 }
