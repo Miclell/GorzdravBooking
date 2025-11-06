@@ -18,7 +18,7 @@ public class ExternalAppointmentService(IApiService apiService) : IExternalAppoi
         return response.Result!;
     }
 
-    public async Task<(bool IsSucces, int? ErrorCode)> CreateAppointmentAsync(AppointmentCreateRequest request)
+    public async Task<(bool IsSucces, int ErrorCode)> CreateAppointmentAsync(AppointmentCreateRequest request)
     {
         var response =
             await apiService.PostAsync<AppointmentCreateRequest, bool>(GorzdravApiEndpoints.AppointmentCreate, request);

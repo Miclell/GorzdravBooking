@@ -90,7 +90,7 @@ public class AppointmentCoordinatorTests
 
         _mockExternalService
             .Setup(x => x.CreateAppointmentAsync(It.IsAny<AppointmentCreateRequest>()))
-            .ReturnsAsync((true, null));
+            .ReturnsAsync((true, 0));
 
         // Act
         var result = await _coordinator.CreateCompleteAppointmentAsync(request, CancellationToken.None);

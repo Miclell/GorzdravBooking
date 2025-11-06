@@ -9,6 +9,7 @@ using StatefulMenu.Core.Models;
 
 namespace CLI.Menus.PatientMenu.CreatePatientFlow.Commands;
 
+// TODO  Ошибка при получении id пациента: реализовать обработку
 public class CreatePatientCommand(IServiceProvider serviceProvider) : IMenuCommand
 {
     public string Title { get; } = "Ввести данные пациента";

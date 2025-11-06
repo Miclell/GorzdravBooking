@@ -7,3 +7,4 @@ riderModule.iml
 .vs
 GorzdravBooking.sln.DotSettings.user
 identifier.sqlite
+src/Infrastructure/GorzdravBooking.db

@@ -88,6 +88,7 @@ public class AppointmentCoordinator(
             if (result.IsSucces)
             {
                 await SaveAppointmentToDatabase(request, appointment, cancellationToken);
+                logger.LogDebug("Запись успешна");
                 return Result.Success(true);
             }
     

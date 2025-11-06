@@ -22,7 +22,7 @@ public static class DependencyInjection
 
         // ApiClient
         services.AddGorzdravClient();
-        // services.AddFakeGorzdravClient();
+        //services.AddFakeGorzdravClient();
 
         // Services
         services.AddScoped<IExternalAppointmentService, ExternalAppointmentService>();
