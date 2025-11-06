@@ -22,10 +22,10 @@ public class ExternalAppointmentService(IApiService apiService) : IExternalAppoi
     {
         var response =
             await apiService.PostAsync<AppointmentCreateRequest, bool>(GorzdravApiEndpoints.AppointmentCreate, request);
-
+       
         return !response.Success
             ? throw new HttpRequestException($"Ошибка при выполнении записи: {response.Message}")
-            : (response.Result!, response.ErrorCode);
+            : (response.Success, response.ErrorCode);
     }
 
     public async Task<bool> CancelAppointmentAsync(AppointmentСancelRequest request)

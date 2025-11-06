@@ -9,7 +9,6 @@ using StatefulMenu.Core.Models;
 
 namespace CLI.Menus.PatientMenu.CreatePatientFlow.Commands;
 
-// TODO  Ошибка при получении id пациента: реализовать обработку
 public class CreatePatientCommand(IServiceProvider serviceProvider) : IMenuCommand
 {
     public string Title { get; } = "Ввести данные пациента";
@@ -33,20 +32,28 @@ public class CreatePatientCommand(IServiceProvider serviceProvider) : IMenuComma
             BirthDate = createPatientDto.PatientBirthdate
         };
 
-        var appSettingService = serviceProvider.GetRequiredService<IAppSettingsService>();
-        createPatientDto = createPatientDto! with
+        try
         {
-            UserId = await appSettingService.GetDefaultUserIdAsync(),
-            LpuId = lpu!.Id.ToString(),
-            LpuShortName = lpu!.LpuShortName,
-            LpuAddress = lpu!.Address,
-            PatientId = await externalPatientService.GetPatientIdAsync(patientIdSearchRequest)
-        };
+            var appSettingService = serviceProvider.GetRequiredService<IAppSettingsService>();
+            var patientId = await externalPatientService.GetPatientIdAsync(patientIdSearchRequest);
+            createPatientDto = createPatientDto with
+            {
+                UserId = await appSettingService.GetDefaultUserIdAsync(),
+                LpuId = lpu.Id.ToString(),
+                LpuShortName = lpu.LpuShortName,
+                LpuAddress = lpu.Address,
+                PatientId = patientId
+            };
 
-        await patientService.Create(createPatientDto!, cancellationToken);
+            await patientService.Create(createPatientDto, cancellationToken);
 
-        Console.WriteLine("Пациент успешно создан! Нажмите клавишу чтобы продолжить..");
-        Console.ReadKey();
+            Console.WriteLine("Пациент успешно создан! Нажмите клавишу чтобы продолжить..");
+            Console.ReadKey();
+        }
+        catch
+        {
+            Console.WriteLine("Ошибка при создании пациента, возможно указана не та поликлиника");
+        }
 
         dataService.Remove(nameof(Lpu));
 

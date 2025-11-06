@@ -17,12 +17,13 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
+        // Database
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlite("Data Source=GorzdravBooking.db"));
 
         // ApiClient
-        services.AddGorzdravClient();
-        //services.AddFakeGorzdravClient();
+        // services.AddGorzdravClient();
+        services.AddFakeGorzdravClient();
 
         // Services
         services.AddScoped<IExternalAppointmentService, ExternalAppointmentService>();
