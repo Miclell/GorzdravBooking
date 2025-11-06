@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -70,6 +70,31 @@ namespace Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TimePreferences",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Day = table.Column<int>(type: "INTEGER", nullable: true),
+                    PreferredTimeFrom = table.Column<TimeSpan>(type: "TEXT", nullable: true),
+                    PreferredTimeTo = table.Column<TimeSpan>(type: "TEXT", nullable: true),
+                    AnyTime = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TimePreferences", x => x.Id);
+                    table.CheckConstraint("CK_TimePreferences_Day_Required", "(\"AnyTime\" = true OR \"Day\" IS NOT NULL)");
+                    table.CheckConstraint("CK_TimePreferences_TimeRange", "(\"AnyTime\" = true OR (\"PreferredTimeFrom\" IS NOT NULL AND \r\n            \"PreferredTimeTo\" IS NOT NULL AND \r\n            \"PreferredTimeFrom\" < \"PreferredTimeTo\"))");
+                    table.ForeignKey(
+                        name: "FK_TimePreferences_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Appointments",
                 columns: table => new
                 {
@@ -105,6 +130,7 @@ namespace Infrastructure.Persistence.Migrations
                     LpuName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
                     DoctorId = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     DoctorName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    Speciality = table.Column<string>(type: "TEXT", nullable: false),
                     SearchInterval = table.Column<long>(type: "INTEGER", nullable: false, defaultValue: 36000000000L),
                     SpecificStartPoints = table.Column<string>(type: "TEXT", nullable: false),
                     TimePreferencesPresetName = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
@@ -119,34 +145,8 @@ namespace Infrastructure.Persistence.Migrations
                 {
                     table.PrimaryKey("PK_AppointmentSearchRequests", x => x.Id);
                     table.CheckConstraint("CK_AppointmentSearchRequests_AttemptCount", "\"AttemptCount\" >= 0");
-                    table.CheckConstraint("CK_AppointmentSearchRequests_Period", "(\"PeriodStart\" IS NULL AND \"PeriodEnd\" IS NULL) OR \r\n            (\"PeriodStart\" IS NOT NULL AND \"PeriodEnd\" IS NOT NULL AND \r\n            \"PeriodStart\" <= \"PeriodEnd\")");
                     table.ForeignKey(
                         name: "FK_AppointmentSearchRequests_PatientProfiles_PatientProfileId",
-                        column: x => x.PatientProfileId,
-                        principalTable: "PatientProfiles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TimePreferences",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    PatientProfileId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Day = table.Column<int>(type: "INTEGER", nullable: true),
-                    PreferredTimeFrom = table.Column<TimeSpan>(type: "TEXT", nullable: true),
-                    PreferredTimeTo = table.Column<TimeSpan>(type: "TEXT", nullable: true),
-                    AnyTime = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TimePreferences", x => x.Id);
-                    table.CheckConstraint("CK_TimePreferences_Day_Required", "(\"AnyTime\" = true OR \"Day\" IS NOT NULL)");
-                    table.CheckConstraint("CK_TimePreferences_TimeRange", "(\"AnyTime\" = true OR (\"PreferredTimeFrom\" IS NOT NULL AND \r\n            \"PreferredTimeTo\" IS NOT NULL AND \r\n            \"PreferredTimeFrom\" < \"PreferredTimeTo\"))");
-                    table.ForeignKey(
-                        name: "FK_TimePreferences_PatientProfiles_PatientProfileId",
                         column: x => x.PatientProfileId,
                         principalTable: "PatientProfiles",
                         principalColumn: "Id",
@@ -216,19 +216,19 @@ namespace Infrastructure.Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_TimePreferences_PatientId_Day",
+                name: "IX_TimePreferences_UserId",
                 table: "TimePreferences",
-                columns: new[] { "PatientProfileId", "Day" });
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TimePreferences_PatientId_Name",
+                name: "IX_TimePreferences_UserId_Day",
                 table: "TimePreferences",
-                columns: new[] { "PatientProfileId", "Name" });
+                columns: new[] { "UserId", "Day" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_TimePreferences_PatientProfileId",
+                name: "IX_TimePreferences_UserId_Name",
                 table: "TimePreferences",
-                column: "PatientProfileId");
+                columns: new[] { "UserId", "Name" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_CreatedAt",

@@ -26,8 +26,8 @@ public static class Program
             .ConfigureLogging(logging =>
             {
                 logging.ClearProviders();
-                AddDebugLogging(logging);
-                // AddProductionLogging(logging);
+                // AddDebugLogging(logging);
+                AddProductionLogging(logging);
             })
             .ConfigureServices((_, services) =>
             {

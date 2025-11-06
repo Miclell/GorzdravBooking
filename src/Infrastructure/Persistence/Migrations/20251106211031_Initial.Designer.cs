@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250927195046_InitialCreate1")]
-    partial class InitialCreate1
+    [Migration("20251106211031_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -143,6 +143,10 @@ namespace Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(36000000000L);
+
+                    b.Property<string>("Speciality")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.PrimitiveCollection<string>("SpecificStartPoints")
                         .IsRequired()
@@ -276,24 +280,24 @@ namespace Infrastructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("PatientProfileId")
-                        .HasColumnType("TEXT");
-
                     b.Property<TimeSpan?>("PreferredTimeFrom")
                         .HasColumnType("TEXT");
 
                     b.Property<TimeSpan?>("PreferredTimeTo")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("PatientProfileId");
+                    b.HasIndex("UserId");
 
-                    b.HasIndex("PatientProfileId", "Day")
-                        .HasDatabaseName("IX_TimePreferences_PatientId_Day");
+                    b.HasIndex("UserId", "Day")
+                        .HasDatabaseName("IX_TimePreferences_UserId_Day");
 
-                    b.HasIndex("PatientProfileId", "Name")
-                        .HasDatabaseName("IX_TimePreferences_PatientId_Name");
+                    b.HasIndex("UserId", "Name")
+                        .HasDatabaseName("IX_TimePreferences_UserId_Name");
 
                     b.ToTable("TimePreferences", null, t =>
                         {
@@ -375,13 +379,13 @@ namespace Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Core.Entities.TimePreferences", b =>
                 {
-                    b.HasOne("Core.Entities.PatientProfile", "PatientProfile")
+                    b.HasOne("Core.Entities.User", "User")
                         .WithMany("TimePreferences")
-                        .HasForeignKey("PatientProfileId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PatientProfile");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Core.Entities.PatientProfile", b =>
@@ -389,13 +393,13 @@ namespace Infrastructure.Persistence.Migrations
                     b.Navigation("AppointmentSearchRequests");
 
                     b.Navigation("Appointments");
-
-                    b.Navigation("TimePreferences");
                 });
 
             modelBuilder.Entity("Core.Entities.User", b =>
                 {
                     b.Navigation("Profiles");
+
+                    b.Navigation("TimePreferences");
                 });
 #pragma warning restore 612, 618
         }
