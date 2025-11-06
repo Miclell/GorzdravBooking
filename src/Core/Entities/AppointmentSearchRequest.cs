@@ -16,7 +16,8 @@ public class AppointmentSearchRequest
 
     public TimeSpan SearchInterval { get; set; }
     public List<DateTime> SpecificStartPoints { get; set; } = [];
-
+    // public DateTime MaxDateForBooking { get; set; } TODO сделать максимальную дату записи чтобы ловить нормеики
+    
     public string TimePreferencesPresetName { get; set; } = null!;
 
     public bool ViewOnly { get; set; } = false;

@@ -127,7 +127,7 @@ public class ExternalAppointmentServiceTests
         var result = await _externalAppointmentService.CreateAppointmentAsync(createRequest);
 
         // Assert
-        Assert.True(result);
+        Assert.Equal((true, 0), result);
     }
 
     [Fact]
@@ -170,8 +170,7 @@ public class ExternalAppointmentServiceTests
             AppointmentId = "appointment_789",
             LpuId = "1",
             PatientId = "patient_456",
-            EsiaId = "esia_123",
-            AppointmentType = "regular"
+            EsiaId = "esia_123"
         };
 
         const string uri = "appointment/cancel";
@@ -198,8 +197,7 @@ public class ExternalAppointmentServiceTests
             AppointmentId = "appointment_789",
             LpuId = "1",
             PatientId = "patient_456",
-            EsiaId = "esia_123",
-            AppointmentType = "regular"
+            EsiaId = "esia_123"
         };
 
         const string uri = "appointment/cancel";

@@ -18,14 +18,14 @@ public class ExternalAppointmentService(IApiService apiService) : IExternalAppoi
         return response.Result!;
     }
 
-    public async Task<bool> CreateAppointmentAsync(AppointmentCreateRequest request)
+    public async Task<(bool IsSucces, int? ErrorCode)> CreateAppointmentAsync(AppointmentCreateRequest request)
     {
         var response =
             await apiService.PostAsync<AppointmentCreateRequest, bool>(GorzdravApiEndpoints.AppointmentCreate, request);
 
         return !response.Success
             ? throw new HttpRequestException($"Ошибка при выполнении записи: {response.Message}")
-            : response.Result!;
+            : (response.Result!, response.ErrorCode);
     }
 
     public async Task<bool> CancelAppointmentAsync(AppointmentСancelRequest request)
