@@ -3,7 +3,6 @@ using Core.Interfaces.Repositories;
 using Core.Interfaces.Security;
 using Core.Interfaces.Services;
 using Infrastructure.Events;
-using Infrastructure.Http;
 using Infrastructure.Repositories;
 using Infrastructure.Security;
 using Infrastructure.Services;
