@@ -1,11 +1,13 @@
 ﻿using Application.DTOs.User;
 using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Server.Configurations;
+using Server.Configurations.Common;
 
 namespace Server.Controllers;
 
 [ApiController]
-[Route("api/user")]
+[Route($"{ApiRoutes.ApiV1Prefix}/[controller]")]
 public class UserController(
     IUserService userService,
     ILogger<UserController> logger) : ControllerBase
@@ -45,6 +47,3 @@ public class UserController(
         return BadRequest(result.Error);
     }
 }
-
-// DTO для смены пароля TODO добавить в Application.DTOs.User
-public record UpdatePasswordRequest(string NewPassword);
