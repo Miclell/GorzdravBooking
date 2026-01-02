@@ -6,6 +6,7 @@ using CLI.Helpers;
 using CLI.Menus;
 using Core.Events.Common;
 using Infrastructure;
+using Infrastructure.Persistence;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

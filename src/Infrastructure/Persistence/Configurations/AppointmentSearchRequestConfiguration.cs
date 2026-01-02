@@ -13,12 +13,18 @@ public class AppointmentSearchRequestConfiguration : IEntityTypeConfiguration<Ap
 
         // Primary Key
         builder.HasKey(asr => asr.Id);
+        
+        // TPH Discriminator
+        builder
+            .HasDiscriminator<string>("RequestType")
+            .HasValue<ManualSearchRequest>("Manual")
+            .HasValue<ReferralSearchRequest>("Referral");
 
         // Relationships
         builder.HasOne(asr => asr.PatientProfile)
             .WithMany(pp => pp.AppointmentSearchRequests)
             .HasForeignKey(asr => asr.PatientProfileId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         // Properties
         builder.Property(asr => asr.Id)
@@ -29,31 +35,45 @@ public class AppointmentSearchRequestConfiguration : IEntityTypeConfiguration<Ap
             .IsRequired()
             .HasMaxLength(200);
 
-        builder.Property(asr => asr.DoctorId)
+        builder.Property(asr => asr.Speciality)
             .IsRequired()
+            .HasMaxLength(300);
+        
+        builder.Property(asr => asr.DoctorMode)
+            .IsRequired()
+            .HasConversion<string>();
+        
+        builder.Property(asr => asr.DoctorId)
             .HasMaxLength(100);
 
         builder.Property(asr => asr.DoctorName)
-            .IsRequired()
             .HasMaxLength(200);
-
+        
+        builder.Property(asr => asr.TimeMode)
+            .IsRequired()
+            .HasConversion<string>();
+        
+        builder.Property(asr => asr.TimePreferencesPresetName)
+            .HasMaxLength(100);
+        
         builder.Property(asr => asr.SearchInterval)
             .IsRequired()
             .HasConversion(
                 timeSpan => timeSpan.Ticks,
                 ticks => new TimeSpan(ticks)
-            )
-            .HasDefaultValue(TimeSpan.FromHours(1));
-
+            );
+        
         builder.Property(asr => asr.SpecificStartPoints);
-
-        builder.Property(asr => asr.TimePreferencesPresetName)
-            .IsRequired()
-            .HasMaxLength(100);
+        
+        builder.Property(asr => asr.MaxDaysToSearch)
+            .IsRequired();
 
         builder.Property(asr => asr.ViewOnly)
+            .IsRequired();
+        
+        builder.Property(asr => asr.Status)
             .IsRequired()
-            .HasDefaultValue(false);
+            .HasConversion<string>();
 
         builder.Property(asr => asr.CreatedAt)
             .IsRequired();
@@ -64,15 +84,6 @@ public class AppointmentSearchRequestConfiguration : IEntityTypeConfiguration<Ap
         builder.Property(asr => asr.AttemptCount)
             .IsRequired()
             .HasDefaultValue(0);
-
-        builder.Property(asr => asr.Status)
-            .IsRequired()
-            .HasConversion<string>()
-            .HasDefaultValue(SearchRequestStatus.Pending);
-
-        builder.Property(asr => asr.MaxDaysToSearch)
-            .IsRequired()
-            .HasDefaultValue(30);
 
         // Indexes
         builder.HasIndex(asr => asr.PatientProfileId)
@@ -86,9 +97,8 @@ public class AppointmentSearchRequestConfiguration : IEntityTypeConfiguration<Ap
 
         builder.HasIndex(asr => new { asr.DoctorId, asr.LpuName })
             .HasDatabaseName("IX_AppointmentSearchRequests_Doctor_Lpu");
-
-        // Check constraints
-        builder.HasCheckConstraint("CK_AppointmentSearchRequests_AttemptCount",
-            @"""AttemptCount"" >= 0");
+        
+        builder.HasIndex(asr => new { asr.Status, asr.LastSearchAttempt })
+            .HasDatabaseName("IX_AppointmentSearchRequests_Status_LastSearchAttempt");
     }
 }

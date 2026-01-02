@@ -103,7 +103,7 @@ public class AppointmentCoordinatorTests
         _mockAppointmentService.Verify(x => x.CreateAsync(It.IsAny<CreateAppointmentDto>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
-    private static Core.Entities.AppointmentSearchRequest CreateTestRequest() => new()
+    private static Core.Entities.ManualSearchRequest CreateTestRequest() => new()
     {
         PatientProfileId = Guid.NewGuid(),
         TimePreferencesPresetName = "test",

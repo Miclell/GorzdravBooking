@@ -144,7 +144,7 @@ public class AppointmentSearchRequestServiceTests
             RequestId: requestId,
             TimePreferencesName: "UpdatedPreset");
 
-        var existingRequest = new AppointmentSearchRequest
+        var existingRequest = new ManualSearchRequest
         {
             Id = requestId,
             TimePreferencesPresetName = "OldPreset"
@@ -199,7 +199,7 @@ public class AppointmentSearchRequestServiceTests
             RequestId: Guid.NewGuid(), 
             TimePreferencesName: "UpdatedPreset");
 
-        var existingRequest = new AppointmentSearchRequest { Id = updateDto.RequestId };
+        var existingRequest = new ManualSearchRequest { Id = updateDto.RequestId };
         var exception = new Exception("Database error");
 
         _mockRepository
@@ -231,7 +231,7 @@ public class AppointmentSearchRequestServiceTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var requests = new List<AppointmentSearchRequest>
+        var requests = new List<ManualSearchRequest>
         {
             new()
             {
@@ -359,7 +359,7 @@ public class AppointmentSearchRequestServiceTests
     {
         // Arrange
         var patientProfileId = Guid.NewGuid();
-        var requests = new List<AppointmentSearchRequest>
+        var requests = new List<ManualSearchRequest>
         {
             new()
             {

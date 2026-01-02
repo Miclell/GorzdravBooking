@@ -1,6 +1,7 @@
 ﻿using Application.Abstract;
 using Application.Common.Results;
 using Application.DTOs.AppointmentSearchRequest;
+using Application.Extensions;
 using Application.Services.Interfaces;
 using Core.Entities;
 using Core.Enums;
@@ -19,20 +20,31 @@ public class AppointmentSearchRequestService(
     {
         try
         {
-            var request = new AppointmentSearchRequest
+            AppointmentSearchRequest request;
+            if (createDto.ReferralNumber.HasValue)
             {
-                PatientProfileId = createDto.PatientProfileId,
-                LpuName = createDto.LpuName,
-                DoctorId = createDto.DoctorId,
-                DoctorName = createDto.DoctorName,
-                Speciality = createDto.Speciality,
-                SearchInterval = createDto.SearchInterval,
-                SpecificStartPoints = createDto.SpecificStartPoints,
-                TimePreferencesPresetName = createDto.TimePreferencesPresetName,
-                ViewOnly = createDto.ViewOnly,
-                MaxDaysToSearch = createDto.MaxDaysToSearch,
-                Status = SearchRequestStatus.Pending
-            };
+                request = new ReferralSearchRequest
+                {
+                    ReferralNumber = createDto.ReferralNumber.Value
+                };
+            }
+            else
+            {
+                request = new ManualSearchRequest();
+            }
+
+            request.PatientProfileId = createDto.PatientProfileId;
+            request.LpuName = createDto.LpuName;
+            request.Speciality = createDto.Speciality;
+            request.DoctorMode = createDto.DoctorMode;
+            request.DoctorId = createDto.DoctorId;
+            request.DoctorName = createDto.DoctorName;
+            request.TimeMode = createDto.TimeMode;
+            request.TimePreferencesPresetName = createDto.TimePreferencesPresetName;
+            request.SearchInterval = createDto.SearchInterval;
+            request.SpecificStartPoints = createDto.SpecificStartPoints;
+            request.ViewOnly = createDto.ViewOnly;
+            request.MaxDaysToSearch = createDto.MaxDaysToSearch;
 
             await appointmentSearchRequestRepository.AddAsync(request, cancellationToken);
 
@@ -91,22 +103,7 @@ public class AppointmentSearchRequestService(
         {
             var requests = await appointmentSearchRequestRepository.GetActiveByUserIdAsync(userId, cancellationToken);
 
-            var dtos = requests.Select(request => new AppointmentSearchRequestDto(
-                request.Id,
-                request.PatientProfileId,
-                request.LpuName,
-                request.DoctorName,
-                request.SearchInterval,
-                request.SpecificStartPoints,
-                request.TimePreferencesPresetName,
-                request.ViewOnly,
-                request.MaxDaysToSearch,
-                request.CreatedAt,
-                request.LastSearchAttempt,
-                request.AttemptCount,
-                request.Status.ToString(),
-                $"{request.PatientProfile.PatientLastName} {request.PatientProfile.PatientFirstName} {request.PatientProfile.PatientMiddleName}"
-            ));
+            var dtos = requests.Select(request => request.ToDto());
 
             return Result.Success(dtos);
         }
@@ -117,7 +114,6 @@ public class AppointmentSearchRequestService(
         }
     }
 
-    // Дополнительный метод - получить все запросы пациента
     public async Task<Result<IEnumerable<AppointmentSearchRequestDto>>> GetByPatientAsync(
         Guid patientProfileId,
         CancellationToken cancellationToken = default)
@@ -128,22 +124,7 @@ public class AppointmentSearchRequestService(
                 await appointmentSearchRequestRepository.GetByPatientProfileIdAsync(patientProfileId,
                     cancellationToken);
 
-            var dtos = requests.Select(request => new AppointmentSearchRequestDto(
-                request.Id,
-                request.PatientProfileId,
-                request.LpuName,
-                request.DoctorName,
-                request.SearchInterval,
-                request.SpecificStartPoints,
-                request.TimePreferencesPresetName,
-                request.ViewOnly,
-                request.MaxDaysToSearch,
-                request.CreatedAt,
-                request.LastSearchAttempt,
-                request.AttemptCount,
-                request.Status.ToString(),
-                $"{request.PatientProfile.PatientLastName} {request.PatientProfile.PatientFirstName} {request.PatientProfile.PatientMiddleName}"
-            ));
+            var dtos = requests.Select(request  => request.ToDto());
 
             return Result.Success(dtos);
         }

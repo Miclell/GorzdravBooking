@@ -37,7 +37,7 @@ public class CheckAppointmentSearchRequestsUseCaseTests
     public async Task ExecuteAsync_WithActiveRequests_ProcessesEachRequest()
     {
         // Arrange
-        var requests = new List<AppointmentSearchRequest>
+        var requests = new List<ManualSearchRequest>
         {
             new()
             {
@@ -84,7 +84,7 @@ public class CheckAppointmentSearchRequestsUseCaseTests
     public async Task ExecuteAsync_WhenCoordinatorFails_LogsErrorButContinues()
     {
         // Arrange
-        var requests = new List<AppointmentSearchRequest>
+        var requests = new List<ManualSearchRequest>
         {
             new() { Id = Guid.NewGuid(), Status = SearchRequestStatus.InProgress, LastSearchAttempt = null },
             new() { Id = Guid.NewGuid(), Status = SearchRequestStatus.InProgress, LastSearchAttempt = null }
@@ -115,7 +115,7 @@ public class CheckAppointmentSearchRequestsUseCaseTests
     {
         // Arrange
         var now = DateTime.UtcNow;
-        var request = new AppointmentSearchRequest
+        var request = new ManualSearchRequest
         {
             Id = Guid.NewGuid(),
             Status = SearchRequestStatus.InProgress,

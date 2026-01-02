@@ -1,18 +1,26 @@
-﻿namespace Application.DTOs.AppointmentSearchRequest;
+﻿using Core.Enums;
+using Core.Models;
+
+namespace Application.DTOs.AppointmentSearchRequest;
 
 public record AppointmentSearchRequestDto(
     Guid Id,
     Guid PatientProfileId,
     string LpuName,
-    string DoctorName,
+    string Speciality,
+    DoctorSelectionMode DoctorMode,
+    string? DoctorName,
+    TimeSelectionMode TimeMode,
+    string? TimePreferencesPresetName,
     TimeSpan SearchInterval,
-    List<DateTime> SpecificStartPoints,
-    string TimePreferencesPresetName,
-    bool ViewOnly,
+    List<DateTime>? SpecificStartPoints,
     int MaxDaysToSearch,
+    bool ViewOnly,
+    string Status,
     DateTime CreatedAt,
     DateTime? LastSearchAttempt,
     int AttemptCount,
-    string Status,
-    string PatientFullName
+    string PatientFullName,
+    int? ReferralNumber,
+    string RequestType
 );

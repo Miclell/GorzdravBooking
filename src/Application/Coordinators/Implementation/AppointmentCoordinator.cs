@@ -4,6 +4,7 @@ using Application.DTOs.Appointment;
 using Application.DTOs.TimePreferences;
 using Application.Services.Interfaces;
 using Core.Entities;
+using Core.Enums;
 using Core.Interfaces.Services;
 using Core.Models;
 using Microsoft.Extensions.Logging;
@@ -23,16 +24,34 @@ public class AppointmentCoordinator(
         try
         {
             logger.LogDebug("Начало создания записи для пациента {PatientId}", request.PatientProfile.PatientId);
+
+            var timePreferences = Result.Success(new TimePreferencesPresetDto(
+                    "Любое время",
+                    request.PatientProfileId,
+                    true,
+                    new List<TimePreferenceDto>()
+                    ));
+            
+            if (request.TimeMode == TimeSelectionMode.WeekdayPattern)
+            {
+                timePreferences = await timePreferencesService.GetByPresetAsync(
+                    request.PatientProfile.UserId,
+                    request.TimePreferencesPresetName,
+                    cancellationToken);
     
-            var timePreferences = await timePreferencesService.GetByPresetAsync(
-                request.PatientProfile.UserId,
-                request.TimePreferencesPresetName,
-                cancellationToken);
-    
-            logger.LogDebug("Получены временные предпочтения: {Success}", timePreferences.IsSuccess);
-    
-            if (timePreferences.IsFailure)
-                return timePreferences.Error;
+                logger.LogDebug("Получены временные предпочтения: {Success}", timePreferences.IsSuccess);
+                
+                if (timePreferences.IsFailure)
+                    return timePreferences.Error;
+            }
+            else if (request.TimeMode == TimeSelectionMode.SpecificDates)
+            {
+                
+            }
+            else
+            {
+                
+            }
     
             var appointmentResult = await TryFindAndBookAppointmentWithRetryAsync(
                 request, timePreferences.Value, cancellationToken);

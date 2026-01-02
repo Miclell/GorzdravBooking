@@ -13,7 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="StatefulMenu" Version="1.0.0"/>
+        <PackageReference Include="StatefulMenu" Version="1.0.2"/>
     </ItemGroup>
 
 </Project>
