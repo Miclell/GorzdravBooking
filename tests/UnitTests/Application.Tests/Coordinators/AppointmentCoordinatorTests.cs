@@ -85,7 +85,7 @@ public class AppointmentCoordinatorTests
             .ReturnsAsync(Result.Success(timePreferences));
 
         _mockExternalService
-            .Setup(x => x.GetByDoctorAsync(It.IsAny<int>(), request.DoctorId))
+            .Setup(x => x.GetByDoctorAsync(It.IsAny<int>(), request.DoctorIds))
             .ReturnsAsync(appointments);
 
         _mockExternalService
@@ -107,7 +107,7 @@ public class AppointmentCoordinatorTests
     {
         PatientProfileId = Guid.NewGuid(),
         TimePreferencesPresetName = "test",
-        DoctorId = "doc123",
+        DoctorIds = "doc123",
         PatientProfile = new Core.Entities.PatientProfile
         {
             LpuId = "123",

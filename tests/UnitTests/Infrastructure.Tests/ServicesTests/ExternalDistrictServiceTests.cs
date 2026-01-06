@@ -1,5 +1,5 @@
 ﻿using Core.Models;
-using Infrastructure.ApiClient.Models;
+using Infrastructure.ApiClient;
 using Infrastructure.Services;
 using Infrastructure.Stubs;
 using Xunit;

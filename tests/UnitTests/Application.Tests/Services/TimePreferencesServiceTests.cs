@@ -32,11 +32,11 @@ public class TimePreferencesServiceTests
         };
 
         var createdIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
-        var capturedEntities = new List<TimePreferences>();
+        var capturedEntities = new List<TimePreference>();
 
         _mockRepository
-            .Setup(x => x.AddRangeAsync(It.IsAny<IEnumerable<TimePreferences>>(), It.IsAny<CancellationToken>())) // ← IEnumerable вместо List
-            .Callback<IEnumerable<TimePreferences>, CancellationToken>((entities, _) => // ← IEnumerable вместо List
+            .Setup(x => x.AddRangeAsync(It.IsAny<IEnumerable<TimePreference>>(), It.IsAny<CancellationToken>())) // ← IEnumerable вместо List
+            .Callback<IEnumerable<TimePreference>, CancellationToken>((entities, _) => // ← IEnumerable вместо List
             {
                 var entityList = entities.ToList();
                 capturedEntities.AddRange(entityList);
@@ -55,7 +55,7 @@ public class TimePreferencesServiceTests
         Assert.Equal(dtos[0].Name, capturedEntities[0].Name);
         Assert.Equal(dtos[0].Day, capturedEntities[0].Day);
     
-        _mockRepository.Verify(x => x.AddRangeAsync(It.IsAny<IEnumerable<TimePreferences>>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockRepository.Verify(x => x.AddRangeAsync(It.IsAny<IEnumerable<TimePreference>>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public class TimePreferencesServiceTests
         var exception = new Exception("Database error");
 
         _mockRepository
-            .Setup(x => x.AddRangeAsync(It.IsAny<List<TimePreferences>>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.AddRangeAsync(It.IsAny<List<TimePreference>>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(exception);
 
         // Act
@@ -142,7 +142,7 @@ public class TimePreferencesServiceTests
         var userId = Guid.NewGuid();
         var UserId = Guid.NewGuid();
     
-        var entities = new List<TimePreferences>
+        var entities = new List<TimePreference>
         {
             new() { Name = "WorkDays", UserId = UserId, AnyTime = false, Day = DayOfWeek.Monday, PreferredTimeFrom = TimeOnly.FromTimeSpan(TimeSpan.FromHours(9)), PreferredTimeTo = TimeOnly.FromTimeSpan(TimeSpan.FromHours(12)) },
             new() { Name = "WorkDays", UserId = UserId, AnyTime = false, Day = DayOfWeek.Tuesday, PreferredTimeFrom = TimeOnly.FromTimeSpan(TimeSpan.FromHours(9)), PreferredTimeTo = TimeOnly.FromTimeSpan(TimeSpan.FromHours(12)) },
@@ -182,7 +182,7 @@ public class TimePreferencesServiceTests
 
         _mockRepository
             .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<TimePreferences>());
+            .ReturnsAsync(new List<TimePreference>());
 
         // Act
         var result = await _service.GetByUserAsync(userId, CancellationToken.None);
@@ -228,7 +228,7 @@ public class TimePreferencesServiceTests
         var userId = Guid.NewGuid();
         var presetName = "WorkDays";
         
-        var preferences = new List<TimePreferences>
+        var preferences = new List<TimePreference>
         {
             new() { Name = presetName, UserId = userId, AnyTime = false, Day = DayOfWeek.Monday, PreferredTimeFrom = TimeOnly.FromTimeSpan(TimeSpan.FromHours(9)), PreferredTimeTo = TimeOnly.FromTimeSpan(TimeSpan.FromHours(12)) },
             new() { Name = presetName, UserId = userId, AnyTime = false, Day = DayOfWeek.Tuesday, PreferredTimeFrom = TimeOnly.FromTimeSpan(TimeSpan.FromHours(14)), PreferredTimeTo = TimeOnly.FromTimeSpan(TimeSpan.FromHours(16)) }
@@ -260,7 +260,7 @@ public class TimePreferencesServiceTests
         var userId = Guid.NewGuid();
         var presetName = "AnyTimePreset";
         
-        var preferences = new List<TimePreferences>
+        var preferences = new List<TimePreference>
         {
             new() { Name = presetName, UserId = userId, AnyTime = true }
         };
@@ -292,7 +292,7 @@ public class TimePreferencesServiceTests
 
         _mockRepository
             .Setup(x => x.GetByPresetAsync(userId, presetName, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<TimePreferences>());
+            .ReturnsAsync(new List<TimePreference>());
 
         // Act
         var result = await _service.GetByPresetAsync(userId, presetName, CancellationToken.None);

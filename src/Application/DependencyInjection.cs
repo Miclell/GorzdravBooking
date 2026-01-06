@@ -20,6 +20,7 @@ public static class DependencyInjection
             .AsImplementedInterfaces()
             .WithScopedLifetime());
 
+        services.AddSingleton(TimeProvider.System);
         services.AddScoped<IAppointmentCoordinator, AppointmentCoordinator>();
 
         // services.AddScoped<CheckAppointmentSearchRequestsUseCase>();

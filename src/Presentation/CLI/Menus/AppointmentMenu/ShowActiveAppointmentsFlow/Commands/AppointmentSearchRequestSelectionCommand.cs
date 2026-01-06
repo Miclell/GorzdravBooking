@@ -12,7 +12,7 @@ public class AppointmentSearchRequestSelectionCommand(
     IServiceProvider serviceProvider) : IMenuCommand
 {
     public string Title { get; } = $"{appointment.LpuName} " +
-                                   $"{appointment.DoctorName} | " +
+                                   $"{appointment.DoctorNames} | " +
                                    $"{appointment.TimePreferencesPresetName}";
 
     public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default)

@@ -1,5 +1,8 @@
-﻿using Application.DTOs.AppointmentSearchRequest;
+﻿using Application.DTOs.Appointment;
+using Application.DTOs.AppointmentSearchRequest;
 using Core.Entities;
+using Core.Models;
+using Appointment = Core.Models.Appointment;
 
 namespace Application.Extensions;
 
@@ -12,7 +15,7 @@ public static class AppointmentSearchRequestExtensions
             request.LpuName,
             request.Speciality,
             request.DoctorMode,
-            request.DoctorName,
+            request.DoctorNames,
             request.TimeMode,
             request.TimePreferencesPresetName,
             request.SearchInterval,
@@ -31,4 +34,36 @@ public static class AppointmentSearchRequestExtensions
                 ManualSearchRequest => "Manual",
                 _ => "Unknown"
             });
+    
+    public static CreateAppointmentDto ToCreateAppointmentDto(this AppointmentSearchRequest request,  Appointment appointment, string doctorName) =>
+        new(
+            request.PatientProfileId,
+            appointment.Id,
+            appointment.VisitStart,
+            appointment.VisitEnd,
+            appointment.Address,
+            appointment.Number,
+            appointment.Room,
+            request.Speciality,
+            doctorName
+        );
+
+    public static AppointmentCreateRequest ToAppointmentCreateRequest(this AppointmentSearchRequest request, Appointment appointment) =>
+        new()
+        {
+            EsiaId = null,
+            LpuId = request.PatientProfile.LpuId,
+            PatientId = request.PatientProfile.PatientId,
+            AppointmentId = appointment.Id,
+            ReferralId = null,
+            IpmpiCardId = null,
+            RecipientEmail = request.PatientProfile.RecipientEmail,
+            PatientLastName = request.PatientProfile.PatientLastName,
+            PatientFirstName = request.PatientProfile.PatientFirstName,
+            PatientMiddleName = request.PatientProfile.PatientMiddleName,
+            PatientBirthdate = request.PatientProfile.PatientBirthdate,
+            Room = appointment.Room,
+            Address = request.PatientProfile.LpuAddress,
+            VisitDate = appointment.VisitStart
+        };
 }

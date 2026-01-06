@@ -6,10 +6,13 @@ namespace Application.DTOs.TimePreferences;
 public record CreateTimePreferenceDto(
     string Name,
     Guid UserId,
+    DateOnly? Date,
     DayOfWeek? Day,
     [property: InputField("Время с")] 
     TimeOnly? PreferredTimeFrom,
     [property: InputField("Время до")] 
     TimeOnly? PreferredTimeTo,
-    bool AnyTime = false
+    List<DateOnly>? ExcludedDates,
+    int MaxDaysAhead,
+    int MinHoursFromNow
 );

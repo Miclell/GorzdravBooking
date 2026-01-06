@@ -31,8 +31,8 @@ public class AppointmentSearchRequestServiceTests
         {
             PatientProfileId = Guid.NewGuid(),
             LpuName = "Test Hospital",
-            DoctorId = "doc123",
-            DoctorName = "Dr. Smith",
+            DoctorIds = "doc123",
+            DoctorNames = "Dr. Smith",
             SearchInterval = TimeSpan.FromHours(2),
             SpecificStartPoints = new List<DateTime> { DateTime.Now.AddDays(1) },
             TimePreferencesPresetName = "WorkDays",
@@ -64,7 +64,7 @@ public class AppointmentSearchRequestServiceTests
         {
             PatientProfileId = Guid.NewGuid(),
             LpuName = "Test Hospital",
-            DoctorName = "Dr. Smith"
+            DoctorNames = "Dr. Smith"
         };
 
         var exception = new Exception("Database error");
@@ -238,7 +238,7 @@ public class AppointmentSearchRequestServiceTests
                 Id = Guid.NewGuid(),
                 PatientProfileId = Guid.NewGuid(),
                 LpuName = "Hospital 1",
-                DoctorName = "Dr. Ivanov",
+                DoctorNames = "Dr. Ivanov",
                 SearchInterval = TimeSpan.FromHours(1),
                 SpecificStartPoints = new List<DateTime>(),
                 TimePreferencesPresetName = "WorkDays",
@@ -260,7 +260,7 @@ public class AppointmentSearchRequestServiceTests
                 Id = Guid.NewGuid(),
                 PatientProfileId = Guid.NewGuid(),
                 LpuName = "Hospital 2",
-                DoctorName = "Dr. Petrov",
+                DoctorNames = "Dr. Petrov",
                 SearchInterval = TimeSpan.FromHours(2),
                 SpecificStartPoints = new List<DateTime>(),
                 TimePreferencesPresetName = "Weekend",
@@ -293,13 +293,13 @@ public class AppointmentSearchRequestServiceTests
         Assert.Equal(2, resultList.Count);
         
         Assert.Equal("Hospital 1", resultList[0].LpuName);
-        Assert.Equal("Dr. Ivanov", resultList[0].DoctorName);
+        Assert.Equal("Dr. Ivanov", resultList[0].DoctorNames);
         Assert.Equal("WorkDays", resultList[0].TimePreferencesPresetName);
         Assert.Equal("Ivanov Ivan Ivanovich", resultList[0].PatientFullName);
         Assert.Equal(SearchRequestStatus.InProgress.ToString(), resultList[0].Status);
         
         Assert.Equal("Hospital 2", resultList[1].LpuName);
-        Assert.Equal("Dr. Petrov", resultList[1].DoctorName);
+        Assert.Equal("Dr. Petrov", resultList[1].DoctorNames);
         Assert.Equal("Weekend", resultList[1].TimePreferencesPresetName);
         Assert.Equal("Petrov Petr Petrovich", resultList[1].PatientFullName);
         Assert.Equal(SearchRequestStatus.Pending.ToString(), resultList[1].Status);
@@ -366,7 +366,7 @@ public class AppointmentSearchRequestServiceTests
                 Id = Guid.NewGuid(),
                 PatientProfileId = patientProfileId,
                 LpuName = "Test Hospital",
-                DoctorName = "Dr. Smith",
+                DoctorNames = "Dr. Smith",
                 SearchInterval = TimeSpan.FromHours(1),
                 SpecificStartPoints = new List<DateTime>(),
                 TimePreferencesPresetName = "WorkDays",
@@ -399,7 +399,7 @@ public class AppointmentSearchRequestServiceTests
         Assert.Single(resultList);
         Assert.Equal(patientProfileId, resultList[0].PatientProfileId);
         Assert.Equal("Test Hospital", resultList[0].LpuName);
-        Assert.Equal("Dr. Smith", resultList[0].DoctorName);
+        Assert.Equal("Dr. Smith", resultList[0].DoctorNames);
         Assert.Equal("Sidorov Sidor Sidorovich", resultList[0].PatientFullName);
         Assert.Equal(SearchRequestStatus.Completed.ToString(), resultList[0].Status);
         

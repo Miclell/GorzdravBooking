@@ -1,6 +1,7 @@
 ﻿using Application.Abstract;
 using Application.Common.Results;
 using Application.DTOs.TimePreferences;
+using Application.Extensions;
 using Application.Services.Interfaces;
 using Core.Entities;
 using Core.Interfaces.Repositories;
@@ -17,15 +18,7 @@ public class TimePreferencesService(
     {
         try
         {
-            var timePreferences = dtos.Select(dto => new TimePreferences
-            {
-                Name = dto.Name,
-                UserId = dto.UserId,
-                Day = dto.Day,
-                PreferredTimeFrom = dto.PreferredTimeFrom,
-                PreferredTimeTo = dto.PreferredTimeTo,
-                AnyTime = dto.AnyTime
-            }).ToList();
+            var timePreferences = dtos.Select(dto => dto.ToEntity()).ToList();
 
             await timePreferencesRepository.AddRangeAsync(timePreferences, cancellationToken);
 
@@ -68,19 +61,21 @@ public class TimePreferencesService(
 
             var presets = entities
                 .GroupBy(tp => tp.Name)
-                .Select(group => new TimePreferencesPresetDto(
-                    group.Key,
-                    group.First().UserId,
-                    group.First().AnyTime,
-                    group
-                        .Select(tp => new TimePreferenceDto(
-                            tp.Day,
-                            tp.PreferredTimeFrom,
-                            tp.PreferredTimeTo
-                        ))
-                        .ToList()
-                        .AsReadOnly()
-                ));
+                .Select(group =>
+                {
+                    var first = group.First();
+                
+                    return new TimePreferencesPresetDto(
+                        first.Name,
+                        first.UserId,
+                        group.Select(tp => tp.ToDto())
+                            .ToList()
+                            .AsReadOnly(),
+                        first.ExcludedDates,
+                        first.MaxDaysAhead,
+                        first.MinHoursFromNow
+                    );
+                });
 
             return Result.Success(presets);
         }
@@ -99,30 +94,23 @@ public class TimePreferencesService(
             var preferences = await timePreferencesRepository
                 .GetByPresetAsync(userId, name, cancellationToken);
 
-            var timePreferencesEnumerable = preferences.ToList();
-            if (timePreferencesEnumerable.Count == 0)
+            var timePreferencesList = preferences.ToList();
+            if (timePreferencesList.Count == 0)
                 return Error.NotFound("Preferences.Not.Found", "Preferences not found");
 
-            var anyTimePreference = timePreferencesEnumerable.FirstOrDefault(p => p.AnyTime);
-            var hasAnyTime = anyTimePreference != null;
-
-            var presetDto = new TimePreferencesPresetDto(
+            var first = timePreferencesList.First();
+            var preset = new TimePreferencesPresetDto(
                 name,
                 userId,
-                hasAnyTime,
-                hasAnyTime
-                    ? new List<TimePreferenceDto>().AsReadOnly()
-                    : timePreferencesEnumerable
-                        .Select(p => new TimePreferenceDto(
-                            p.Day,
-                            p.PreferredTimeFrom,
-                            p.PreferredTimeTo
-                        ))
-                        .ToList()
-                        .AsReadOnly()
+                timePreferencesList.Select(tp => tp.ToDto())
+                    .ToList()
+                    .AsReadOnly(),
+                first.ExcludedDates,
+                first.MaxDaysAhead,
+                first.MinHoursFromNow
             );
 
-            return Result.Success(presetDto);
+            return Result.Success(preset);
         }
         catch (Exception e)
         {

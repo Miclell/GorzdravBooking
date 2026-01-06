@@ -9,7 +9,7 @@ public record AppointmentSearchRequestDto(
     string LpuName,
     string Speciality,
     DoctorSelectionMode DoctorMode,
-    string? DoctorName,
+    List<string>? DoctorNames,
     TimeSelectionMode TimeMode,
     string? TimePreferencesPresetName,
     TimeSpan SearchInterval,

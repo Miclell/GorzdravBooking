@@ -23,7 +23,7 @@ public class DeleteAppointmentSearchRequestCommand(
 
         Console.WriteLine($"Запрос " +
                           $"{appointment.LpuName} " +
-                          $"{appointment.DoctorName} |" +
+                          $"{appointment.DoctorNames} |" +
                           $"{appointment.TimePreferencesPresetName} успешно удален!\n" +
                           $"Нажмите любую клавишу для продолжения..");
         Console.ReadKey();

@@ -2,6 +2,7 @@
 using Application.DTOs.Patient;
 using CLI.Helpers;
 using CLI.Menus.AppointmentMenu.CreateAppointmentFlow.Commands;
+using Core.Enums;
 using Core.Models;
 using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu.Commands.BuiltIn;
@@ -17,23 +18,27 @@ public class CreateAppointmentProvider(IServiceProvider serviceProvider) : IMenu
     {
         var dataService = serviceProvider.GetRequiredService<IDataService>();
         dataService.TryGet<BasePatientProfileDto>(nameof(BasePatientProfileDto), out var patient);
-        dataService.TryGet<Doctor>(nameof(Doctor), out var doctor);
+        dataService.TryGet<List<Doctor>>("SelectedDoctors", out var doctors);
         dataService.TryGet<MedicalSpeciality>(nameof(MedicalSpeciality), out var speciality);
         dataService.TryGet<CreateAppointmentSearchRequestDto>(nameof(CreateAppointmentSearchRequestDto),
             out var createAppointmentSearchRequestDto);
+
+        dataService.TryGet<bool>("IsAnyOfSpeciality", out var isAnyOfSpeciality);
 
         createAppointmentSearchRequestDto = new CreateAppointmentSearchRequestDto
         {
             PatientProfileId = patient!.Id,
             LpuName = patient.LpuShortName,
-            DoctorId = doctor!.Id,
-            DoctorName = doctor.Name,
             Speciality = speciality!.Name,
+            DoctorMode = isAnyOfSpeciality ? DoctorSelectionMode.AnyOfSpeciality : DoctorSelectionMode.SpecificDoctorOrRange,
+            DoctorIds = isAnyOfSpeciality ? null : doctors!.Select(d => d.Name).ToList(),
+            DoctorNames = isAnyOfSpeciality ? null : doctors!.Select(d => d.Id).ToList(),
+            TimeMode = TimeSelectionMode.AnyTime,
+            TimePreferencesPresetName = createAppointmentSearchRequestDto.TimePreferencesPresetName,
             SearchInterval = createAppointmentSearchRequestDto!.SearchInterval,
             SpecificStartPoints = createAppointmentSearchRequestDto.SpecificStartPoints,
-            TimePreferencesPresetName = createAppointmentSearchRequestDto.TimePreferencesPresetName,
-            ViewOnly = createAppointmentSearchRequestDto.ViewOnly,
-            MaxDaysToSearch = createAppointmentSearchRequestDto.MaxDaysToSearch
+            MaxDaysToSearch = createAppointmentSearchRequestDto.MaxDaysToSearch,
+            ViewOnly = createAppointmentSearchRequestDto.ViewOnly
         };
 
         var commands = new List<IMenuCommand>

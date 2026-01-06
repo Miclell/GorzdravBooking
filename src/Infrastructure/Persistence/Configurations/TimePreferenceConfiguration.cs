@@ -4,14 +4,26 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Persistence.Configurations;
 
-public class TimePreferencesConfiguration : IEntityTypeConfiguration<TimePreferences>
+public class TimePreferenceConfiguration : IEntityTypeConfiguration<TimePreference>
 {
-    public void Configure(EntityTypeBuilder<TimePreferences> builder)
+    public void Configure(EntityTypeBuilder<TimePreference> builder)
     {
         builder.ToTable("TimePreferences");
 
         // Primary Key
         builder.HasKey(tp => tp.Id);
+        
+        // TPH Discriminator
+        builder
+            .HasDiscriminator<string>("PreferenceType")
+            .HasValue<WeekDayPreference>("WeekDay")
+            .HasValue<MonthDayPreference>("MonthDay");
+        
+        // Relationships
+        builder.HasOne(tp => tp.User)
+            .WithMany(u => u.TimePreferences)
+            .HasForeignKey(tp => tp.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // Properties
         builder.Property(tp => tp.Id)
@@ -21,10 +33,6 @@ public class TimePreferencesConfiguration : IEntityTypeConfiguration<TimePrefere
         builder.Property(tp => tp.Name)
             .IsRequired()
             .HasMaxLength(100);
-
-        builder.Property(tp => tp.Day)
-            .IsRequired(false)
-            .HasConversion<int?>();
 
         builder.Property(tp => tp.PreferredTimeFrom)
             .IsRequired(false)
@@ -40,32 +48,19 @@ public class TimePreferencesConfiguration : IEntityTypeConfiguration<TimePrefere
                 ts => ts.HasValue ? TimeOnly.FromTimeSpan(ts.Value) : null
             );
 
-        builder.Property(tp => tp.AnyTime)
-            .IsRequired()
-            .HasDefaultValue(false);
-
-        // Relationships
-        builder.HasOne(tp => tp.User)
-            .WithMany(u => u.TimePreferences)
-            .HasForeignKey(tp => tp.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
-
+        builder.Property(tp => tp.ExcludedDates)
+            .IsRequired(false);
+        
         // Indexes
         builder.HasIndex(tp => tp.UserId);
 
         builder.HasIndex(tp => new { tp.UserId, tp.Name })
             .HasDatabaseName("IX_TimePreferences_UserId_Name");
-
-        builder.HasIndex(tp => new { tp.UserId, tp.Day })
-            .HasDatabaseName("IX_TimePreferences_UserId_Day");
-
+        
         // Check constraints
         builder.HasCheckConstraint("CK_TimePreferences_TimeRange",
-            @"(""AnyTime"" = true OR (""PreferredTimeFrom"" IS NOT NULL AND 
-            ""PreferredTimeTo"" IS NOT NULL AND 
-            ""PreferredTimeFrom"" < ""PreferredTimeTo""))");
-
-        builder.HasCheckConstraint("CK_TimePreferences_Day_Required",
-            @"(""AnyTime"" = true OR ""Day"" IS NOT NULL)");
+            @"(""PreferredTimeFrom"" IS NULL AND ""PreferredTimeTo"" IS NULL) OR 
+              (""PreferredTimeFrom"" IS NOT NULL AND ""PreferredTimeTo"" IS NOT NULL AND 
+               ""PreferredTimeFrom"" < ""PreferredTimeTo"")");
     }
 }

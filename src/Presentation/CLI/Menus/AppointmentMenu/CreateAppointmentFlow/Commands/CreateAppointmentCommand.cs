@@ -11,7 +11,7 @@ public class CreateAppointmentCommand(
     IServiceProvider serviceProvider) : IMenuCommand
 {
     public string Title { get; } = $"{createAppointmentSearchRequestDto.LpuName} " +
-                                   $"{createAppointmentSearchRequestDto.DoctorName} | " +
+                                   $"{createAppointmentSearchRequestDto.DoctorNames} | " +
                                    $"{createAppointmentSearchRequestDto.TimePreferencesPresetName}";
 
     public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default)

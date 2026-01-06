@@ -37,8 +37,8 @@ public class AppointmentSearchRequestService(
             request.LpuName = createDto.LpuName;
             request.Speciality = createDto.Speciality;
             request.DoctorMode = createDto.DoctorMode;
-            request.DoctorId = createDto.DoctorId;
-            request.DoctorName = createDto.DoctorName;
+            request.DoctorIds = createDto.DoctorIds;
+            request.DoctorNames = createDto.DoctorNames;
             request.TimeMode = createDto.TimeMode;
             request.TimePreferencesPresetName = createDto.TimePreferencesPresetName;
             request.SearchInterval = createDto.SearchInterval;

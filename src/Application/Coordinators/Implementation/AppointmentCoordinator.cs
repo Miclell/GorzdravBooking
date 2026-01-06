@@ -1,75 +1,64 @@
 ﻿using Application.Common.Results;
 using Application.Coordinators.Interfaces;
-using Application.DTOs.Appointment;
 using Application.DTOs.TimePreferences;
+using Application.Extensions;
 using Application.Services.Interfaces;
 using Core.Entities;
 using Core.Enums;
 using Core.Interfaces.Services;
-using Core.Models;
 using Microsoft.Extensions.Logging;
 using Appointment = Core.Models.Appointment;
 
 namespace Application.Coordinators.Implementation;
 
 public class AppointmentCoordinator(
-    IExternalAppointmentService externalExternalAppointmentService,
+    IExternalAppointmentService externalAppointmentService,
     ITimePreferencesService timePreferencesService,
     IAppointmentService appointmentService,
+    TimeProvider timeProvider,
     ILogger<AppointmentCoordinator> logger) : IAppointmentCoordinator
 {
     public async Task<Result<bool>> CreateCompleteAppointmentAsync(AppointmentSearchRequest request,
-    CancellationToken cancellationToken)
+        CancellationToken cancellationToken)
     {
         try
         {
             logger.LogDebug("Начало создания записи для пациента {PatientId}", request.PatientProfile.PatientId);
 
-            var timePreferences = Result.Success(new TimePreferencesPresetDto(
-                    "Любое время",
-                    request.PatientProfileId,
-                    true,
-                    new List<TimePreferenceDto>()
-                    ));
-            
-            if (request.TimeMode == TimeSelectionMode.WeekdayPattern)
+            TimePreferencesPresetDto? timePreferences = null;
+        
+            if (request.TimeMode is TimeSelectionMode.WeekdayPattern or TimeSelectionMode.SpecificDates)
             {
-                timePreferences = await timePreferencesService.GetByPresetAsync(
+                var preferencesResult = await timePreferencesService.GetByPresetAsync(
                     request.PatientProfile.UserId,
-                    request.TimePreferencesPresetName,
+                    request.TimePreferencesPresetName!,
                     cancellationToken);
-    
-                logger.LogDebug("Получены временные предпочтения: {Success}", timePreferences.IsSuccess);
-                
-                if (timePreferences.IsFailure)
-                    return timePreferences.Error;
+
+                logger.LogDebug("Получены временные предпочтения: {Success}", preferencesResult.IsSuccess);
+        
+                if (preferencesResult.IsFailure)
+                    return preferencesResult.Error;
+            
+                timePreferences = preferencesResult.Value;
             }
-            else if (request.TimeMode == TimeSelectionMode.SpecificDates)
-            {
-                
-            }
-            else
-            {
-                
-            }
-    
+        
             var appointmentResult = await TryFindAndBookAppointmentWithRetryAsync(
-                request, timePreferences.Value, cancellationToken);
-    
+                request, timePreferences, cancellationToken);
+
             return appointmentResult.IsFailure 
                 ? appointmentResult.Error 
                 : Result.Success(appointmentResult.Value);
         }
         catch (Exception e)
         {
-            logger.LogError("Booking appointment error - {e}", e.ToString());
+            logger.LogError(e, "Booking appointment error for patient {PatientId}", request.PatientProfile.PatientId);
             return Error.Failure(e.ToString(), "Booking appointment error");
         }
     }
     
     private async Task<Result<bool>> TryFindAndBookAppointmentWithRetryAsync(
         AppointmentSearchRequest request,
-        TimePreferencesPresetDto timePreferences,
+        TimePreferencesPresetDto? timePreferences,
         CancellationToken cancellationToken)
     {
         const int maxRetries = 3;
@@ -78,14 +67,17 @@ public class AppointmentCoordinator(
         for (var attempt = 1; attempt <= maxRetries; attempt++)
         {
             logger.LogDebug("Попытка {attempt} найти и забронировать номерок", attempt);
-    
-            var appointments = await externalExternalAppointmentService.GetByDoctorAsync(
-                int.Parse(request.PatientProfile.LpuId),
-                request.DoctorId);
-    
+
+            var appointments = await GetAppointmentsAsync(request);
+            if (appointments == null)
+            {
+                logger.LogDebug("Не найдено номерков на попытке {attempt}", attempt);
+                return Result.Success(false);
+            }
+            
             logger.LogDebug("Получено {count} номерков на попытке {attempt}", appointments.Count, attempt);
     
-            var appointment = TryGetPreferAppointment(appointments, timePreferences);
+            var appointment = TryGetPreferAppointment(appointments, timePreferences, request.TimeMode, timeProvider.GetLocalNow().DateTime);
     
             if (appointment == null)
             {
@@ -99,14 +91,14 @@ public class AppointmentCoordinator(
                 return Result.Success(false);
             }
     
-            logger.LogDebug("Попытка бронирования номерка {AppointmentId}", appointment.Id);
+            logger.LogDebug("Попытка бронирования номерка {AppointmentId}", appointment.Value.Appointment);
     
-            var createRequest = CreateAppointmentRequest(request, appointment);
-            var result = await externalExternalAppointmentService.CreateAppointmentAsync(createRequest);
+            var createRequest = request.ToAppointmentCreateRequest(appointment.Value.Appointment);
+            var result = await externalAppointmentService.CreateAppointmentAsync(createRequest);
     
             if (result.IsSucces)
             {
-                await SaveAppointmentToDatabase(request, appointment, cancellationToken);
+                await appointmentService.CreateAsync(request.ToCreateAppointmentDto(appointment.Value.Appointment, appointment.Value.Doctor), cancellationToken);
                 logger.LogDebug("Запись успешна");
                 return Result.Success(true);
             }
@@ -116,83 +108,151 @@ public class AppointmentCoordinator(
                 logger.LogWarning("Критическая ошибка бронирования: {ErrorCode}", result.ErrorCode);
                 return Error.Conflict("Failed.Booking", "Failed to booking appointment in external service");
             }
+            
+            // TODO если уже есть такая запись просто отменяем запрос
     
             logger.LogWarning("Нас обогнала бабуля");
 
             if (attempt >= maxRetries) continue;
             
             var delay = baseDelayMs * Math.Pow(2, attempt - 1);
-            logger.LogDebug("Ждем {delay}ms перед следующей попыткой", delay);
+            logger.LogDebug("Ждем {Delay}ms перед следующей попыткой", delay);
             await Task.Delay(TimeSpan.FromMilliseconds(delay), cancellationToken);
         }
     
         logger.LogWarning("Нас обогнала бабуля!");
         return Error.Failure("Failure.Booking", "Нас обогнала бабуля!");
     }
-    
-    private static AppointmentCreateRequest CreateAppointmentRequest(AppointmentSearchRequest request, Appointment appointment)
+
+    private async Task<List<(string Doctor, Appointment Appointment)>?> GetAppointmentsAsync(AppointmentSearchRequest request)
     {
-        return new AppointmentCreateRequest
+        if (request is ManualSearchRequest manualSearchRequest)
         {
-            EsiaId = null,
-            LpuId = request.PatientProfile.LpuId,
-            PatientId = request.PatientProfile.PatientId,
-            AppointmentId = appointment.Id,
-            ReferralId = null,
-            IpmpiCardId = null,
-            RecipientEmail = request.PatientProfile.RecipientEmail,
-            PatientLastName = request.PatientProfile.PatientLastName,
-            PatientFirstName = request.PatientProfile.PatientFirstName,
-            PatientMiddleName = request.PatientProfile.PatientMiddleName,
-            PatientBirthdate = request.PatientProfile.PatientBirthdate,
-            Room = appointment.Room,
-            Address = request.PatientProfile.LpuAddress,
-            VisitDate = appointment.VisitStart
+            var appointments = new List<(string Doctor, Appointment Appointment)>();
+            if (request.DoctorMode == DoctorSelectionMode.SpecificDoctorOrRange)
+            {
+                foreach (var (doctorId, doctorName) in request.DoctorIds!
+                             .Zip(request.DoctorNames!))
+                {
+                    var slots = await externalAppointmentService.GetByDoctorAsync(
+                        int.Parse(manualSearchRequest.PatientProfile.LpuId),
+                        doctorId);
+        
+                    appointments.AddRange(slots.Select(slot => (doctorName, slot)));
+                }
+            }
+            else
+            {
+                appointments.AddRange(await externalAppointmentService.GetBySpecialityAsync(
+                    int.Parse(manualSearchRequest.PatientProfile.LpuId),
+                    request.Speciality));
+            }
+            
+            return appointments;
+        }
+        
+        if (request is ReferralSearchRequest referralSearchRequest)
+        {
+            var result = await externalAppointmentService.GetByReferralAsync(
+                referralSearchRequest.ReferralNumber,
+                referralSearchRequest.PatientProfile.PatientLastName);
+            
+            if (request.DoctorMode == DoctorSelectionMode.SpecificDoctorOrRange)
+            {
+                var appointments = new List<(string Doctor, Appointment Appointment)>();
+                foreach (var doctorName in request.DoctorNames!)
+                {
+                    appointments.AddRange(result
+                        .SelectMany(r => r.Specialities)
+                        .SelectMany(s => s.Doctors)
+                        .Where(d => string.Equals(d.Name, doctorName, StringComparison.CurrentCultureIgnoreCase))
+                        .SelectMany(d => d.Appointments
+                            .Select(a => (d.Name, a))));
+                }
+
+                return appointments;
+            }
+
+            return result
+                .SelectMany(r => r.Specialities)
+                .SelectMany(s => s.Doctors)
+                .SelectMany(d => d.Appointments
+                    .Select(a => (d.Name, a))).ToList();
+        }
+        
+        throw new NotSupportedException();
+    }
+    
+    private static (string Doctor, Appointment Appointment)? TryGetPreferAppointment(
+        List<(string Doctor, Appointment Appointment)> appointments,
+        TimePreferencesPresetDto? timePreferences,
+        TimeSelectionMode timeMode,
+        DateTime dateTimeNow)
+    {
+        if (timeMode == TimeSelectionMode.AnyTime && appointments.Count != 0)
+            return appointments.First();
+        
+        if (timePreferences == null || appointments.Count == 0)
+            return null;
+    
+        return appointments.FirstOrDefault(a => 
+            IsAppointmentMatching(a.Appointment, timePreferences, timeMode, dateTimeNow));
+    }
+
+    private static bool IsAppointmentMatching(
+        Appointment appointment,
+        TimePreferencesPresetDto timePreferences,
+        TimeSelectionMode timeMode,
+        DateTime dateTimeNow)
+    {
+        var appointmentDate = DateOnly.FromDateTime(appointment.VisitStart);
+        var appointmentTime = TimeOnly.FromDateTime(appointment.VisitStart);
+        
+        if (!IsWithinTimeConstraints(appointment.VisitStart, timePreferences, dateTimeNow))
+            return false;
+        
+        if (timePreferences.ExcludedDates.Contains(appointmentDate))
+            return false;
+    
+        return timePreferences.Preferences.Any(pref => 
+            MatchesPattern(appointment.VisitStart, appointmentDate, pref, timeMode) 
+            && MatchesTimeWindow(appointmentTime, pref));
+    }
+    
+    private static bool IsWithinTimeConstraints(
+        DateTime appointmentStart,
+        TimePreferencesPresetDto timePreferences,
+        DateTime dateTimeNow)
+    {
+        var daysAhead = (appointmentStart - dateTimeNow).Days;
+        var hoursFromNow = (appointmentStart - dateTimeNow).TotalHours;
+        
+        return daysAhead <= timePreferences.MaxDaysAhead 
+            && hoursFromNow >= timePreferences.MinHoursFromNow;
+    }
+    
+    private static bool MatchesPattern(
+        DateTime appointmentStart,
+        DateOnly appointmentDate,
+        TimePreferenceDto preference,
+        TimeSelectionMode timeMode)
+    {
+        return timeMode switch
+        {
+            TimeSelectionMode.SpecificDates => 
+                preference.Date.HasValue && preference.Date.Value == appointmentDate,
+            TimeSelectionMode.WeekdayPattern => 
+                preference.Day.HasValue && preference.Day.Value == appointmentStart.DayOfWeek,
+            _ => false
         };
     }
     
-    private async Task SaveAppointmentToDatabase(AppointmentSearchRequest request, Appointment appointment, 
-        CancellationToken cancellationToken)
+    private static bool MatchesTimeWindow(TimeOnly appointmentTime, TimePreferenceDto preference)
     {
-        var dto = new CreateAppointmentDto(
-            request.PatientProfileId,
-            appointment.Id,
-            appointment.VisitStart,
-            appointment.VisitEnd,
-            appointment.Address,
-            appointment.Number,
-            appointment.Room,
-            request.Speciality,
-            request.DoctorName
-        );
-    
-        await appointmentService.CreateAsync(dto, cancellationToken);
-    }
-    
-    private static Appointment? TryGetPreferAppointment(List<Appointment> appointments,
-        TimePreferencesPresetDto timePreferences)
-    {
-        if ((timePreferences.Preferences.Count == 0 && !timePreferences.AnyTime)
-            || appointments.Count == 0)
-            return null;
-
-        if (timePreferences.AnyTime)
-            return appointments.First();
-
-        return appointments.FirstOrDefault(appointment =>
-            timePreferences.Preferences.Any(preference =>
-            {
-                if (preference.Day.HasValue &&
-                    preference.Day.Value != appointment.VisitStart.DayOfWeek)
-                    return false;
-
-                if (preference is not { From: not null, To: not null })
-                    return true;
-
-                var appointmentTime = TimeOnly.FromDateTime(appointment.VisitStart);
-                return appointmentTime >= preference.From.Value &&
-                       appointmentTime <= preference.To.Value;
-            })
-        );
+        if (preference is not { From: not null, To: not null })
+            return true;
+        
+        return appointmentTime >= preference.From.Value 
+            && appointmentTime <= preference.To.Value;
     }
 }

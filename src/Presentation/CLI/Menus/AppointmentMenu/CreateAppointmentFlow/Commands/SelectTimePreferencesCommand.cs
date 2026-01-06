@@ -1,9 +1,11 @@
 ﻿using System.Globalization;
 using Application.DTOs.AppointmentSearchRequest;
 using Application.DTOs.TimePreferences;
+using CLI.Extensions.Converters;
 using CLI.Menus.AppointmentMenu.CreateAppointmentFlow.Providers;
 using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu.Commands.Interfaces;
+using StatefulMenu.Core.Attributes;
 using StatefulMenu.Core.Interfaces;
 using StatefulMenu.Core.Models;
 
@@ -25,41 +27,17 @@ public class SelectTimePreferencesCommand(
             await inputService.ReadModelAsync<CreateAppointmentSearchRequestDto>(cancellationToken);
         
         createAppointmentSearchRequestDto!.TimePreferencesPresetName = timePreferencesPresetDto.Name;
-        createAppointmentSearchRequestDto.SpecificStartPoints = ReadSpecificStartPoints();
+        createAppointmentSearchRequestDto.SpecificStartPoints = (await inputService.ReadModelAsync<SpecificStartPointsInputModel>(cancellationToken))!.SpecificStartPoints;
         dataService.Set(nameof(CreateAppointmentSearchRequestDto), createAppointmentSearchRequestDto);
 
         var createAppointmentProvider = serviceProvider.GetRequiredService<CreateAppointmentProvider>();
         return MenuResult.Push(await createAppointmentProvider.CreateMenuAsync(cancellationToken));
     }
-
-    private static List<DateTime> ReadSpecificStartPoints()
-    {
-        Console.WriteLine("Добавьте стартовые точки через ; (необязательно)");
-        Console.Write("Введите даты (HH:mm): ");
     
-        var input = Console.ReadLine();
-    
-        if (string.IsNullOrWhiteSpace(input))
-            return [];
-    
-        var startPoints = new List<DateTime>();
-        var timeStrings = input.Split(';', StringSplitOptions.RemoveEmptyEntries);
-    
-        foreach (var timeString in timeStrings)
-        {
-            var trimmedTime = timeString.Trim();
-        
-            if (DateTime.TryParseExact(trimmedTime, "HH:mm", 
-                    CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime time))
-            {
-                var dateTime = DateTime.Today.Add(time.TimeOfDay);
-                startPoints.Add(dateTime);
-            }
-            else
-            {
-                Console.WriteLine($"Неверный формат даты: '{trimmedTime}'");
-            }
-        }
-        return startPoints;
-    }
+    [InputModel("стартовых точек")]
+    private record SpecificStartPointsInputModel(
+        [property: InputField("Введите стартовые точки HH:mm через ;", 
+            IsRequired = false, 
+            Converters = [typeof(ListDateTimeConverter)])]
+        List<DateTime>? SpecificStartPoints);
 }

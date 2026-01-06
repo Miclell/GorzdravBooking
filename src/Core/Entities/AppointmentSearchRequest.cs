@@ -12,8 +12,8 @@ public abstract class AppointmentSearchRequest
     public string LpuName { get; set; }
     public string Speciality { get; set; }
     public DoctorSelectionMode DoctorMode { get; set; } = DoctorSelectionMode.SpecificDoctorOrRange;
-    public string? DoctorId { get; set; }
-    public string? DoctorName { get; set; }
+    public List<string>? DoctorIds { get; set; }
+    public List<string>? DoctorNames { get; set; }
 
     public TimeSelectionMode TimeMode { get; set; } = TimeSelectionMode.AnyTime;
     public string? TimePreferencesPresetName { get; set; }  // TODO зарефакторить tp

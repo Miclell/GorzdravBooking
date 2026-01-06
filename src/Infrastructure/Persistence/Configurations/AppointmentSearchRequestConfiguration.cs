@@ -43,10 +43,10 @@ public class AppointmentSearchRequestConfiguration : IEntityTypeConfiguration<Ap
             .IsRequired()
             .HasConversion<string>();
         
-        builder.Property(asr => asr.DoctorId)
+        builder.Property(asr => asr.DoctorIds)
             .HasMaxLength(100);
 
-        builder.Property(asr => asr.DoctorName)
+        builder.Property(asr => asr.DoctorNames)
             .HasMaxLength(200);
         
         builder.Property(asr => asr.TimeMode)
@@ -95,7 +95,7 @@ public class AppointmentSearchRequestConfiguration : IEntityTypeConfiguration<Ap
         builder.HasIndex(asr => asr.Status)
             .HasDatabaseName("IX_AppointmentSearchRequests_Status");
 
-        builder.HasIndex(asr => new { asr.DoctorId, asr.LpuName })
+        builder.HasIndex(asr => new { DoctorId = asr.DoctorIds, asr.LpuName })
             .HasDatabaseName("IX_AppointmentSearchRequests_Doctor_Lpu");
         
         builder.HasIndex(asr => new { asr.Status, asr.LastSearchAttempt })

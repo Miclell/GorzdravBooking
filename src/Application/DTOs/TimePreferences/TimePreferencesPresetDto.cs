@@ -3,6 +3,8 @@
 public record TimePreferencesPresetDto(
     string Name,
     Guid UserId,
-    bool AnyTime,
-    IReadOnlyList<TimePreferenceDto> Preferences
+    IReadOnlyList<TimePreferenceDto> Preferences,
+    List<DateOnly> ExcludedDates,
+    int MaxDaysAhead,
+    int MinHoursFromNow
 );

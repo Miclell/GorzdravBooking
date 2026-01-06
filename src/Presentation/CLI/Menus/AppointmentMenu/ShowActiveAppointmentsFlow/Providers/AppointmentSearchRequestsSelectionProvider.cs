@@ -28,7 +28,7 @@ public class AppointmentSearchRequestsSelectionProvider(IServiceProvider service
         dataService.TryGet<AppointmentSearchRequestDto>(nameof(AppointmentSearchRequestDto), out var appointment);
         return Task.FromResult(new MenuState($"Выберите действие для запроса " +
                                              $"{appointment!.LpuName}" +
-                                             $"{appointment.DoctorName} | " +
+                                             $"{appointment.DoctorNames} | " +
                                              $"{appointment.TimePreferencesPresetName}", items,
             header: HeaderFactorySetup.SetupHeader()));
     }
