@@ -1,5 +1,4 @@
 ﻿using Core.Entities;
-using Core.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,7 +12,7 @@ public class AppointmentSearchRequestConfiguration : IEntityTypeConfiguration<Ap
 
         // Primary Key
         builder.HasKey(asr => asr.Id);
-        
+
         // TPH Discriminator
         builder
             .HasDiscriminator<string>("RequestType")
@@ -38,39 +37,35 @@ public class AppointmentSearchRequestConfiguration : IEntityTypeConfiguration<Ap
         builder.Property(asr => asr.Speciality)
             .IsRequired()
             .HasMaxLength(300);
-        
+
         builder.Property(asr => asr.DoctorMode)
             .IsRequired()
             .HasConversion<string>();
-        
+
         builder.Property(asr => asr.DoctorIds)
             .HasMaxLength(100);
 
         builder.Property(asr => asr.DoctorNames)
             .HasMaxLength(200);
-        
-        builder.Property(asr => asr.TimeMode)
-            .IsRequired()
-            .HasConversion<string>();
-        
+
         builder.Property(asr => asr.TimePreferencesPresetName)
             .HasMaxLength(100);
-        
+
         builder.Property(asr => asr.SearchInterval)
             .IsRequired()
             .HasConversion(
                 timeSpan => timeSpan.Ticks,
                 ticks => new TimeSpan(ticks)
             );
-        
+
         builder.Property(asr => asr.SpecificStartPoints);
-        
+
         builder.Property(asr => asr.MaxDaysToSearch)
             .IsRequired();
 
         builder.Property(asr => asr.ViewOnly)
             .IsRequired();
-        
+
         builder.Property(asr => asr.Status)
             .IsRequired()
             .HasConversion<string>();
@@ -97,7 +92,7 @@ public class AppointmentSearchRequestConfiguration : IEntityTypeConfiguration<Ap
 
         builder.HasIndex(asr => new { DoctorId = asr.DoctorIds, asr.LpuName })
             .HasDatabaseName("IX_AppointmentSearchRequests_Doctor_Lpu");
-        
+
         builder.HasIndex(asr => new { asr.Status, asr.LastSearchAttempt })
             .HasDatabaseName("IX_AppointmentSearchRequests_Status_LastSearchAttempt");
     }

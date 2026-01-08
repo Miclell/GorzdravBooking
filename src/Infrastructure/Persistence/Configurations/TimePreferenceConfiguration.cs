@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using Core.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,13 +13,14 @@ public class TimePreferenceConfiguration : IEntityTypeConfiguration<TimePreferen
 
         // Primary Key
         builder.HasKey(tp => tp.Id);
-        
+
         // TPH Discriminator
         builder
-            .HasDiscriminator<string>("PreferenceType")
-            .HasValue<WeekDayPreference>("WeekDay")
-            .HasValue<MonthDayPreference>("MonthDay");
-        
+            .HasDiscriminator(tp => tp.TimeMode)
+            .HasValue<WeekDayPreference>(TimeSelectionMode.WeekdayPattern)
+            .HasValue<MonthDayPreference>(TimeSelectionMode.SpecificDates)
+            .HasValue<AnyTimePreference>(TimeSelectionMode.AnyTime);
+
         // Relationships
         builder.HasOne(tp => tp.User)
             .WithMany(u => u.TimePreferences)
@@ -33,6 +35,10 @@ public class TimePreferenceConfiguration : IEntityTypeConfiguration<TimePreferen
         builder.Property(tp => tp.Name)
             .IsRequired()
             .HasMaxLength(100);
+
+        builder.Property(tp => tp.TimeMode)
+            .IsRequired()
+            .HasConversion<string>();
 
         builder.Property(tp => tp.PreferredTimeFrom)
             .IsRequired(false)
@@ -50,13 +56,13 @@ public class TimePreferenceConfiguration : IEntityTypeConfiguration<TimePreferen
 
         builder.Property(tp => tp.ExcludedDates)
             .IsRequired(false);
-        
+
         // Indexes
         builder.HasIndex(tp => tp.UserId);
 
         builder.HasIndex(tp => new { tp.UserId, tp.Name })
             .HasDatabaseName("IX_TimePreferences_UserId_Name");
-        
+
         // Check constraints
         builder.HasCheckConstraint("CK_TimePreferences_TimeRange",
             @"(""PreferredTimeFrom"" IS NULL AND ""PreferredTimeTo"" IS NULL) OR 

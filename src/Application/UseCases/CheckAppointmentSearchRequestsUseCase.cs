@@ -63,7 +63,7 @@ public class CheckAppointmentSearchRequestsUseCase(
 
     private static bool IsTimeToCheck(AppointmentSearchRequest request, DateTime now)
     {
-        if (request.SpecificStartPoints != null 
+        if (request.SpecificStartPoints != null
             && request.SpecificStartPoints.Count != 0)
         {
             var nearest = request.SpecificStartPoints.Where(t => t > (request.LastSearchAttempt ?? request.CreatedAt))

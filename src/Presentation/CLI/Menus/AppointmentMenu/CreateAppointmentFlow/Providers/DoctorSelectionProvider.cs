@@ -25,25 +25,26 @@ public class DoctorSelectionProvider(
         {
             var isAnyOfSpeciality = (await inputService
                     .ReadModelAsync<AnyOfSpecialityInputModel>(cancellationToken))!
-                    .IsAnyOfSpeciality;
-            dataService.Set(nameof(isAnyOfSpeciality), isAnyOfSpeciality!);
+                .IsAnyOfSpeciality;
+
+            dataService.Set("IsAnyOfSpeciality", isAnyOfSpeciality!);
             if (isAnyOfSpeciality)
             {
                 var selectTimePreferencesProvider = serviceProvider.GetRequiredService<SelectTimePreferencesProvider>();
                 return await selectTimePreferencesProvider.CreateMenuAsync(cancellationToken);
             }
-            
+
             dataService.TryGet<BasePatientProfileDto>(nameof(BasePatientProfileDto), out var patient);
             dataService.TryGet<MedicalSpeciality>(nameof(MedicalSpeciality), out var speciality);
             doctors = await doctorService.GetBySpecialtyAsync(int.Parse(patient!.LpuId), speciality!.Id);
-            
+
             dataService.Set("ToChoseDoctors", doctors);
         }
         else
         {
             dataService.TryGet("ToChoseDoctors", out doctors);
         }
-        
+
         var commands = doctors!
             .Select(d => new DoctorSelectionCommand(d, serviceProvider))
             .Cast<IMenuCommand>()
@@ -60,5 +61,6 @@ public class DoctorSelectionProvider(
 
     [InputModel("определения типа поиска")]
     private record AnyOfSpecialityInputModel(
-        [property: InputField("Любой врач по специальности (да/нет)")]bool IsAnyOfSpeciality);
+        [property: InputField("Любой врач по специальности (да/нет)")]
+        bool IsAnyOfSpeciality);
 }

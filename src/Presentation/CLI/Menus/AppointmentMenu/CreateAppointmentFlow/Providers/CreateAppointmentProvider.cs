@@ -30,12 +30,13 @@ public class CreateAppointmentProvider(IServiceProvider serviceProvider) : IMenu
             PatientProfileId = patient!.Id,
             LpuName = patient.LpuShortName,
             Speciality = speciality!.Name,
-            DoctorMode = isAnyOfSpeciality ? DoctorSelectionMode.AnyOfSpeciality : DoctorSelectionMode.SpecificDoctorOrRange,
-            DoctorIds = isAnyOfSpeciality ? null : doctors!.Select(d => d.Name).ToList(),
-            DoctorNames = isAnyOfSpeciality ? null : doctors!.Select(d => d.Id).ToList(),
-            TimeMode = TimeSelectionMode.AnyTime,
-            TimePreferencesPresetName = createAppointmentSearchRequestDto.TimePreferencesPresetName,
-            SearchInterval = createAppointmentSearchRequestDto!.SearchInterval,
+            DoctorMode = isAnyOfSpeciality
+                ? DoctorSelectionMode.AnyOfSpeciality
+                : DoctorSelectionMode.SpecificDoctorOrRange,
+            DoctorIds = isAnyOfSpeciality ? null : doctors!.Select(d => d.Id).ToList(),
+            DoctorNames = isAnyOfSpeciality ? null : doctors!.Select(d => d.Name).ToList(),
+            TimePreferencesPresetName = createAppointmentSearchRequestDto!.TimePreferencesPresetName,
+            SearchInterval = createAppointmentSearchRequestDto.SearchInterval,
             SpecificStartPoints = createAppointmentSearchRequestDto.SpecificStartPoints,
             MaxDaysToSearch = createAppointmentSearchRequestDto.MaxDaysToSearch,
             ViewOnly = createAppointmentSearchRequestDto.ViewOnly

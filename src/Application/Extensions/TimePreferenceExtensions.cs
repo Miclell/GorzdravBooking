@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.TimePreferences;
 using Core.Entities;
+using Core.Enums;
 
 namespace Application.Extensions;
 
@@ -13,8 +14,10 @@ public static class TimePreferenceExtensions
             {
                 Name = dto.Name,
                 UserId = dto.UserId,
+                TimeMode = TimeSelectionMode.WeekdayPattern,
                 PreferredTimeFrom = dto.PreferredTimeFrom,
                 PreferredTimeTo = dto.PreferredTimeTo,
+                ExcludedDates = dto.ExcludedDates,
                 MaxDaysAhead = dto.MaxDaysAhead,
                 MinHoursFromNow = dto.MinHoursFromNow,
                 Day = dto.Day.Value
@@ -23,35 +26,50 @@ public static class TimePreferenceExtensions
             {
                 Name = dto.Name,
                 UserId = dto.UserId,
+                TimeMode = TimeSelectionMode.SpecificDates,
                 PreferredTimeFrom = dto.PreferredTimeFrom,
                 PreferredTimeTo = dto.PreferredTimeTo,
+                ExcludedDates = dto.ExcludedDates,
                 MaxDaysAhead = dto.MaxDaysAhead,
                 MinHoursFromNow = dto.MinHoursFromNow,
                 Date = dto.Date.Value
             },
-            _ => throw new InvalidOperationException("Day and Date dont must be null")
+            _ => new AnyTimePreference
+            {
+                Name = dto.Name,
+                UserId = dto.UserId,
+                TimeMode = TimeSelectionMode.AnyTime,
+                ExcludedDates = dto.ExcludedDates,
+                MaxDaysAhead = dto.MaxDaysAhead,
+                MinHoursFromNow = dto.MinHoursFromNow
+            }
         };
-        
+
         return preference;
     }
-    
+
     public static TimePreferenceDto ToDto(this TimePreference timePreference)
     {
         return timePreference switch
         {
             WeekDayPreference week => new TimePreferenceDto(
-                Date: null,
-                Day: week.Day,
-                From: timePreference.PreferredTimeFrom,
-                To: timePreference.PreferredTimeTo
+                null,
+                week.Day,
+                timePreference.PreferredTimeFrom,
+                timePreference.PreferredTimeTo
             ),
             MonthDayPreference month => new TimePreferenceDto(
-                Date: month.Date,
-                Day: null,
-                From: timePreference.PreferredTimeFrom,
-                To: timePreference.PreferredTimeTo
+                month.Date,
+                null,
+                timePreference.PreferredTimeFrom,
+                timePreference.PreferredTimeTo
             ),
-            _ => throw new InvalidOperationException($"Unknown preference type: {timePreference.GetType().Name}")
+            _ => new TimePreferenceDto(
+                null,
+                null,
+                null,
+                null
+            )
         };
     }
 }

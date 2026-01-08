@@ -1,3 +1,5 @@
 ﻿namespace Core.Entities;
 
-public class ManualSearchRequest : AppointmentSearchRequest { }
+public class ManualSearchRequest : AppointmentSearchRequest
+{
+}

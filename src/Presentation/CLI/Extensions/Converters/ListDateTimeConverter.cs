@@ -7,24 +7,24 @@ public class ListDateTimeConverter
     public object? Convert(string input, out string? errorMessage)
     {
         errorMessage = null;
-        
+
         if (string.IsNullOrWhiteSpace(input))
             return null;
-        
+
         var startPoints = new List<DateTime>();
         var timeStrings = input.Split(';', StringSplitOptions.RemoveEmptyEntries);
-        
+
         if (timeStrings.Length == 0)
         {
             errorMessage = "Не найдено времён для парсинга";
             return null;
         }
-        
+
         foreach (var timeString in timeStrings)
         {
             var trimmedTime = timeString.Trim();
-            
-            if (DateTime.TryParseExact(trimmedTime, "HH:mm", 
+
+            if (DateTime.TryParseExact(trimmedTime, "HH:mm",
                     CultureInfo.InvariantCulture, DateTimeStyles.None, out var time))
             {
                 var dateTime = DateTime.Today.Add(time.TimeOfDay);
@@ -36,7 +36,7 @@ public class ListDateTimeConverter
                 return null;
             }
         }
-        
+
         return startPoints;
     }
 }

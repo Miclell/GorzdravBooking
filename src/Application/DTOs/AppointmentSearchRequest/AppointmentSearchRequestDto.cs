@@ -1,5 +1,4 @@
 ﻿using Core.Enums;
-using Core.Models;
 
 namespace Application.DTOs.AppointmentSearchRequest;
 
@@ -10,7 +9,6 @@ public record AppointmentSearchRequestDto(
     string Speciality,
     DoctorSelectionMode DoctorMode,
     List<string>? DoctorNames,
-    TimeSelectionMode TimeMode,
     string? TimePreferencesPresetName,
     TimeSpan SearchInterval,
     List<DateTime>? SpecificStartPoints,

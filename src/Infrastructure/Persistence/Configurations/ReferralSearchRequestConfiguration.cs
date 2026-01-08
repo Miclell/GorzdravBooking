@@ -10,7 +10,7 @@ public class ReferralSearchRequestConfiguration : IEntityTypeConfiguration<Refer
     {
         builder.Property(rsr => rsr.ReferralNumber)
             .IsRequired();
-        
+
         builder.HasIndex(rsr => rsr.ReferralNumber);
     }
 }

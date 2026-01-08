@@ -1,5 +1,4 @@
 using Infrastructure.Persistence;
-using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Server.Configurations;
 

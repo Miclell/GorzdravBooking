@@ -15,7 +15,7 @@ public class TimePreferencesController(
     public async Task<IActionResult> Create([FromBody] IEnumerable<CreateTimePreferenceDto> request)
     {
         var result = await timePreferencesService.CreateRangeAsync(request);
-        
+
         if (result.IsSuccess)
             return Ok(result.Value);
 

@@ -4,7 +4,6 @@ using Application.DTOs.AppointmentSearchRequest;
 using Application.Extensions;
 using Application.Services.Interfaces;
 using Core.Entities;
-using Core.Enums;
 using Core.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
 
@@ -22,16 +21,12 @@ public class AppointmentSearchRequestService(
         {
             AppointmentSearchRequest request;
             if (createDto.ReferralNumber.HasValue)
-            {
                 request = new ReferralSearchRequest
                 {
                     ReferralNumber = createDto.ReferralNumber.Value
                 };
-            }
             else
-            {
                 request = new ManualSearchRequest();
-            }
 
             request.PatientProfileId = createDto.PatientProfileId;
             request.LpuName = createDto.LpuName;
@@ -39,7 +34,6 @@ public class AppointmentSearchRequestService(
             request.DoctorMode = createDto.DoctorMode;
             request.DoctorIds = createDto.DoctorIds;
             request.DoctorNames = createDto.DoctorNames;
-            request.TimeMode = createDto.TimeMode;
             request.TimePreferencesPresetName = createDto.TimePreferencesPresetName;
             request.SearchInterval = createDto.SearchInterval;
             request.SpecificStartPoints = createDto.SpecificStartPoints;
@@ -124,7 +118,7 @@ public class AppointmentSearchRequestService(
                 await appointmentSearchRequestRepository.GetByPatientProfileIdAsync(patientProfileId,
                     cancellationToken);
 
-            var dtos = requests.Select(request  => request.ToDto());
+            var dtos = requests.Select(request => request.ToDto());
 
             return Result.Success(dtos);
         }

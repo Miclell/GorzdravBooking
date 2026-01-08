@@ -1,4 +1,6 @@
-﻿namespace Core.Entities;
+﻿using Core.Enums;
+
+namespace Core.Entities;
 
 public abstract class TimePreference
 {
@@ -8,6 +10,8 @@ public abstract class TimePreference
 
     public Guid UserId { get; set; }
     public User User { get; set; } = null!;
+
+    public TimeSelectionMode TimeMode { get; set; }
 
     public TimeOnly? PreferredTimeFrom { get; set; }
     public TimeOnly? PreferredTimeTo { get; set; }

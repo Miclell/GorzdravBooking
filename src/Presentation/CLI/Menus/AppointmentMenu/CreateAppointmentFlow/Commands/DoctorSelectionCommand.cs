@@ -39,12 +39,13 @@ public class DoctorSelectionCommand(
                 return MenuResult.Push(await doctorSelectionProvider.CreateMenuAsync(cancellationToken));
             }
         }
-        
+
         var selectTimePreferencesProvider = serviceProvider.GetRequiredService<SelectTimePreferencesProvider>();
         return MenuResult.Push(await selectTimePreferencesProvider.CreateMenuAsync(cancellationToken));
     }
-    
+
     [InputModel("выбор нескольких врачей")]
     private record AnotherDoctorInputModel(
-        [property: InputField("Выбрать еще одного врача (да/нет)")]bool IsAnotherDoctor);
+        [property: InputField("Выбрать еще одного врача (да/нет)")]
+        bool IsAnotherDoctor);
 }

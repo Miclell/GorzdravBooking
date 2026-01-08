@@ -13,11 +13,11 @@ public static class ApiConfiguration
         services.ConfigureRoutes();
         services.ConfigureAuthentication(configuration);
         services.ConfigureSwagger();
-        
+
         services.AddInfrastructure();
         services.AddApplication();
         services.AddHostedService<AppointmentSchedulerWorker>();
-        
+
         services.AddControllers(options =>
             {
                 options.Conventions.Add(new RouteTokenTransformerConvention(

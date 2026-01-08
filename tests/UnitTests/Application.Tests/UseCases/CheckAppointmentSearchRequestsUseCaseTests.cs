@@ -13,10 +13,10 @@ namespace Application.Tests.UseCases;
 
 public class CheckAppointmentSearchRequestsUseCaseTests
 {
-    private readonly Mock<IAppointmentSearchRequestRepository> _mockRepo;
     private readonly Mock<IAppointmentCoordinator> _mockCoordinator;
-    private readonly Mock<ILogger<CheckAppointmentSearchRequestsUseCase>> _mockLogger;
     private readonly Mock<IEventBus> _mockEventBus;
+    private readonly Mock<ILogger<CheckAppointmentSearchRequestsUseCase>> _mockLogger;
+    private readonly Mock<IAppointmentSearchRequestRepository> _mockRepo;
     private readonly CheckAppointmentSearchRequestsUseCase _useCase;
 
     public CheckAppointmentSearchRequestsUseCaseTests()
@@ -25,10 +25,10 @@ public class CheckAppointmentSearchRequestsUseCaseTests
         _mockCoordinator = new Mock<IAppointmentCoordinator>();
         _mockLogger = new Mock<ILogger<CheckAppointmentSearchRequestsUseCase>>();
         _mockEventBus = new Mock<IEventBus>();
-        
+
         _useCase = new CheckAppointmentSearchRequestsUseCase(
-            _mockRepo.Object, 
-            _mockCoordinator.Object, 
+            _mockRepo.Object,
+            _mockCoordinator.Object,
             _mockLogger.Object,
             _mockEventBus.Object);
     }
@@ -51,7 +51,7 @@ public class CheckAppointmentSearchRequestsUseCaseTests
             },
             new()
             {
-                Id = Guid.NewGuid(), 
+                Id = Guid.NewGuid(),
                 PatientProfileId = Guid.Parse("f7362ecc-6359-4238-9688-9fd0f53bec41"),
                 Status = SearchRequestStatus.InProgress,
                 LastSearchAttempt = DateTime.UtcNow.AddHours(-2), // 2 часа назад > 1 час интервал → обработается
@@ -65,7 +65,8 @@ public class CheckAppointmentSearchRequestsUseCaseTests
             .ReturnsAsync(requests);
 
         _mockCoordinator
-            .Setup(x => x.CreateCompleteAppointmentAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.CreateCompleteAppointmentAsync(It.IsAny<AppointmentSearchRequest>(),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result.Success(true));
 
         // Act
@@ -73,10 +74,10 @@ public class CheckAppointmentSearchRequestsUseCaseTests
 
         // Assert
         _mockCoordinator.Verify(
-            x => x.CreateCompleteAppointmentAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()), 
+            x => x.CreateCompleteAppointmentAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()),
             Times.Exactly(2));
-        
-        _mockRepo.Verify(x => x.UpdateAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()), 
+
+        _mockRepo.Verify(x => x.UpdateAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()),
             Times.Exactly(2));
     }
 
@@ -94,7 +95,8 @@ public class CheckAppointmentSearchRequestsUseCaseTests
             .ReturnsAsync(requests);
 
         _mockCoordinator
-            .SetupSequence(x => x.CreateCompleteAppointmentAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()))
+            .SetupSequence(x =>
+                x.CreateCompleteAppointmentAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Error.Failure("First Failed", "First Failed"))
             .ReturnsAsync(Result.Success(true));
 
@@ -103,10 +105,10 @@ public class CheckAppointmentSearchRequestsUseCaseTests
 
         // Assert - все равно обрабатываем оба запроса
         _mockCoordinator.Verify(
-            x => x.CreateCompleteAppointmentAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()), 
+            x => x.CreateCompleteAppointmentAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()),
             Times.Exactly(2));
-        
-        _mockRepo.Verify(x => x.UpdateAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()), 
+
+        _mockRepo.Verify(x => x.UpdateAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()),
             Times.Exactly(2));
     }
 
@@ -128,7 +130,8 @@ public class CheckAppointmentSearchRequestsUseCaseTests
             .ReturnsAsync(new List<AppointmentSearchRequest> { request });
 
         _mockCoordinator
-            .Setup(x => x.CreateCompleteAppointmentAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.CreateCompleteAppointmentAsync(It.IsAny<AppointmentSearchRequest>(),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result.Success(true));
 
         // Act
@@ -136,7 +139,7 @@ public class CheckAppointmentSearchRequestsUseCaseTests
 
         // Assert
         _mockCoordinator.Verify(
-            x => x.CreateCompleteAppointmentAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()), 
+            x => x.CreateCompleteAppointmentAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()),
             Times.Once);
     }
 }

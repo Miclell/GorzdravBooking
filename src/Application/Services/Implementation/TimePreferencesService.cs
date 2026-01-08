@@ -3,7 +3,6 @@ using Application.Common.Results;
 using Application.DTOs.TimePreferences;
 using Application.Extensions;
 using Application.Services.Interfaces;
-using Core.Entities;
 using Core.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
 
@@ -64,10 +63,11 @@ public class TimePreferencesService(
                 .Select(group =>
                 {
                     var first = group.First();
-                
+
                     return new TimePreferencesPresetDto(
                         first.Name,
                         first.UserId,
+                        first.TimeMode,
                         group.Select(tp => tp.ToDto())
                             .ToList()
                             .AsReadOnly(),
@@ -102,6 +102,7 @@ public class TimePreferencesService(
             var preset = new TimePreferencesPresetDto(
                 name,
                 userId,
+                first.TimeMode,
                 timePreferencesList.Select(tp => tp.ToDto())
                     .ToList()
                     .AsReadOnly(),

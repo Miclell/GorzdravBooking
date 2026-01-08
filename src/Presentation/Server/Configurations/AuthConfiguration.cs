@@ -20,7 +20,8 @@ public static class AuthConfiguration
                     ValidIssuer = configuration["Jwt:Issuer"],
                     ValidAudience = configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("JWT Secret Key is not configured")))
+                        Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"] ??
+                                               throw new InvalidOperationException("JWT Secret Key is not configured")))
                 };
             });
 

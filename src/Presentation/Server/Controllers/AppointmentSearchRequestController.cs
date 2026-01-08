@@ -18,7 +18,7 @@ public class AppointmentSearchRequestController(
 
         if (result.IsSuccess)
             return Ok(result.Value);
-        
+
         return BadRequest(result.Error);
     }
 }

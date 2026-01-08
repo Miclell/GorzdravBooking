@@ -8,9 +8,6 @@ public static class FluentValidationConfiguration
     [Obsolete("Obsolete")]
     public static void ConfigureFluentValidation(this IMvcBuilder mvcBuilder)
     {
-        mvcBuilder.AddFluentValidation(fv => 
-        {
-            fv.RegisterValidatorsFromAssemblyContaining<BaseUserDtoValidator>();
-        });
+        mvcBuilder.AddFluentValidation(fv => { fv.RegisterValidatorsFromAssemblyContaining<BaseUserDtoValidator>(); });
     }
 }

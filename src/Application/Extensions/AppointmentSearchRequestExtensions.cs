@@ -8,15 +8,15 @@ namespace Application.Extensions;
 
 public static class AppointmentSearchRequestExtensions
 {
-    public static AppointmentSearchRequestDto ToDto(this AppointmentSearchRequest request) =>
-        new(
+    public static AppointmentSearchRequestDto ToDto(this AppointmentSearchRequest request)
+    {
+        return new AppointmentSearchRequestDto(
             request.Id,
             request.PatientProfileId,
             request.LpuName,
             request.Speciality,
             request.DoctorMode,
             request.DoctorNames,
-            request.TimeMode,
             request.TimePreferencesPresetName,
             request.SearchInterval,
             request.SpecificStartPoints,
@@ -34,9 +34,12 @@ public static class AppointmentSearchRequestExtensions
                 ManualSearchRequest => "Manual",
                 _ => "Unknown"
             });
-    
-    public static CreateAppointmentDto ToCreateAppointmentDto(this AppointmentSearchRequest request,  Appointment appointment, string doctorName) =>
-        new(
+    }
+
+    public static CreateAppointmentDto ToCreateAppointmentDto(this AppointmentSearchRequest request,
+        Appointment appointment, string doctorName)
+    {
+        return new CreateAppointmentDto(
             request.PatientProfileId,
             appointment.Id,
             appointment.VisitStart,
@@ -47,9 +50,12 @@ public static class AppointmentSearchRequestExtensions
             request.Speciality,
             doctorName
         );
+    }
 
-    public static AppointmentCreateRequest ToAppointmentCreateRequest(this AppointmentSearchRequest request, Appointment appointment) =>
-        new()
+    public static AppointmentCreateRequest ToAppointmentCreateRequest(this AppointmentSearchRequest request,
+        Appointment appointment)
+    {
+        return new AppointmentCreateRequest
         {
             EsiaId = null,
             LpuId = request.PatientProfile.LpuId,
@@ -66,4 +72,5 @@ public static class AppointmentSearchRequestExtensions
             Address = request.PatientProfile.LpuAddress,
             VisitDate = appointment.VisitStart
         };
+    }
 }

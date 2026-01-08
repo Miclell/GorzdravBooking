@@ -7,7 +7,6 @@ using CLI.Menus;
 using Core.Events.Common;
 using Infrastructure;
 using Infrastructure.Persistence;
-using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,8 +26,8 @@ public static class Program
             .ConfigureLogging(logging =>
             {
                 logging.ClearProviders();
-                // AddDebugLogging(logging);
-                AddProductionLogging(logging);
+                AddDebugLogging(logging);
+                //AddProductionLogging(logging);
             })
             .ConfigureServices((_, services) =>
             {
@@ -92,7 +91,7 @@ public static class Program
         logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None);
         logging.AddFilter("Microsoft.AspNetCore.Hosting", LogLevel.None);
         logging.AddFilter("Microsoft.AspNetCore.Routing", LogLevel.None);
-        
+
         logging.AddFilter("System.Net.Http.HttpClient", LogLevel.None);
         logging.AddFilter("System.Net.Http.HttpClient.*", LogLevel.None);
 

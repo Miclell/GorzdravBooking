@@ -11,8 +11,7 @@ public static class RouteConfiguration
             options.LowercaseUrls = true;
             options.LowercaseQueryStrings = false;
         });
-        
+
         services.AddSingleton<IOutboundParameterTransformer, KebabCaseParameterTransformer>();
     }
 }
-

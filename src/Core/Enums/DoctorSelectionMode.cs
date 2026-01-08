@@ -3,5 +3,5 @@
 public enum DoctorSelectionMode
 {
     AnyOfSpeciality = 0,
-    SpecificDoctorOrRange = 1,
+    SpecificDoctorOrRange = 1
 }

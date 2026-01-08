@@ -1,7 +1,6 @@
 ﻿using Application.DTOs.User;
 using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Server.Configurations;
 using Server.Configurations.Common;
 
 namespace Server.Controllers;

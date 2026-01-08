@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Application.DTOs.AppointmentSearchRequest;
+﻿using Application.DTOs.AppointmentSearchRequest;
 using Application.DTOs.TimePreferences;
 using CLI.Extensions.Converters;
 using CLI.Menus.AppointmentMenu.CreateAppointmentFlow.Providers;
@@ -25,19 +24,20 @@ public class SelectTimePreferencesCommand(
         var inputService = serviceProvider.GetRequiredService<IConsoleInputService>();
         var createAppointmentSearchRequestDto =
             await inputService.ReadModelAsync<CreateAppointmentSearchRequestDto>(cancellationToken);
-        
+
         createAppointmentSearchRequestDto!.TimePreferencesPresetName = timePreferencesPresetDto.Name;
-        createAppointmentSearchRequestDto.SpecificStartPoints = (await inputService.ReadModelAsync<SpecificStartPointsInputModel>(cancellationToken))!.SpecificStartPoints;
+        createAppointmentSearchRequestDto.SpecificStartPoints =
+            (await inputService.ReadModelAsync<SpecificStartPointsInputModel>(cancellationToken))!.SpecificStartPoints;
         dataService.Set(nameof(CreateAppointmentSearchRequestDto), createAppointmentSearchRequestDto);
 
         var createAppointmentProvider = serviceProvider.GetRequiredService<CreateAppointmentProvider>();
         return MenuResult.Push(await createAppointmentProvider.CreateMenuAsync(cancellationToken));
     }
-    
+
     [InputModel("стартовых точек")]
     private record SpecificStartPointsInputModel(
-        [property: InputField("Введите стартовые точки HH:mm через ;", 
-            IsRequired = false, 
+        [property: InputField("Введите стартовые точки HH:mm через ;",
+            IsRequired = false,
             Converters = [typeof(ListDateTimeConverter)])]
         List<DateTime>? SpecificStartPoints);
 }
