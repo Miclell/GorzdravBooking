@@ -69,6 +69,7 @@ public class PatientService(
                 patient.Id,
                 patient.LpuShortName,
                 patient.LpuId,
+                patient.PatientId,
                 patient.PatientLastName,
                 patient.PatientFirstName,
                 patient.PatientMiddleName,
@@ -111,6 +112,34 @@ public class PatientService(
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка при обновлении данных пациента с id {PatientProfile}", patientProfile.Id);
+            return Error.Failure(e.ToString(), "Ошибка");
+        }
+    }
+
+    public async Task<Result<BasePatientProfileDto>> GetById(Guid patientId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var patient = await patientRepository.GetByIdAsync(patientId, cancellationToken);
+            if (patient == null)
+                return Error.Conflict("Not.Found", $"Patient {patientId} not found");
+            
+            return new BasePatientProfileDto(
+                patient.Id,
+                patient.LpuShortName,
+                patient.LpuId,
+                patient.PatientId,
+                patient.PatientLastName,
+                patient.PatientFirstName,
+                patient.PatientMiddleName,
+                patient.PatientBirthdate,
+                patient.RecipientEmail,
+                patient.MobilePhoneNumber
+            );
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Ошибка при получении пациента с id {PatientId}", patientId);
             return Error.Failure(e.ToString(), "Ошибка");
         }
     }

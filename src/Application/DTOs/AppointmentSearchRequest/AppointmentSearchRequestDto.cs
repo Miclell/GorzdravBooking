@@ -9,7 +9,7 @@ public record AppointmentSearchRequestDto(
     string Speciality,
     DoctorSelectionMode DoctorMode,
     List<string>? DoctorNames,
-    string? TimePreferencesPresetName,
+    string TimePreferencesPresetName,
     TimeSpan SearchInterval,
     List<DateTime>? SpecificStartPoints,
     int MaxDaysToSearch,

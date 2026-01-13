@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.AppointmentSearchRequest;
+using Application.Extensions;
 using CLI.Menus.AppointmentMenu.ShowActiveAppointmentsFlow.Providers;
 using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu.Commands.Interfaces;
@@ -11,9 +12,7 @@ public class AppointmentSearchRequestSelectionCommand(
     AppointmentSearchRequestDto appointment,
     IServiceProvider serviceProvider) : IMenuCommand
 {
-    public string Title { get; } = $"{appointment.LpuName} " +
-                                   $"{appointment.DoctorNames} | " +
-                                   $"{appointment.TimePreferencesPresetName}";
+    public string Title { get; } = appointment.GetDisplayTitle();
 
     public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default)
     {

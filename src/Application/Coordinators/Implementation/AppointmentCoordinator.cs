@@ -156,8 +156,7 @@ public class AppointmentCoordinator(
             {
                 var appointments = new List<(string Doctor, Appointment Appointment)>();
                 foreach (var doctorName in request.DoctorNames!)
-                    appointments.AddRange(result
-                        .SelectMany(r => r.Specialities)
+                    appointments.AddRange(result.Specialities
                         .SelectMany(s => s.Doctors)
                         .Where(d => string.Equals(d.Name, doctorName, StringComparison.CurrentCultureIgnoreCase))
                         .SelectMany(d => d.Appointments
@@ -166,8 +165,7 @@ public class AppointmentCoordinator(
                 return appointments;
             }
 
-            return result
-                .SelectMany(r => r.Specialities)
+            return result.Specialities
                 .SelectMany(s => s.Doctors)
                 .SelectMany(d => d.Appointments
                     .Select(a => (d.Name, a))).ToList();

@@ -1,4 +1,5 @@
-﻿using Core.Interfaces.ApiClient;
+﻿using Core.Exceptions;
+using Core.Interfaces.ApiClient;
 using Core.Interfaces.Services;
 using Core.Models;
 using Core.Models.Referral;
@@ -44,12 +45,15 @@ public class ExternalAppointmentService(
         return response.Result!;
     }
 
-    public async Task<List<ReferralResult>> GetByReferralAsync(int referralNumber, string lastName)
+    public async Task<ReferralResult> GetByReferralAsync(int referralNumber, string lastName)
     {
         var response =
-            await apiService.GetAsync<List<ReferralResult>>(
+            await apiService.GetAsync<ReferralResult>(
                 GorzdravApiEndpoints.AppointmentsByReferral(referralNumber, lastName));
 
+        if (response.ErrorCode == 676)
+            throw new ReferralNotFoundException(referralNumber);
+        
         if (!response.Success)
             throw new HttpRequestException($"Ошибка при получении номерков: {response.Message}");
 

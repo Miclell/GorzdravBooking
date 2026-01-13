@@ -5,15 +5,8 @@ using Core.Models;
 
 namespace Infrastructure.Stubs;
 
-public class FakeApiService : IApiService
+public class FakeApiService(FakeApiDataService dataService) : IApiService
 {
-    private readonly FakeApiDataService _dataService;
-
-    public FakeApiService(FakeApiDataService dataService)
-    {
-        _dataService = dataService;
-    }
-
     public Task<ApiResponse<TResponse>> GetAsync<TResponse>(string additionalUri)
     {
         try
@@ -48,39 +41,33 @@ public class FakeApiService : IApiService
         }
     }
 
-    // Для тестов - пустые реализации
-    public void SetupGetResponse<TResponse>(string uri, ApiResponse<TResponse> response)
-    {
-    }
-
-    public void SetupPostResponse<TRequest, TResponse>(string uri, ApiResponse<TResponse> response)
-    {
-    }
-
     private ApiResponse<TResponse> HandleGetRequest<TResponse>(string additionalUri)
     {
-        // Убираем начальный слеш если есть
         var uri = additionalUri.TrimStart('/');
 
         return uri switch
         {
             "shared/districts" =>
-                SuccessResponse<TResponse>(_dataService.GetDistricts()),
+                SuccessResponse<TResponse>(dataService.GetDistricts()),
 
-            string s when Regex.IsMatch(s, @"^shared/district/(\d+)/lpus$") =>
+            { } s when Regex.IsMatch(s, @"^shared/district/(\d+)/lpus$") =>
                 HandleLpusByDistrict<TResponse>(s),
 
-            string s when Regex.IsMatch(s, @"^schedule/lpu/(\d+)/specialties$") =>
+            { } s when Regex.IsMatch(s, @"^schedule/lpu/(\d+)/specialties$") =>
                 HandleSpecialtiesByLpu<TResponse>(s),
 
-            string s when Regex.IsMatch(s, @"^schedule/lpu/(\d+)/speciality/([^/]+)/doctors$") =>
+            { } s when Regex.IsMatch(s, @"^schedule/lpu/(\d+)/speciality/([^/]+)/doctors$") =>
                 HandleDoctorsBySpecialty<TResponse>(s),
 
-            string s when Regex.IsMatch(s, @"^schedule/lpu/(\d+)/doctor/([^/]+)/appointments$") =>
+            { } s when Regex.IsMatch(s, @"^schedule/lpu/(\d+)/doctor/([^/]+)/appointments$") =>
                 HandleAppointmentsByDoctor<TResponse>(s),
 
-            string s when s.StartsWith("patient/search") =>
+            { } s when s.StartsWith("patient/search") =>
                 HandlePatientSearch<TResponse>(s),
+
+            // Новый обработчик для Referral
+            { } s when Regex.IsMatch(s, @"^referral/([^?]+)") =>
+                HandleReferral<TResponse>(s),
 
             _ => ErrorResponse<TResponse>($"URL '{additionalUri}' not configured in fake service")
         };
@@ -109,7 +96,7 @@ public class FakeApiService : IApiService
 
     private ApiResponse<TResponse> HandleAppointmentCreate<TResponse>(AppointmentCreateRequest request)
     {
-        var result = _dataService.CreateAppointment(request);
+        var result = dataService.CreateAppointment(request);
 
         return new ApiResponse<TResponse>
         {
@@ -122,7 +109,7 @@ public class FakeApiService : IApiService
 
     private ApiResponse<TResponse> HandleAppointmentCancel<TResponse>(AppointmentСancelRequest request)
     {
-        var result = _dataService.CancelAppointment(request);
+        var result = dataService.CancelAppointment(request);
         return new ApiResponse<TResponse>
         {
             Success = result.Success,
@@ -134,7 +121,7 @@ public class FakeApiService : IApiService
 
     private ApiResponse<TResponse> HandlePatientUpdate<TResponse>(PatientPhoneUpdateRequest request)
     {
-        var result = _dataService.UpdatePatientPhone(request);
+        var result = dataService.UpdatePatientPhone(request);
         return new ApiResponse<TResponse>
         {
             Success = result.Success,
@@ -151,7 +138,7 @@ public class FakeApiService : IApiService
         if (match.Success)
         {
             var districtId = match.Groups[1].Value;
-            var lpus = _dataService.GetLpusByDistrict(districtId);
+            var lpus = dataService.GetLpusByDistrict(districtId);
             return SuccessResponse<TResponse>(lpus);
         }
 
@@ -164,7 +151,7 @@ public class FakeApiService : IApiService
         if (match.Success)
         {
             var lpuId = int.Parse(match.Groups[1].Value);
-            var specialties = _dataService.GetSpecialtiesByLpu(lpuId);
+            var specialties = dataService.GetSpecialtiesByLpu(lpuId);
             return SuccessResponse<TResponse>(specialties);
         }
 
@@ -178,7 +165,7 @@ public class FakeApiService : IApiService
         {
             var lpuId = int.Parse(match.Groups[1].Value);
             var specialtyId = Uri.UnescapeDataString(match.Groups[2].Value);
-            var doctors = _dataService.GetDoctorsBySpecialty(lpuId, specialtyId);
+            var doctors = dataService.GetDoctorsBySpecialty(lpuId, specialtyId);
             return SuccessResponse<TResponse>(doctors);
         }
 
@@ -192,7 +179,7 @@ public class FakeApiService : IApiService
         {
             var lpuId = int.Parse(match.Groups[1].Value);
             var doctorId = Uri.UnescapeDataString(match.Groups[2].Value);
-            var appointments = _dataService.GetAppointmentsByDoctor(lpuId, doctorId);
+            var appointments = dataService.GetAppointmentsByDoctor(lpuId, doctorId);
             return SuccessResponse<TResponse>(appointments);
         }
 
@@ -214,8 +201,29 @@ public class FakeApiService : IApiService
                                        DateTime.Now.AddYears(-30).ToString("yyyy-MM-dd"))
         };
 
-        var patientId = _dataService.GetPatientId(request);
+        var patientId = dataService.GetPatientId(request);
         return SuccessResponse<TResponse>(patientId);
+    }
+    
+    private ApiResponse<TResponse> HandleReferral<TResponse>(string uri)
+    {
+        var match = Regex.Match(uri, @"^referral/([^?]+)");
+        if (!match.Success)
+            return ErrorResponse<TResponse>("Invalid referral URL");
+    
+        var referralNumber = Uri.UnescapeDataString(match.Groups[1].Value);
+    
+        // Парсим query string для lastName
+        string? lastName = null;
+        if (uri.Contains('?'))
+        {
+            var queryString = uri.Split('?')[1];
+            var queryParams = ParseQueryString(queryString);
+            lastName = queryParams["lastName"];
+        }
+    
+        var result = dataService.GetReferral(referralNumber, lastName);
+        return SuccessResponse<TResponse>(result);
     }
 
     // Вспомогательные методы

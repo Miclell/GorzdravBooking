@@ -6,7 +6,6 @@ namespace Application.DTOs.AppointmentSearchRequest;
 [InputModel("создания записи")]
 public class CreateAppointmentSearchRequestDto
 {
-    [InputField("Номер направления (если по направлению)", IsRequired = false)]
     public int? ReferralNumber { get; set; }
 
     public Guid PatientProfileId { get; set; }

@@ -1,19 +1,18 @@
 ﻿using Application.DTOs.AppointmentSearchRequest;
+using Application.Extensions;
 using Application.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu.Commands.Interfaces;
 using StatefulMenu.Core.Models;
 
-namespace CLI.Menus.AppointmentMenu.CreateAppointmentFlow.Commands;
+namespace CLI.Menus.AppointmentMenu.CreateReferralAppointmentFlow.Commands;
 
-public class CreateAppointmentCommand(
+public class CreateReferralAppointmentCommand(
     CreateAppointmentSearchRequestDto createAppointmentSearchRequestDto,
     IServiceProvider serviceProvider) : IMenuCommand
 {
-    public string Title { get; } = $"{createAppointmentSearchRequestDto.LpuName} " +
-                                   $"{createAppointmentSearchRequestDto.DoctorNames} | " +
-                                   $"{createAppointmentSearchRequestDto.TimePreferencesPresetName}";
-
+    public string Title { get; } = createAppointmentSearchRequestDto.GetDisplayTitle();
+    
     public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default)
     {
         var appointmentSearchRequestService = serviceProvider.GetRequiredService<IAppointmentSearchRequestService>();

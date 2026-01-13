@@ -1,5 +1,6 @@
 ﻿using CLI.Helpers;
 using CLI.Menus.AppointmentMenu.CreateAppointmentFlow;
+using CLI.Menus.AppointmentMenu.CreateReferralAppointmentFlow;
 using CLI.Menus.AppointmentMenu.ShowActiveAppointmentsFlow;
 using CLI.Menus.AppointmentMenu.ShowAppointmentsFlow;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,7 @@ public class ShowAppointmentMenuProvider(IServiceProvider serviceProvider) : IMe
         var commands = new IMenuCommand[]
         {
             serviceProvider.GetRequiredService<RunCreateAppointmentFlowCommand>(),
+            serviceProvider.GetRequiredService<RunCreateReferralAppointmentFlowCommand>(),
             serviceProvider.GetRequiredService<RunShowAppointmentsFlowCommand>(),
             serviceProvider.GetRequiredService<RunShowActiveAppointmentsFlowCommand>(),
             serviceProvider.GetRequiredService<BackCommand>()
