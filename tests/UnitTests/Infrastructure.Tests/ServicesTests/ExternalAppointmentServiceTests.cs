@@ -148,59 +148,33 @@ public class ExternalAppointmentServiceTests
         const int referralNumber = 12345;
         const string lastName = "Иванов";
 
-        var expectedReferrals = new List<ReferralResult>
+        var expectedReferrals = new ReferralResult
         {
-            new()
-            {
-                LpuId = "1",
-                LpuShortName = "Поликлиника №1",
-                LpuFullName = "ГБУЗ Поликлиника №1",
-                LpuAddress = "ул. Ленина, д. 10",
-                LpuPhone = "+7(812)123-45-67",
-                PatId = "patient_456",
-                LastName = "Иванов",
-                FirstName = "Иван",
-                MiddleName = "Иванович",
-                BirthDate = new DateTime(1980, 5, 15),
-                Specialities = new List<ReferralSpeciality>
+            LpuId = "1",
+            LpuShortName = "Поликлиника №1",
+            LpuFullName = "ГБУЗ Поликлиника №1",
+            LpuAddress = "ул. Ленина, д. 10",
+            LpuPhone = "+7(812)123-45-67",
+            PatId = "patient_456",
+            LastName = "Иванов",
+            FirstName = "Иван",
+            MiddleName = "Иванович",
+            BirthDate = new DateTime(1980, 5, 15),
+            Specialities =
+            [
+                new()
                 {
-                    new()
-                    {
-                        Id = "spec_1",
-                        Name = "Терапевт",
-                        Description = "Врач-терапевт",
-                        Doctors = new List<ReferralDoctor>()
-                    }
+                    Id = "spec_1",
+                    Name = "Терапевт",
+                    Description = "Врач-терапевт",
+                    Doctors = new List<ReferralDoctor>()
                 }
-            },
-            new()
-            {
-                LpuId = "2",
-                LpuShortName = "Поликлиника №2",
-                LpuFullName = "ГБУЗ Поликлиника №2",
-                LpuAddress = "пр. Победы, д. 25",
-                LpuPhone = "+7(812)765-43-21",
-                PatId = "patient_456",
-                LastName = "Иванов",
-                FirstName = "Иван",
-                MiddleName = "Иванович",
-                BirthDate = new DateTime(1980, 5, 15),
-                Specialities = new List<ReferralSpeciality>
-                {
-                    new()
-                    {
-                        Id = "spec_2",
-                        Name = "Кардиолог",
-                        Description = "Врач-кардиолог",
-                        Doctors = new List<ReferralDoctor>()
-                    }
-                }
-            }
+            ]
         };
 
         var uri = GorzdravApiEndpoints.AppointmentsByReferral(referralNumber, lastName);
 
-        _fakeApiService.SetupGetResponse(uri, new ApiResponse<List<ReferralResult>>
+        _fakeApiService.SetupGetResponse(uri, new ApiResponse<ReferralResult>
         {
             Success = true,
             Result = expectedReferrals
@@ -210,13 +184,11 @@ public class ExternalAppointmentServiceTests
         var result = await _externalAppointmentService.GetByReferralAsync(referralNumber, lastName);
 
         // Assert
-        Assert.Equal(2, result.Count);
-        Assert.Equal(expectedReferrals[0].LpuId, result[0].LpuId);
-        Assert.Equal(expectedReferrals[0].LpuShortName, result[0].LpuShortName);
-        Assert.Equal(expectedReferrals[1].PatId, result[1].PatId);
-        Assert.Single(result[0].Specialities);
-        Assert.Equal("Терапевт", result[0].Specialities[0].Name);
-        Assert.Equal("spec_1", result[0].Specialities[0].Id);
+        Assert.Equal(expectedReferrals.LpuId, result.LpuId);
+        Assert.Equal(expectedReferrals.LpuShortName, result.LpuShortName);
+        Assert.Single(result.Specialities);
+        Assert.Equal("Терапевт", result.Specialities[0].Name);
+        Assert.Equal("spec_1", result.Specialities[0].Id);
     }
 
     [Fact]
@@ -227,7 +199,7 @@ public class ExternalAppointmentServiceTests
         const string lastName = "Иванов";
         var uri = GorzdravApiEndpoints.AppointmentsByReferral(referralNumber, lastName);
 
-        _fakeApiService.SetupGetResponse(uri, new ApiResponse<List<ReferralResult>>
+        _fakeApiService.SetupGetResponse(uri, new ApiResponse<ReferralResult>
         {
             Success = false,
             Message = "Referral not found"
