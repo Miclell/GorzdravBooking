@@ -1,5 +1,4 @@
 ﻿using CLI.Menus.AppointmentMenu.CreateReferralAppointmentFlow.Providers;
-using Core.Models;
 using Core.Models.Referral;
 using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu.Commands.Interfaces;
@@ -10,11 +9,11 @@ using StatefulMenu.Core.Models;
 namespace CLI.Menus.AppointmentMenu.CreateReferralAppointmentFlow.Commands;
 
 public class DoctorSelectionCommand(
-    ReferralDoctor doctor, 
+    ReferralDoctor doctor,
     IServiceProvider serviceProvider) : IMenuCommand
 {
     public string Title { get; } = $"{doctor.Name}";
-    
+
     public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default)
     {
         var dataService = serviceProvider.GetRequiredService<IDataService>();
@@ -22,7 +21,7 @@ public class DoctorSelectionCommand(
             dataService.Set("SelectedDoctors", new List<ReferralDoctor> { doctor });
         else
             selectedDoctors!.Add(doctor);
-        
+
         dataService.TryGet<List<ReferralDoctor>>("ToChoseDoctors", out var doctors);
         doctors!.Remove(doctor);
 
@@ -40,11 +39,11 @@ public class DoctorSelectionCommand(
                 return MenuResult.Push(await doctorSelectionProvider.CreateMenuAsync(cancellationToken));
             }
         }
-        
+
         var timePreferencesSelectionProvider = serviceProvider.GetRequiredService<TimePreferenceSelectionProvider>();
         return MenuResult.Push(await timePreferencesSelectionProvider.CreateMenuAsync(cancellationToken));
     }
-    
+
     [InputModel("выбор нескольких врачей")]
     private record AnotherDoctorInputModel(
         [property: InputField("Выбрать еще одного врача (да/нет)")]

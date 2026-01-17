@@ -8,7 +8,7 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
 {
     public void Configure(EntityTypeBuilder<Appointment> builder)
     {
-        builder.ToTable("Appointments");
+        builder.ToTable("Appointments", t => t.HasComment("Записи на прием к врачу"));
 
         // Primary Key
         builder.HasKey(a => a.Id);
@@ -64,8 +64,5 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
 
         builder.HasIndex(a => new { a.PatientProfileId, a.VisitStart })
             .HasDatabaseName("IX_Appointments_PatientId_VisitStart");
-
-        // Comment
-        builder.HasComment("Записи на прием к врачу");
     }
 }

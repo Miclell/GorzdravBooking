@@ -98,7 +98,7 @@ public class AppointmentServiceTests
                     v.ToString()
                         .Contains($"Ошибка при создании записи на прием для пациента {createDto.PatientProfileId}")),
                 exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
     }
 
@@ -154,7 +154,7 @@ public class AppointmentServiceTests
 
         _mockAppointmentRepository
             .Setup(x => x.GetByIdAsync(appointmentId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Appointment)null);
+            .ReturnsAsync((Appointment?)null);
 
         // Act
         var result = await _appointmentService.DeleteAsync(appointmentId, CancellationToken.None);
@@ -209,9 +209,9 @@ public class AppointmentServiceTests
             x => x.Log(
                 LogLevel.Warning,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Не удалось отменить запись во внешней системе")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Не удалось отменить запись во внешней системе")),
+                It.IsAny<Exception?>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
     }
 
@@ -251,9 +251,9 @@ public class AppointmentServiceTests
                 LogLevel.Error,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) =>
-                    v.ToString().Contains($"Ошибка при удалении записи на прием {appointmentId}")),
+                    v.ToString()!.Contains($"Ошибка при удалении записи на прием {appointmentId}")),
                 exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
     }
 
@@ -435,7 +435,7 @@ public class AppointmentServiceTests
 
         _mockAppointmentRepository
             .Setup(x => x.GetByIdAsync(appointmentId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Appointment)null);
+            .ReturnsAsync((Appointment?)null);
 
         // Act
         var result = await _appointmentService.GetByIdAsync(appointmentId, CancellationToken.None);
@@ -469,9 +469,9 @@ public class AppointmentServiceTests
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при получении записи {appointmentId}")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Ошибка при получении записи {appointmentId}")),
                 exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
     }
 }

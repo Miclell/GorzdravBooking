@@ -6,4 +6,4 @@ namespace Application.DTOs.UseCases;
 public record ReferralValidationResult(
     BasePatientProfileDto PatientProfile,
     List<ReferralSpeciality> Specialities
-    );
+);

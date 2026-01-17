@@ -10,7 +10,7 @@ using StatefulMenu.Core.Models;
 namespace CLI.Menus.AppointmentMenu.CreateReferralAppointmentFlow.Providers;
 
 public class DoctorSelectionProvider(
-    IDataService dataService, 
+    IDataService dataService,
     IServiceProvider serviceProvider) : IMenuProvider
 {
     public async Task<MenuState> CreateMenuAsync(CancellationToken cancellationToken = default)
@@ -27,7 +27,7 @@ public class DoctorSelectionProvider(
         {
             dataService.TryGet("ToChoseDoctors", out doctors);
         }
-        
+
         var commands = doctors
             .Select(d => new DoctorSelectionCommand(d, serviceProvider))
             .Cast<IMenuCommand>()

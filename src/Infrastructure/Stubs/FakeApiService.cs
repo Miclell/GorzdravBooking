@@ -204,15 +204,15 @@ public class FakeApiService(FakeApiDataService dataService) : IApiService
         var patientId = dataService.GetPatientId(request);
         return SuccessResponse<TResponse>(patientId);
     }
-    
+
     private ApiResponse<TResponse> HandleReferral<TResponse>(string uri)
     {
         var match = Regex.Match(uri, @"^referral/([^?]+)");
         if (!match.Success)
             return ErrorResponse<TResponse>("Invalid referral URL");
-    
+
         var referralNumber = Uri.UnescapeDataString(match.Groups[1].Value);
-    
+
         // Парсим query string для lastName
         string? lastName = null;
         if (uri.Contains('?'))
@@ -221,7 +221,7 @@ public class FakeApiService(FakeApiDataService dataService) : IApiService
             var queryParams = ParseQueryString(queryString);
             lastName = queryParams["lastName"];
         }
-    
+
         var result = dataService.GetReferral(referralNumber, lastName);
         return SuccessResponse<TResponse>(result);
     }

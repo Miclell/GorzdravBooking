@@ -162,7 +162,7 @@ public class ExternalAppointmentServiceTests
             BirthDate = new DateTime(1980, 5, 15),
             Specialities =
             [
-                new()
+                new ReferralSpeciality
                 {
                     Id = "spec_1",
                     Name = "Терапевт",

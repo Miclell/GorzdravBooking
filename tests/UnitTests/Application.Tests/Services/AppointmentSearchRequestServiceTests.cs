@@ -72,7 +72,7 @@ public class AppointmentSearchRequestServiceTests
     public async Task CreateAsync_CreatesManualSearchRequest_WhenDoctorModeIsSpecific()
     {
         // Arrange
-        var dto = CreateValidDto(DoctorSelectionMode.SpecificDoctorOrRange);
+        var dto = CreateValidDto();
         ManualSearchRequest? capturedRequest = null;
 
         _repositoryMock

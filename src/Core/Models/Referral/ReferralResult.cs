@@ -2,16 +2,16 @@
 
 public class ReferralResult
 {
-    public string LpuId { get; set; }
-    public string LpuShortName { get; set; }
-    public string LpuFullName { get; set; }
-    public string LpuAddress { get; set; }
-    public string LpuPhone { get; set; }
+    public string LpuId { get; set; } = null!;
+    public string LpuShortName { get; set; } = null!;
+    public string LpuFullName { get; set; } = null!;
+    public string LpuAddress { get; set; } = null!;
+    public string LpuPhone { get; set; } = null!;
 
-    public string PatId { get; set; }
-    public string LastName { get; set; }
-    public string FirstName { get; set; }
-    public string MiddleName { get; set; }
+    public string PatId { get; set; } = null!;
+    public string LastName { get; set; } = null!;
+    public string FirstName { get; set; } = null!;
+    public string MiddleName { get; set; } = null!;
 
     public string? PolisN { get; set; }
     public string? PolisS { get; set; }

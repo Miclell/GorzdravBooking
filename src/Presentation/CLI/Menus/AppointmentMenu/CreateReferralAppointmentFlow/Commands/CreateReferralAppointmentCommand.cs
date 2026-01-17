@@ -12,7 +12,7 @@ public class CreateReferralAppointmentCommand(
     IServiceProvider serviceProvider) : IMenuCommand
 {
     public string Title { get; } = createAppointmentSearchRequestDto.GetDisplayTitle();
-    
+
     public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default)
     {
         var appointmentSearchRequestService = serviceProvider.GetRequiredService<IAppointmentSearchRequestService>();

@@ -53,7 +53,7 @@ public class ExternalAppointmentService(
 
         if (response.ErrorCode == 676)
             throw new ReferralNotFoundException(referralNumber);
-        
+
         if (!response.Success)
             throw new HttpRequestException($"Ошибка при получении номерков: {response.Message}");
 
@@ -78,11 +78,11 @@ public class ExternalAppointmentService(
         if (!response.Success)
             throw new HttpRequestException($"Ошибка при отмене записи: {response.Message}");
 
-        return response.Result!;
+        return response.Result;
     }
 
-    public async Task<(bool IsSucces, int ErrorCode)> CreateReferralAppointmentAsync(AppointmentCreateRequest request)
-    {
-        throw new NotImplementedException();
-    }
+    // public Task<(bool IsSucces, int ErrorCode)> CreateReferralAppointmentAsync(AppointmentCreateRequest request)
+    // {
+    //     throw new NotImplementedException();
+    // }
 }

@@ -6,8 +6,8 @@ namespace Server.Identity.Attributes;
 
 public class ValidateUserOwnershipAttribute(
     string idParameterName = "id",
-    Type serviceType = null,
-    string methodName = null)
+    Type? serviceType = null,
+    string? methodName = null)
     : ActionFilterAttribute
 {
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)

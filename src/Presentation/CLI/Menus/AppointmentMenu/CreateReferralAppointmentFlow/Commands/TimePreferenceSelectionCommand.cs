@@ -15,12 +15,12 @@ public class TimePreferenceSelectionCommand(
     IServiceProvider serviceProvider) : IMenuCommand
 {
     public string Title { get; } = $"{timePreferencesPresetDto.Name}";
-    
+
     public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default)
     {
         var dataService = serviceProvider.GetRequiredService<IDataService>();
         dataService.Set(nameof(TimePreferencesPresetDto), timePreferencesPresetDto);
-        
+
         var inputService = serviceProvider.GetRequiredService<IConsoleInputService>();
         var createAppointmentSearchRequestDto =
             await inputService.ReadModelAsync<CreateAppointmentSearchRequestDto>(cancellationToken);
@@ -33,7 +33,7 @@ public class TimePreferenceSelectionCommand(
         var createReferralAppointmentProvider = serviceProvider.GetRequiredService<CreateReferralAppointmentProvider>();
         return MenuResult.Push(await createReferralAppointmentProvider.CreateMenuAsync(cancellationToken));
     }
-    
+
     [InputModel("стартовых точек")] // TODO вынести главный рекорд
     private record SpecificStartPointsInputModel(
         [property: InputField("Введите стартовые точки HH:mm через ;",

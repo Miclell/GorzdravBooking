@@ -2,11 +2,11 @@
 
 public class MedicalSpeciality
 {
-    public string Id { get; set; }
-    public string FerId { get; set; }
-    public string Name { get; set; }
+    public string Id { get; set; } = null!;
+    public string FerId { get; set; } = null!;
+    public string Name { get; set; } = null!;
     public int CountFreeParticipant { get; set; }
     public int CountFreeTicket { get; set; }
-    public string LastDate { get; set; }
-    public string NearestDate { get; set; }
+    public string LastDate { get; set; } = null!;
+    public string NearestDate { get; set; } = null!;
 }

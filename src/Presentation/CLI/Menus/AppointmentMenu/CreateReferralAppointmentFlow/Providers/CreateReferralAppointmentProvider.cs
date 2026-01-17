@@ -1,6 +1,5 @@
 ﻿using Application.DTOs.AppointmentSearchRequest;
 using Application.DTOs.Patient;
-using Application.DTOs.TimePreferences;
 using Application.DTOs.UseCases;
 using CLI.Helpers;
 using CLI.Menus.AppointmentMenu.CreateReferralAppointmentFlow.Commands;
@@ -19,14 +18,15 @@ public class CreateReferralAppointmentProvider(IServiceProvider serviceProvider)
     public Task<MenuState> CreateMenuAsync(CancellationToken cancellationToken = default)
     {
         var dataService = serviceProvider.GetRequiredService<IDataService>();
-        dataService.TryGet<ReferralValidationRequest>(nameof(ReferralValidationRequest), out var referralValidationRequest);
+        dataService.TryGet<ReferralValidationRequest>(nameof(ReferralValidationRequest),
+            out var referralValidationRequest);
         dataService.TryGet<BasePatientProfileDto>(nameof(BasePatientProfileDto), out var patient);
         dataService.TryGet<bool>("IsAnyOfSpeciality", out var isAnyOfSpeciality);
         dataService.TryGet<ReferralSpeciality>(nameof(ReferralSpeciality), out var speciality);
         dataService.TryGet<List<ReferralDoctor>>("SelectedDoctors", out var doctors);
         dataService.TryGet<CreateAppointmentSearchRequestDto>(nameof(CreateAppointmentSearchRequestDto),
             out var createAppointmentSearchRequestDto);
-        
+
         createAppointmentSearchRequestDto = new CreateAppointmentSearchRequestDto
         {
             ReferralNumber = referralValidationRequest!.ReferralNumber,
@@ -44,7 +44,7 @@ public class CreateReferralAppointmentProvider(IServiceProvider serviceProvider)
             MaxDaysToSearch = createAppointmentSearchRequestDto.MaxDaysToSearch,
             ViewOnly = createAppointmentSearchRequestDto.ViewOnly
         };
-        
+
         var commands = new List<IMenuCommand>
         {
             new CreateReferralAppointmentCommand(createAppointmentSearchRequestDto, serviceProvider),

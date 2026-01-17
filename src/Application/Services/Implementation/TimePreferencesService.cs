@@ -71,7 +71,7 @@ public class TimePreferencesService(
                         group.Select(tp => tp.ToDto())
                             .ToList()
                             .AsReadOnly(),
-                        first.ExcludedDates,
+                        first.ExcludedDates ?? new List<DateOnly>(),
                         first.MaxDaysAhead,
                         first.MinHoursFromNow
                     );
@@ -106,7 +106,7 @@ public class TimePreferencesService(
                 timePreferencesList.Select(tp => tp.ToDto())
                     .ToList()
                     .AsReadOnly(),
-                first.ExcludedDates,
+                first.ExcludedDates ?? new List<DateOnly>(),
                 first.MaxDaysAhead,
                 first.MinHoursFromNow
             );

@@ -10,13 +10,13 @@ public class CreateAppointmentSearchRequestDto
 
     public Guid PatientProfileId { get; set; }
 
-    public string LpuName { get; set; }
-    public string Speciality { get; set; }
+    public string LpuName { get; set; } = null!;
+    public string Speciality { get; set; } = null!;
     public DoctorSelectionMode DoctorMode { get; set; }
     public List<string>? DoctorIds { get; set; }
     public List<string>? DoctorNames { get; set; }
 
-    public string TimePreferencesPresetName { get; set; }
+    public string TimePreferencesPresetName { get; set; } = null!;
     [InputField("Интервал поиска (мин)")] public TimeSpan SearchInterval { get; set; }
     public List<DateTime>? SpecificStartPoints { get; set; } = [];
 

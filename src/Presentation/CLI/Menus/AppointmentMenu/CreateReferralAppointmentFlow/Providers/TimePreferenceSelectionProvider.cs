@@ -19,7 +19,7 @@ public class TimePreferenceSelectionProvider(
 
         if (!tps.Value.Any())
             Console.WriteLine("Не найдено ни одного пресета, создайте пресеты!");
-        
+
         var commands = tps.Value
             .Select(tp => new TimePreferenceSelectionCommand(tp, serviceProvider))
             .Cast<IMenuCommand>()

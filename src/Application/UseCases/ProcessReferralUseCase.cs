@@ -1,6 +1,5 @@
 ﻿using Application.Abstract;
 using Application.Common.Results;
-using Application.DTOs.Patient;
 using Application.DTOs.UseCases;
 using Application.Extensions;
 using Application.Services.Interfaces;
@@ -16,7 +15,7 @@ public class ProcessReferralUseCase(
     ILogger<ProcessReferralUseCase> logger) : IAppUseCase
 {
     public async Task<Result<ReferralValidationResult>> Execute(
-        ReferralValidationRequest request, 
+        ReferralValidationRequest request,
         CancellationToken cancellationToken = default)
     {
         try
@@ -29,8 +28,8 @@ public class ProcessReferralUseCase(
                 return Error.Failure("Failed.To.Get.Patients", $"Ошибка при получении пациентов для {request.UserId}");
 
             var patient = patients.Value
-                .FirstOrDefault(p 
-                    => p.PatientId == referralResult.PatId && 
+                .FirstOrDefault(p
+                    => p.PatientId == referralResult.PatId &&
                        p.LpuShortName == referralResult.LpuShortName);
 
             if (patient != null)
@@ -39,13 +38,16 @@ public class ProcessReferralUseCase(
             var patientId = await patientService
                 .Create(referralResult.ToCreatePatientDto(request.UserId), cancellationToken);
 
+            if (!patientId.IsSuccess)
+                return patientId.Error;
+
             return new ReferralValidationResult(
                 (await patientService.GetById(patientId.Value, cancellationToken)).Value,
                 referralResult.Specialities);
         }
         catch (ReferralNotFoundException e)
         {
-            return Error.NotFound("Invalid.Referral",e.Message);
+            return Error.NotFound("Invalid.Referral", e.Message);
         }
         catch (Exception e)
         {

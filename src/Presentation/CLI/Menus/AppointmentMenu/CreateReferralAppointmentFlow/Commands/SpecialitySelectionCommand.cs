@@ -10,7 +10,7 @@ namespace CLI.Menus.AppointmentMenu.CreateReferralAppointmentFlow.Commands;
 public class SpecialitySelectionCommand(ReferralSpeciality speciality, IServiceProvider serviceProvider) : IMenuCommand
 {
     public string Title { get; } = speciality.Name;
-    
+
     public async Task<MenuResult> ExecuteAsync(CancellationToken cancellationToken = default)
     {
         var dataService = serviceProvider.GetRequiredService<IDataService>();

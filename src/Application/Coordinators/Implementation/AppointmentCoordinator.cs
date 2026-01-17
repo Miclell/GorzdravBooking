@@ -127,10 +127,14 @@ public class AppointmentCoordinator(
     {
         if (request is ManualSearchRequest manualSearchRequest)
         {
+            if (request.DoctorIds == null || request.DoctorNames == null)
+                throw new InvalidOperationException(
+                    "DoctorIds and DoctorNames must be set for SpecificDoctorOrRange mode");
+
             var appointments = new List<(string Doctor, Appointment Appointment)>();
             if (request.DoctorMode == DoctorSelectionMode.SpecificDoctorOrRange)
-                foreach (var (doctorId, doctorName) in request.DoctorIds!
-                             .Zip(request.DoctorNames!))
+                foreach (var (doctorId, doctorName) in request.DoctorIds
+                             .Zip(request.DoctorNames))
                 {
                     var slots = await externalAppointmentService.GetByDoctorAsync(
                         int.Parse(manualSearchRequest.PatientProfile.LpuId),
@@ -154,8 +158,12 @@ public class AppointmentCoordinator(
 
             if (request.DoctorMode == DoctorSelectionMode.SpecificDoctorOrRange)
             {
+                if (request.DoctorNames == null)
+                    throw new InvalidOperationException(
+                        "DoctorIds and DoctorNames must be set for SpecificDoctorOrRange mode");
+
                 var appointments = new List<(string Doctor, Appointment Appointment)>();
-                foreach (var doctorName in request.DoctorNames!)
+                foreach (var doctorName in request.DoctorNames)
                     appointments.AddRange(result.Specialities
                         .SelectMany(s => s.Doctors)
                         .Where(d => string.Equals(d.Name, doctorName, StringComparison.CurrentCultureIgnoreCase))

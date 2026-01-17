@@ -9,13 +9,13 @@ public abstract class AppointmentSearchRequest
     public Guid PatientProfileId { get; set; }
     public PatientProfile PatientProfile { get; set; } = null!;
 
-    public string LpuName { get; set; }
-    public string Speciality { get; set; }
+    public string LpuName { get; set; } = null!;
+    public string Speciality { get; set; } = null!;
     public DoctorSelectionMode DoctorMode { get; set; } = DoctorSelectionMode.SpecificDoctorOrRange;
     public List<string>? DoctorIds { get; set; }
     public List<string>? DoctorNames { get; set; }
 
-    public string TimePreferencesPresetName { get; set; }
+    public string TimePreferencesPresetName { get; set; } = null!;
     public TimeSpan SearchInterval { get; set; } = TimeSpan.FromMinutes(15);
     public List<DateTime>? SpecificStartPoints { get; set; }
 

@@ -123,7 +123,7 @@ public class PatientService(
             var patient = await patientRepository.GetByIdAsync(patientId, cancellationToken);
             if (patient == null)
                 return Error.Conflict("Not.Found", $"Patient {patientId} not found");
-            
+
             return new BasePatientProfileDto(
                 patient.Id,
                 patient.LpuShortName,

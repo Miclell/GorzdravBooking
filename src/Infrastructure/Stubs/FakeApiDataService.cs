@@ -5,16 +5,16 @@ namespace Infrastructure.Stubs;
 
 public class FakeApiDataService
 {
-    private readonly Dictionary<string, List<Appointment>> _appointmentsByDoctor;
     private readonly Dictionary<string, Appointment> _allAppointments;
+    private readonly Dictionary<string, List<Appointment>> _appointmentsByDoctor;
     private readonly List<District> _districts;
     private readonly List<Doctor> _doctors;
     private readonly List<Lpu> _lpus;
     private readonly Dictionary<string, string> _patientIds;
     private readonly Random _random;
-    private readonly List<MedicalSpeciality> _specialties;
-    private readonly List<ReferralSpeciality> _referralSpecialties;
     private readonly List<ReferralDoctor> _referralDoctors;
+    private readonly List<ReferralSpeciality> _referralSpecialties;
+    private readonly List<MedicalSpeciality> _specialties;
 
     public FakeApiDataService()
     {
@@ -111,10 +111,7 @@ public class FakeApiDataService
         _allAppointments.Remove(appointmentId);
 
         // Удаляем из докторских списков тоже (для консистентности)
-        foreach (var appointments in _appointmentsByDoctor.Values)
-        {
-            appointments.RemoveAll(a => a.Id == appointmentId);
-        }
+        foreach (var appointments in _appointmentsByDoctor.Values) appointments.RemoveAll(a => a.Id == appointmentId);
 
         return true;
     }
@@ -169,7 +166,7 @@ public class FakeApiDataService
     {
         return new ApiResponse<bool> { Success = true, Result = true };
     }
-    
+
     // Referral
     public ReferralResult GetReferral(string referralNumber, string? lastName)
     {
@@ -184,30 +181,31 @@ public class FakeApiDataService
             LpuFullName = lpu.LpuFullName,
             LpuAddress = lpu.Address,
             LpuPhone = lpu.Phone,
-        
+
             PatId = patientData.PatId,
             LastName = patientData.LastName,
             FirstName = patientData.FirstName,
             MiddleName = patientData.MiddleName,
             BirthDate = patientData.BirthDate,
-        
+
             PolisN = null,
             PolisS = null,
             HomePhoneNumber = "",
             MobilePhoneNumber = "",
             Email = "",
-        
+
             Specialities = selectedSpecialties
         };
     }
-    
+
     // Private Referral
-    private (string PatId, string LastName, string FirstName, string MiddleName, DateTime BirthDate) GeneratePatientData(string? lastName)
+    private (string PatId, string LastName, string FirstName, string MiddleName, DateTime BirthDate)
+        GeneratePatientData(string? lastName)
     {
         var lastNames = new[] { "Иванов", "Петров", "Сидоров", "Козлова", "Морозов", "Новиков" };
         var firstNames = new[] { "Михаил", "Александр", "Дмитрий", "Елена", "Ольга", "Анна" };
         var middleNames = new[] { "Евгеньевич", "Петрович", "Сергеевич", "Ивановна", "Алексеевна", "Владимировна" };
-        
+
         return (
             PatId: _random.Next(100000, 999999).ToString(),
             LastName: lastName ?? lastNames[_random.Next(lastNames.Length)],
@@ -216,12 +214,12 @@ public class FakeApiDataService
             BirthDate: DateTime.Now.AddYears(-_random.Next(20, 70))
         );
     }
-    
+
     private List<ReferralSpeciality> SelectReferralSpecialties()
     {
         var count = _random.Next(1, 3);
         var selected = _referralSpecialties.OrderBy(_ => _random.Next()).Take(count).ToList();
-        
+
         return selected.Select(s => new ReferralSpeciality
         {
             Id = s.Id,
@@ -231,7 +229,7 @@ public class FakeApiDataService
             Doctors = GenerateDoctorsForReferralSpecialty(s.Id)
         }).ToList();
     }
-    
+
     private List<ReferralDoctor> GenerateDoctorsForReferralSpecialty(string specialtyId)
     {
         var doctorsForSpecialty = _referralDoctors
@@ -239,7 +237,7 @@ public class FakeApiDataService
             .OrderBy(_ => _random.Next())
             .Take(_random.Next(1, 3))
             .ToList();
-        
+
         return doctorsForSpecialty.Select(d => new ReferralDoctor
         {
             Id = d.Id,
@@ -248,28 +246,28 @@ public class FakeApiDataService
             Appointments = GenerateReferralAppointments()
         }).ToList();
     }
-    
+
     private List<Appointment> GenerateReferralAppointments()
     {
         var appointments = new List<Appointment>();
         var now = DateTime.Now;
-        
+
         var count = _random.Next(3, 9);
-        
+
         for (var i = 0; i < count; i++)
         {
             var daysAhead = _random.Next(1, 14);
             var date = now.AddDays(daysAhead);
-            
+
             while (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
                 date = date.AddDays(1);
-            
+
             var hour = _random.Next(9, 18);
             var minute = _random.Next(0, 4) * 15;
-            
+
             var visitStart = new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
             var visitEnd = visitStart.AddMinutes(15);
-            
+
             var appointment = new Appointment
             {
                 Id = Guid.NewGuid().ToString(),
@@ -279,14 +277,14 @@ public class FakeApiDataService
                 Room = $"{_random.Next(1, 5)}{_random.Next(10, 50)}",
                 Number = null
             };
-            
+
             appointments.Add(appointment);
             _allAppointments[appointment.Id] = appointment;
         }
-        
+
         return appointments.OrderBy(a => a.VisitStart).ToList();
     }
-    
+
     private List<ReferralSpeciality> GenerateReferralSpecialties()
     {
         return new List<ReferralSpeciality>
@@ -307,7 +305,7 @@ public class FakeApiDataService
             }
         };
     }
-    
+
     private List<ReferralDoctor> GenerateReferralDoctors()
     {
         return new List<ReferralDoctor>

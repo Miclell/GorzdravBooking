@@ -26,7 +26,7 @@ public class CheckAppointmentSearchRequestsUseCase(
             logger.LogDebug("Найдено {Count} активных запросов", appointmentSearchRequests.Count);
 
             foreach (var request in appointmentSearchRequests
-                         .Where(request => IsTimeToCheck(request, now) || true))
+                         .Where(request => IsTimeToCheck(request, now)))
                 try
                 {
                     logger.LogDebug("Обработка запроса {RequestId} для пациента {PatientId}", request.Id,

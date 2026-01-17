@@ -11,7 +11,7 @@ namespace CLI.Menus;
 
 public class MainMenuProvider(IServiceProvider serviceProvider) : IMenuProvider
 {
-    public async Task<MenuState> CreateMenuAsync(CancellationToken cancellationToken = default)
+    public Task<MenuState> CreateMenuAsync(CancellationToken cancellationToken = default)
     {
         var commands = new IMenuCommand[]
         {
@@ -27,6 +27,6 @@ public class MainMenuProvider(IServiceProvider serviceProvider) : IMenuProvider
                 : new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken)))
             .ToList();
 
-        return new MenuState("Главное меню", items, header: HeaderFactorySetup.SetupHeader());
+        return Task.FromResult(new MenuState("Главное меню", items, header: HeaderFactorySetup.SetupHeader()));
     }
 }
