@@ -1,6 +1,6 @@
 ﻿using Application.DTOs.Patient;
 using CLI.Helpers;
-using CLI.Menus.AppointmentMenu.CreateAppointmentFlow.Commands;
+using CLI.Menus.AppointmentMenu.CreateManualAppointmentFlow.Commands;
 using Core.Interfaces.Services;
 using Core.Models;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +10,7 @@ using StatefulMenu.Core.Attributes;
 using StatefulMenu.Core.Interfaces;
 using StatefulMenu.Core.Models;
 
-namespace CLI.Menus.AppointmentMenu.CreateAppointmentFlow.Providers;
+namespace CLI.Menus.AppointmentMenu.CreateManualAppointmentFlow.Providers;
 
 public class DoctorSelectionProvider(
     IExternalDoctorService doctorService,
@@ -27,7 +27,7 @@ public class DoctorSelectionProvider(
                     .ReadModelAsync<AnyOfSpecialityInputModel>(cancellationToken))!
                 .IsAnyOfSpeciality;
 
-            dataService.Set("IsAnyOfSpeciality", isAnyOfSpeciality!);
+            dataService.Set("IsAnyOfSpeciality", isAnyOfSpeciality);
             if (isAnyOfSpeciality)
             {
                 var selectTimePreferencesProvider = serviceProvider.GetRequiredService<SelectTimePreferencesProvider>();

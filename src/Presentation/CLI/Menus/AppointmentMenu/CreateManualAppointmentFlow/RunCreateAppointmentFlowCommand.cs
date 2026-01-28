@@ -1,8 +1,8 @@
-﻿using CLI.Menus.AppointmentMenu.CreateAppointmentFlow.Providers;
+﻿using CLI.Menus.AppointmentMenu.CreateManualAppointmentFlow.Providers;
 using StatefulMenu.Commands.Interfaces;
 using StatefulMenu.Core.Models;
 
-namespace CLI.Menus.AppointmentMenu.CreateAppointmentFlow;
+namespace CLI.Menus.AppointmentMenu.CreateManualAppointmentFlow;
 
 public class RunCreateAppointmentFlowCommand(PatientSelectionProvider patientSelectionProvider) : IMenuCommand
 {

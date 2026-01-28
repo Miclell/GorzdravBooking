@@ -1,11 +1,11 @@
-﻿using CLI.Menus.AppointmentMenu.CreateAppointmentFlow.Providers;
+﻿using CLI.Menus.AppointmentMenu.CreateManualAppointmentFlow.Providers;
 using Core.Models;
 using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu.Commands.Interfaces;
 using StatefulMenu.Core.Interfaces;
 using StatefulMenu.Core.Models;
 
-namespace CLI.Menus.AppointmentMenu.CreateAppointmentFlow.Commands;
+namespace CLI.Menus.AppointmentMenu.CreateManualAppointmentFlow.Commands;
 
 public class SpecialitySelectionCommand(
     MedicalSpeciality speciality,

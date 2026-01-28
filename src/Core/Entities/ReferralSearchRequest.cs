@@ -2,5 +2,5 @@
 
 public class ReferralSearchRequest : AppointmentSearchRequest
 {
-    public int ReferralNumber { get; set; }
+    public required string ReferralNumber { get; set; }
 }

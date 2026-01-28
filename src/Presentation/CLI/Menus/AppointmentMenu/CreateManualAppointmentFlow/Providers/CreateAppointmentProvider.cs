@@ -1,7 +1,7 @@
 ﻿using Application.DTOs.AppointmentSearchRequest;
 using Application.DTOs.Patient;
 using CLI.Helpers;
-using CLI.Menus.AppointmentMenu.CreateAppointmentFlow.Commands;
+using CLI.Menus.AppointmentMenu.CreateManualAppointmentFlow.Commands;
 using Core.Enums;
 using Core.Models;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +10,7 @@ using StatefulMenu.Commands.Interfaces;
 using StatefulMenu.Core.Interfaces;
 using StatefulMenu.Core.Models;
 
-namespace CLI.Menus.AppointmentMenu.CreateAppointmentFlow.Providers;
+namespace CLI.Menus.AppointmentMenu.CreateManualAppointmentFlow.Providers;
 
 public class CreateAppointmentProvider(IServiceProvider serviceProvider) : IMenuProvider
 {

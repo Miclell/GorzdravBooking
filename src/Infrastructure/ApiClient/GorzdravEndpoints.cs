@@ -82,7 +82,7 @@ public static class GorzdravApiEndpoints
     ///     <paramref name="referralNumber" /> — номер направления. <br />
     ///     <paramref name="lastName" /> — фамилия (строка).
     /// </remarks>
-    public static string AppointmentsByReferral(int referralNumber, string lastName)
+    public static string AppointmentsByReferral(string referralNumber, string lastName)
     {
         return $"referral/{referralNumber}?lastName={E(lastName)}";
     }

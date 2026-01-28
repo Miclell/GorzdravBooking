@@ -24,10 +24,10 @@ public static class AppointmentMenuExtensions
                $"{dto.TimePreferencesPresetName}";
     }
 
-    private static string GetSpecialityDisplayName(int? referralNumber, string speciality)
+    private static string GetSpecialityDisplayName(string? referralNumber, string speciality)
     {
-        return referralNumber.HasValue
-            ? $"Направление №{referralNumber.Value}"
+        return referralNumber != null
+            ? $"Направление №{referralNumber}"
             : speciality;
     }
 

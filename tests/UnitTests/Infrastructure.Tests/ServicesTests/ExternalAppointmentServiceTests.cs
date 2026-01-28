@@ -145,7 +145,7 @@ public class ExternalAppointmentServiceTests
     public async Task GetByReferralAsync_Success()
     {
         // Arrange
-        const int referralNumber = 12345;
+        const string referralNumber = "12345";
         const string lastName = "Иванов";
 
         var expectedReferrals = new ReferralResult
@@ -195,7 +195,7 @@ public class ExternalAppointmentServiceTests
     public async Task GetByReferralAsync_Failure()
     {
         // Arrange
-        const int referralNumber = 12345;
+        const string referralNumber = "12345";
         const string lastName = "Иванов";
         var uri = GorzdravApiEndpoints.AppointmentsByReferral(referralNumber, lastName);
 

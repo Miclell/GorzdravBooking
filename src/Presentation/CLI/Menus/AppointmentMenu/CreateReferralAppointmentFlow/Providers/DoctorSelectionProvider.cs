@@ -1,5 +1,4 @@
-﻿using Application.DTOs.Patient;
-using CLI.Helpers;
+﻿using CLI.Helpers;
 using CLI.Menus.AppointmentMenu.CreateReferralAppointmentFlow.Commands;
 using Core.Models.Referral;
 using StatefulMenu.Commands.BuiltIn;
@@ -18,7 +17,6 @@ public class DoctorSelectionProvider(
         List<ReferralDoctor>? doctors;
         if (!dataService.TryGet<bool>("IsAnotherDoctor", out _))
         {
-            dataService.TryGet<BasePatientProfileDto>(nameof(BasePatientProfileDto), out var patient);
             dataService.TryGet<ReferralSpeciality>(nameof(ReferralSpeciality), out var speciality);
             doctors = speciality.Doctors; // TODO 
             dataService.Set("ToChoseDoctors", doctors);
@@ -28,7 +26,7 @@ public class DoctorSelectionProvider(
             dataService.TryGet("ToChoseDoctors", out doctors);
         }
 
-        var commands = doctors
+        var commands = doctors!
             .Select(d => new DoctorSelectionCommand(d, serviceProvider))
             .Cast<IMenuCommand>()
             .Append(new BackCommand())

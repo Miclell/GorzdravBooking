@@ -6,7 +6,7 @@ namespace Application.DTOs.AppointmentSearchRequest;
 [InputModel("создания записи")]
 public class CreateAppointmentSearchRequestDto
 {
-    public int? ReferralNumber { get; set; }
+    public string? ReferralNumber { get; set; }
 
     public Guid PatientProfileId { get; set; }
 

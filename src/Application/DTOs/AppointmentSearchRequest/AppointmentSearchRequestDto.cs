@@ -19,6 +19,6 @@ public record AppointmentSearchRequestDto(
     DateTime? LastSearchAttempt,
     int AttemptCount,
     string PatientFullName,
-    int? ReferralNumber,
+    string? ReferralNumber,
     string RequestType
 );

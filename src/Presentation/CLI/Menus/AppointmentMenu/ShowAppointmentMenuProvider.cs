@@ -1,5 +1,5 @@
 ﻿using CLI.Helpers;
-using CLI.Menus.AppointmentMenu.CreateAppointmentFlow;
+using CLI.Menus.AppointmentMenu.CreateManualAppointmentFlow;
 using CLI.Menus.AppointmentMenu.CreateReferralAppointmentFlow;
 using CLI.Menus.AppointmentMenu.ShowActiveAppointmentsFlow;
 using CLI.Menus.AppointmentMenu.ShowAppointmentsFlow;

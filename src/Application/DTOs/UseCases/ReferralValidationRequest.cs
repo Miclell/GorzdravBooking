@@ -6,7 +6,7 @@ namespace Application.DTOs.UseCases;
 public record ReferralValidationRequest(
     Guid UserId,
     [property: InputField("Введите номер направления")]
-    int ReferralNumber,
+    string ReferralNumber,
     [property: InputField("Введите фамилию")]
     string LastName
 );

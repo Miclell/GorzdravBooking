@@ -45,7 +45,7 @@ public class ExternalAppointmentService(
         return response.Result!;
     }
 
-    public async Task<ReferralResult> GetByReferralAsync(int referralNumber, string lastName)
+    public async Task<ReferralResult> GetByReferralAsync(string referralNumber, string lastName)
     {
         var response =
             await apiService.GetAsync<ReferralResult>(

@@ -1,7 +1,7 @@
 ﻿namespace Core.Exceptions;
 
-public class ReferralNotFoundException(int referralNumber)
+public class ReferralNotFoundException(string referralNumber)
     : Exception($"Referral {referralNumber} not found")
 {
-    public int ReferralNumber { get; } = referralNumber;
+    public string ReferralNumber { get; } = referralNumber;
 }

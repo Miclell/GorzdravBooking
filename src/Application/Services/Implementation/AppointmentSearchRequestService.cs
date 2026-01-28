@@ -20,10 +20,10 @@ public class AppointmentSearchRequestService(
         try
         {
             AppointmentSearchRequest request;
-            if (createDto.ReferralNumber.HasValue)
+            if (createDto.ReferralNumber != null)
                 request = new ReferralSearchRequest
                 {
-                    ReferralNumber = createDto.ReferralNumber.Value
+                    ReferralNumber = createDto.ReferralNumber
                 };
             else
                 request = new ManualSearchRequest();
