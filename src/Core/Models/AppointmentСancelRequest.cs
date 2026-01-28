@@ -2,8 +2,8 @@
 
 public class AppointmentСancelRequest
 {
-    public string AppointmentId { get; set; }
-    public string LpuId { get; set; }
-    public string PatientId { get; set; }
+    public string AppointmentId { get; set; } = null!;
+    public string LpuId { get; set; } = null!;
+    public string PatientId { get; set; } = null!;
     public string EsiaId { get; set; } = "";
 }

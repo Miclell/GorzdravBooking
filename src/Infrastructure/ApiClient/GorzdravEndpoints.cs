@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using Core.Models;
 
-namespace Infrastructure.ApiClient.Models;
+namespace Infrastructure.ApiClient;
 
 /// <summary>
 ///     Относительные пути API Горздрава.
@@ -73,6 +73,18 @@ public static class GorzdravApiEndpoints
     public static string AppointmentsByDoctor(int lpuId, string doctorId)
     {
         return $"schedule/lpu/{lpuId}/doctor/{E(doctorId)}/appointments";
+    }
+
+    /// <summary>
+    ///     Получение доступных врачей и талонов по направлению.
+    /// </summary>
+    /// <remarks>
+    ///     <paramref name="referralNumber" /> — номер направления. <br />
+    ///     <paramref name="lastName" /> — фамилия (строка).
+    /// </remarks>
+    public static string AppointmentsByReferral(string referralNumber, string lastName)
+    {
+        return $"referral/{referralNumber}?lastName={E(lastName)}";
     }
 
     /// <summary>

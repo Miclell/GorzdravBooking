@@ -1,8 +1,13 @@
-﻿namespace Application.DTOs.TimePreferences;
+﻿using Core.Enums;
+
+namespace Application.DTOs.TimePreferences;
 
 public record TimePreferencesPresetDto(
     string Name,
     Guid UserId,
-    bool AnyTime,
-    IReadOnlyList<TimePreferenceDto> Preferences
+    TimeSelectionMode TimeMode,
+    IReadOnlyList<TimePreferenceDto> Preferences,
+    List<DateOnly> ExcludedDates,
+    int MaxDaysAhead,
+    int MinHoursFromNow
 );

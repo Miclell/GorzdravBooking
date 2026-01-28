@@ -1,26 +1,33 @@
 ﻿using Core.Models;
+using Core.Models.Referral;
 
 namespace Infrastructure.Stubs;
 
 public class FakeApiDataService
 {
+    private readonly Dictionary<string, Appointment> _allAppointments;
     private readonly Dictionary<string, List<Appointment>> _appointmentsByDoctor;
     private readonly List<District> _districts;
     private readonly List<Doctor> _doctors;
     private readonly List<Lpu> _lpus;
     private readonly Dictionary<string, string> _patientIds;
     private readonly Random _random;
+    private readonly List<ReferralDoctor> _referralDoctors;
+    private readonly List<ReferralSpeciality> _referralSpecialties;
     private readonly List<MedicalSpeciality> _specialties;
 
     public FakeApiDataService()
     {
         _random = new Random();
         _patientIds = new Dictionary<string, string>();
+        _allAppointments = new Dictionary<string, Appointment>();
         _districts = GenerateDistricts();
         _lpus = GenerateLpus();
         _specialties = GenerateSpecialties();
         _doctors = GenerateDoctors();
         _appointmentsByDoctor = new Dictionary<string, List<Appointment>>();
+        _referralSpecialties = GenerateReferralSpecialties();
+        _referralDoctors = GenerateReferralDoctors();
         InitializePatientIds();
     }
 
@@ -93,21 +100,20 @@ public class FakeApiDataService
             _appointmentsByDoctor[doctorKey] = new List<Appointment>();
 
         _appointmentsByDoctor[doctorKey].Add(appointment);
+        _allAppointments[appointment.Id] = appointment; // ✅ Добавляем в центральное хранилище
     }
 
     public bool RemoveAppointment(string appointmentId)
     {
-        foreach (var (doctorKey, appointments) in _appointmentsByDoctor)
-        {
-            var appointment = appointments.FirstOrDefault(a => a.Id == appointmentId);
-            if (appointment != null)
-            {
-                appointments.Remove(appointment);
-                return true;
-            }
-        }
+        if (!_allAppointments.ContainsKey(appointmentId))
+            return false;
 
-        return false;
+        _allAppointments.Remove(appointmentId);
+
+        // Удаляем из докторских списков тоже (для консистентности)
+        foreach (var appointments in _appointmentsByDoctor.Values) appointments.RemoveAll(a => a.Id == appointmentId);
+
+        return true;
     }
 
     // Patient search
@@ -150,13 +156,6 @@ public class FakeApiDataService
 
     public ApiResponse<bool> CancelAppointment(AppointmentСancelRequest request)
     {
-        // В реальном API при отмене нам не нужно возвращать номерок в пул,
-        // т.к. это уже обработанное время, которое может быть занято другими пациентами
-
-        // Просто удаляем запись из системы (если бы у нас была история записей)
-        // и возвращаем успех
-
-        // В нашем фейковом сервисе просто логируем отмену
         Console.WriteLine(
             $"Отменена запись: AppointmentId={request.AppointmentId}, LpuId={request.LpuId}, PatientId={request.PatientId}");
 
@@ -166,6 +165,176 @@ public class FakeApiDataService
     public ApiResponse<bool> UpdatePatientPhone(PatientPhoneUpdateRequest request)
     {
         return new ApiResponse<bool> { Success = true, Result = true };
+    }
+
+    // Referral
+    public ReferralResult GetReferral(string referralNumber, string? lastName)
+    {
+        var lpu = _lpus[_random.Next(_lpus.Count)];
+        var patientData = GeneratePatientData(lastName);
+        var selectedSpecialties = SelectReferralSpecialties();
+
+        return new ReferralResult
+        {
+            LpuId = lpu.Id.ToString(),
+            LpuShortName = lpu.LpuShortName,
+            LpuFullName = lpu.LpuFullName,
+            LpuAddress = lpu.Address,
+            LpuPhone = lpu.Phone,
+
+            PatId = patientData.PatId,
+            LastName = patientData.LastName,
+            FirstName = patientData.FirstName,
+            MiddleName = patientData.MiddleName,
+            BirthDate = patientData.BirthDate,
+
+            PolisN = null,
+            PolisS = null,
+            HomePhoneNumber = "",
+            MobilePhoneNumber = "",
+            Email = "",
+
+            Specialities = selectedSpecialties
+        };
+    }
+
+    // Private Referral
+    private (string PatId, string LastName, string FirstName, string MiddleName, DateTime BirthDate)
+        GeneratePatientData(string? lastName)
+    {
+        var lastNames = new[] { "Иванов", "Петров", "Сидоров", "Козлова", "Морозов", "Новиков" };
+        var firstNames = new[] { "Михаил", "Александр", "Дмитрий", "Елена", "Ольга", "Анна" };
+        var middleNames = new[] { "Евгеньевич", "Петрович", "Сергеевич", "Ивановна", "Алексеевна", "Владимировна" };
+
+        return (
+            PatId: _random.Next(100000, 999999).ToString(),
+            LastName: lastName ?? lastNames[_random.Next(lastNames.Length)],
+            FirstName: firstNames[_random.Next(firstNames.Length)],
+            MiddleName: middleNames[_random.Next(middleNames.Length)],
+            BirthDate: DateTime.Now.AddYears(-_random.Next(20, 70))
+        );
+    }
+
+    private List<ReferralSpeciality> SelectReferralSpecialties()
+    {
+        var count = _random.Next(1, 3);
+        var selected = _referralSpecialties.OrderBy(_ => _random.Next()).Take(count).ToList();
+
+        return selected.Select(s => new ReferralSpeciality
+        {
+            Id = s.Id,
+            FerId = s.FerId,
+            Name = s.Name,
+            Description = s.Description,
+            Doctors = GenerateDoctorsForReferralSpecialty(s.Id)
+        }).ToList();
+    }
+
+    private List<ReferralDoctor> GenerateDoctorsForReferralSpecialty(string specialtyId)
+    {
+        var doctorsForSpecialty = _referralDoctors
+            .Where(d => d.Id.StartsWith(specialtyId))
+            .OrderBy(_ => _random.Next())
+            .Take(_random.Next(1, 3))
+            .ToList();
+
+        return doctorsForSpecialty.Select(d => new ReferralDoctor
+        {
+            Id = d.Id,
+            Name = d.Name,
+            Description = d.Description,
+            Appointments = GenerateReferralAppointments()
+        }).ToList();
+    }
+
+    private List<Appointment> GenerateReferralAppointments()
+    {
+        var appointments = new List<Appointment>();
+        var now = DateTime.Now;
+
+        var count = _random.Next(3, 9);
+
+        for (var i = 0; i < count; i++)
+        {
+            var daysAhead = _random.Next(1, 14);
+            var date = now.AddDays(daysAhead);
+
+            while (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
+                date = date.AddDays(1);
+
+            var hour = _random.Next(9, 18);
+            var minute = _random.Next(0, 4) * 15;
+
+            var visitStart = new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
+            var visitEnd = visitStart.AddMinutes(15);
+
+            var appointment = new Appointment
+            {
+                Id = Guid.NewGuid().ToString(),
+                VisitStart = visitStart,
+                VisitEnd = visitEnd,
+                Address = GetRandomAddress(),
+                Room = $"{_random.Next(1, 5)}{_random.Next(10, 50)}",
+                Number = null
+            };
+
+            appointments.Add(appointment);
+            _allAppointments[appointment.Id] = appointment;
+        }
+
+        return appointments.OrderBy(a => a.VisitStart).ToList();
+    }
+
+    private List<ReferralSpeciality> GenerateReferralSpecialties()
+    {
+        return new List<ReferralSpeciality>
+        {
+            new()
+            {
+                Id = "101",
+                FerId = "101",
+                Name = "УЗИ (ультразвуковая диагностика)",
+                Description = "Ультразвуковое исследование внутренних органов"
+            },
+            new()
+            {
+                Id = "102",
+                FerId = "102",
+                Name = "Гинекология",
+                Description = "Консультация врача-гинеколога"
+            }
+        };
+    }
+
+    private List<ReferralDoctor> GenerateReferralDoctors()
+    {
+        return new List<ReferralDoctor>
+        {
+            new()
+            {
+                Id = "101_1",
+                Name = "Кузнецова Светлана Игоревна",
+                Description = "Врач ультразвуковой диагностики, стаж 12 лет"
+            },
+            new()
+            {
+                Id = "101_2",
+                Name = "Григорьев Павел Николаевич",
+                Description = "Специалист УЗД, стаж 8 лет"
+            },
+            new()
+            {
+                Id = "102_1",
+                Name = "Смирнова Елена Викторовна",
+                Description = "Врач-гинеколог высшей категории"
+            },
+            new()
+            {
+                Id = "102_2",
+                Name = "Андреева Ирина Александровна",
+                Description = "Врач-гинеколог, стаж 15 лет"
+            }
+        };
     }
 
     // Private methods
@@ -183,14 +352,12 @@ public class FakeApiDataService
         var appointments = new List<Appointment>();
         var now = DateTime.Now;
 
-        // Генерируем на 7 дней вперед, только рабочие дни
         for (var i = 0; i < 7; i++)
         {
             var date = now.AddDays(i);
             if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
                 continue;
 
-            // Пропускаем прошедшие дни и время
             if (date.Date < now.Date || (date.Date == now.Date && now.Hour >= 20))
                 continue;
 
@@ -201,38 +368,39 @@ public class FakeApiDataService
         _appointmentsByDoctor[key] = appointments;
     }
 
+    // ✅ ИСПРАВЛЕНО
     private List<Appointment> GenerateAppointmentsForDay(DateTime date, DateTime now)
     {
         var appointments = new List<Appointment>();
         var startHour = date.Date == now.Date ? Math.Max(8, now.Hour + 1) : 8;
 
-        // λ = 0.3 - в среднем 30% слотов заполнены
-        var expectedAppointments = _random.Next(5, 12); // 5-12 номерков в день
+        var expectedAppointments = _random.Next(5, 12);
 
         for (var i = 0; i < expectedAppointments; i++)
         {
             var hour = _random.Next(startHour, 20);
-            var minute = _random.Next(0, 3) * 20; // 0, 20, 40 минут
+            var minute = _random.Next(0, 3) * 20;
 
             var visitStart = new DateTime(date.Year, date.Month, date.Day, hour, minute, 0);
 
-            // Пропускаем если время уже прошло
             if (visitStart <= now)
                 continue;
 
             var visitEnd = visitStart.AddMinutes(20);
 
-            appointments.Add(new Appointment
+            var appointment = new Appointment
             {
                 Id = GenerateAppointmentId(),
                 VisitStart = visitStart,
                 VisitEnd = visitEnd,
                 Room = $"2{_random.Next(10, 30)}",
                 Address = GetRandomAddress()
-            });
+            };
+
+            appointments.Add(appointment);
+            _allAppointments[appointment.Id] = appointment; // ✅ Добавлено
         }
 
-        // Сортируем по времени
         return appointments.OrderBy(a => a.VisitStart).ToList();
     }
 
@@ -253,8 +421,6 @@ public class FakeApiDataService
         return addresses[_random.Next(addresses.Length)];
     }
 
-    // Остальные методы GenerateDistricts, GenerateLpus, GenerateSpecialties, GenerateDoctors
-    // остаются как были ранее (в твоем коде)
     private List<District> GenerateDistricts()
     {
         return new List<District>

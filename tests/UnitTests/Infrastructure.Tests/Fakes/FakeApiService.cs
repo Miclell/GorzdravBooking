@@ -1,7 +1,5 @@
 ﻿using Core.Interfaces.ApiClient;
 using Core.Models;
-using Infrastructure.ApiClient.Models;
-using Infrastructure.Stubs;
 
 namespace Infrastructure.Tests.Fakes;
 

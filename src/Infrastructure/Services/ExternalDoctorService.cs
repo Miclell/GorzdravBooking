@@ -1,7 +1,7 @@
 ﻿using Core.Interfaces.ApiClient;
 using Core.Interfaces.Services;
 using Core.Models;
-using Infrastructure.ApiClient.Models;
+using Infrastructure.ApiClient;
 
 namespace Infrastructure.Services;
 

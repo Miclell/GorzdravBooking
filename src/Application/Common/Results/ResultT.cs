@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace Application.Common.Results;
+﻿namespace Application.Common.Results;
 
 public record Result<TValue> : Result
 {
@@ -15,7 +13,6 @@ public record Result<TValue> : Result
     public TValue Value =>
         !IsSuccess ? throw new InvalidOperationException("Cannot access value of a failed result") : _value;
 
-    [DoesNotReturn]
     public static implicit operator Result<TValue>(Error error)
     {
         return Failure<TValue>(error);

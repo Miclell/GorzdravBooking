@@ -1,12 +1,39 @@
-﻿using Core.Interfaces.ApiClient;
+﻿using Core.Exceptions;
+using Core.Interfaces.ApiClient;
 using Core.Interfaces.Services;
 using Core.Models;
-using Infrastructure.ApiClient.Models;
+using Core.Models.Referral;
+using Infrastructure.ApiClient;
 
 namespace Infrastructure.Services;
 
-public class ExternalAppointmentService(IApiService apiService) : IExternalAppointmentService
+public class ExternalAppointmentService(
+    IApiService apiService,
+    IExternalDoctorService externalDoctorService) : IExternalAppointmentService
 {
+    public async Task<List<(string Doctor, Appointment Appointment)>> GetBySpecialityAsync(int lpuId,
+        string specialtyId)
+    {
+        var doctors = await externalDoctorService.GetBySpecialtyAsync(lpuId, specialtyId);
+
+        var result = new List<(string Doctor, Appointment Appointment)>();
+        foreach (var doctor in doctors)
+        {
+            var response =
+                await apiService.GetAsync<List<Appointment>>(
+                    GorzdravApiEndpoints.AppointmentsByDoctor(lpuId, doctor.Id));
+
+            if (!response.Success)
+                //continue;
+                // TODO найти оптимальное решение
+                throw new HttpRequestException($"Ошибка при получении номерков: {response.Message}");
+
+            if (response.Result != null) result.AddRange(response.Result.Select(a => (doctor.Name, a)));
+        }
+
+        return result;
+    }
+
     public async Task<List<Appointment>> GetByDoctorAsync(int lpuId, string doctorId)
     {
         var response =
@@ -18,11 +45,26 @@ public class ExternalAppointmentService(IApiService apiService) : IExternalAppoi
         return response.Result!;
     }
 
+    public async Task<ReferralResult> GetByReferralAsync(string referralNumber, string lastName)
+    {
+        var response =
+            await apiService.GetAsync<ReferralResult>(
+                GorzdravApiEndpoints.AppointmentsByReferral(referralNumber, lastName));
+
+        if (response.ErrorCode == 676)
+            throw new ReferralNotFoundException(referralNumber);
+
+        if (!response.Success)
+            throw new HttpRequestException($"Ошибка при получении номерков: {response.Message}");
+
+        return response.Result!;
+    }
+
     public async Task<(bool IsSucces, int ErrorCode)> CreateAppointmentAsync(AppointmentCreateRequest request)
     {
         var response =
             await apiService.PostAsync<AppointmentCreateRequest, bool>(GorzdravApiEndpoints.AppointmentCreate, request);
-       
+
         return !response.Success
             ? throw new HttpRequestException($"Ошибка при выполнении записи: {response.Message}")
             : (response.Success, response.ErrorCode);
@@ -36,6 +78,11 @@ public class ExternalAppointmentService(IApiService apiService) : IExternalAppoi
         if (!response.Success)
             throw new HttpRequestException($"Ошибка при отмене записи: {response.Message}");
 
-        return response.Result!;
+        return response.Result;
     }
+
+    // public Task<(bool IsSucces, int ErrorCode)> CreateReferralAppointmentAsync(AppointmentCreateRequest request)
+    // {
+    //     throw new NotImplementedException();
+    // }
 }

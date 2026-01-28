@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Repositories;
+using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;

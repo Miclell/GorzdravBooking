@@ -2,7 +2,7 @@
 
 namespace Core.Entities;
 
-public class AppointmentSearchRequest
+public abstract class AppointmentSearchRequest
 {
     public Guid Id { get; set; } = Guid.NewGuid();
 
@@ -10,22 +10,20 @@ public class AppointmentSearchRequest
     public PatientProfile PatientProfile { get; set; } = null!;
 
     public string LpuName { get; set; } = null!;
-    public string DoctorId { get; set; } = null!;
-    public string DoctorName { get; set; } = null!;
     public string Speciality { get; set; } = null!;
+    public DoctorSelectionMode DoctorMode { get; set; } = DoctorSelectionMode.SpecificDoctorOrRange;
+    public List<string>? DoctorIds { get; set; }
+    public List<string>? DoctorNames { get; set; }
 
-    public TimeSpan SearchInterval { get; set; }
-    public List<DateTime> SpecificStartPoints { get; set; } = [];
-    // public DateTime MaxDateForBooking { get; set; } TODO сделать максимальную дату записи чтобы ловить нормеики
-    
     public string TimePreferencesPresetName { get; set; } = null!;
+    public TimeSpan SearchInterval { get; set; } = TimeSpan.FromMinutes(15);
+    public List<DateTime>? SpecificStartPoints { get; set; }
 
+    public int MaxDaysToSearch { get; set; } = 30;
     public bool ViewOnly { get; set; } = false;
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public SearchRequestStatus Status { get; set; } = SearchRequestStatus.Pending;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // TODO проверить настройку чтобы GMT +3 был
     public DateTime? LastSearchAttempt { get; set; }
     public int AttemptCount { get; set; } = 0;
-
-    public SearchRequestStatus Status { get; set; } = SearchRequestStatus.InProgress;
-    public int MaxDaysToSearch { get; set; } = 30;
 }

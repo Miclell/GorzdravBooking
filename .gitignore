@@ -10,3 +10,4 @@ identifier.sqlite
 src/Infrastructure/GorzdravBooking.db
 src/Infrastructure/ApiClient/ApiService.cs
 src/Infrastructure/Http/HttpClientFactorySetup.cs
+src/Presentation/Server/GorzdravBooking.db

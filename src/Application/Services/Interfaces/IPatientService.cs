@@ -12,4 +12,5 @@ public interface IPatientService
         CancellationToken cancellationToken = default);
 
     Task<Result> Update(BasePatientProfileDto patientProfile, CancellationToken cancellationToken = default);
+    Task<Result<BasePatientProfileDto>> GetById(Guid patientId, CancellationToken cancellationToken);
 }

@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.User;
 using Application.Services.Implementation;
+using Core.Entities;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Security;
 using Microsoft.Extensions.Logging;
@@ -10,9 +11,9 @@ namespace Application.Tests.Services;
 
 public class UserServiceTests
 {
-    private readonly Mock<IUserRepository> _mockUserRepository;
-    private readonly Mock<IPasswordHasher> _mockPasswordHasher;
     private readonly Mock<ILogger<UserService>> _mockLogger;
+    private readonly Mock<IPasswordHasher> _mockPasswordHasher;
+    private readonly Mock<IUserRepository> _mockUserRepository;
     private readonly UserService _userService;
 
     public UserServiceTests()
@@ -33,15 +34,15 @@ public class UserServiceTests
 
         _mockUserRepository
             .Setup(x => x.GetByUsernameAsync(baseUserDto.Username, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Core.Entities.User)null!);
+            .ReturnsAsync((User)null!);
 
         _mockPasswordHasher
             .Setup(x => x.HashPassword(baseUserDto.Password))
             .Returns(passwordHash);
 
         _mockUserRepository
-            .Setup(x => x.AddAsync(It.IsAny<Core.Entities.User>(), It.IsAny<CancellationToken>()))
-            .Callback<Core.Entities.User, CancellationToken>((user, _) => user.Id = expectedUserId);
+            .Setup(x => x.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()))
+            .Callback<User, CancellationToken>((user, _) => user.Id = expectedUserId);
 
         // Act
         var result = await _userService.Create(baseUserDto, CancellationToken.None);
@@ -49,10 +50,11 @@ public class UserServiceTests
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Equal(expectedUserId, result.Value);
-        
-        _mockUserRepository.Verify(x => x.GetByUsernameAsync(baseUserDto.Username, It.IsAny<CancellationToken>()), Times.Once);
+
+        _mockUserRepository.Verify(x => x.GetByUsernameAsync(baseUserDto.Username, It.IsAny<CancellationToken>()),
+            Times.Once);
         _mockPasswordHasher.Verify(x => x.HashPassword(baseUserDto.Password), Times.Once);
-        _mockUserRepository.Verify(x => x.AddAsync(It.IsAny<Core.Entities.User>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockUserRepository.Verify(x => x.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -60,7 +62,7 @@ public class UserServiceTests
     {
         // Arrange
         var baseUserDto = new BaseUserDto("existinguser", "password123");
-        var existingUser = new Core.Entities.User { Id = Guid.NewGuid(), Username = "existinguser" };
+        var existingUser = new User { Id = Guid.NewGuid(), Username = "existinguser" };
 
         _mockUserRepository
             .Setup(x => x.GetByUsernameAsync(baseUserDto.Username, It.IsAny<CancellationToken>()))
@@ -73,8 +75,8 @@ public class UserServiceTests
         Assert.True(result.IsFailure);
         Assert.Equal("User.Username.Exists", result.Error.Code);
         Assert.Equal("Пользователь с таким именем уже существует", result.Error.Description);
-        
-        _mockUserRepository.Verify(x => x.AddAsync(It.IsAny<Core.Entities.User>(), It.IsAny<CancellationToken>()), Times.Never);
+
+        _mockUserRepository.Verify(x => x.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -94,14 +96,14 @@ public class UserServiceTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal("Failure", result.Error.Type.ToString());
-        
+
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Ошибка при добавление User")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
+                It.IsAny<Exception?>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()!),
             Times.Once);
     }
 
@@ -120,7 +122,7 @@ public class UserServiceTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        
+
         _mockUserRepository.Verify(x => x.DeleteAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -140,14 +142,14 @@ public class UserServiceTests
 
         // Assert
         Assert.True(result.IsFailure);
-        
+
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Database error deleting user {userId}")),
                 exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()!),
             Times.Once);
     }
 
@@ -158,14 +160,14 @@ public class UserServiceTests
         var userId = Guid.NewGuid();
         var newPassword = "newPassword123";
         var passwordHash = "new_hashed_password";
-        var existingUser = new Core.Entities.User 
-        { 
-            Id = userId, 
+        var existingUser = new User
+        {
+            Id = userId,
             Username = "testuser",
             PasswordHash = "old_hash",
             UpdatedAt = DateTime.UtcNow.AddDays(-1) // старое значение
         };
-    
+
         var oldUpdatedAt = existingUser.UpdatedAt;
 
         _mockUserRepository
@@ -182,10 +184,10 @@ public class UserServiceTests
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Equal(passwordHash, existingUser.PasswordHash);
-    
+
         Assert.True(existingUser.UpdatedAt > oldUpdatedAt);
         Assert.True(existingUser.UpdatedAt <= DateTime.UtcNow);
-    
+
         _mockUserRepository.Verify(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
         _mockPasswordHasher.Verify(x => x.HashPassword(newPassword), Times.Once);
         _mockUserRepository.Verify(x => x.UpdateAsync(existingUser, It.IsAny<CancellationToken>()), Times.Once);
@@ -200,7 +202,7 @@ public class UserServiceTests
 
         _mockUserRepository
             .Setup(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Core.Entities.User)null!);
+            .ReturnsAsync((User)null!);
 
         // Act
         var result = await _userService.UpdatePassword(userId, newPassword, CancellationToken.None);
@@ -209,9 +211,9 @@ public class UserServiceTests
         Assert.True(result.IsFailure);
         Assert.Equal("User.Not.Found", result.Error.Code);
         Assert.Equal($"Пользователь с {userId} не найден", result.Error.Description);
-        
+
         _mockPasswordHasher.Verify(x => x.HashPassword(It.IsAny<string>()), Times.Never);
-        _mockUserRepository.Verify(x => x.UpdateAsync(It.IsAny<Core.Entities.User>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mockUserRepository.Verify(x => x.UpdateAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -220,7 +222,7 @@ public class UserServiceTests
         // Arrange
         var userId = Guid.NewGuid();
         var newPassword = "newPassword123";
-        var existingUser = new Core.Entities.User { Id = userId, Username = "testuser" };
+        var existingUser = new User { Id = userId, Username = "testuser" };
         var exception = new Exception("Database error");
 
         _mockUserRepository
@@ -236,14 +238,14 @@ public class UserServiceTests
 
         // Assert
         Assert.True(result.IsFailure);
-        
+
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Database error update user {userId} password")),
                 exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()!),
             Times.Once);
     }
 }

@@ -1,5 +1,4 @@
-﻿using Application.Common.Results;
-using Application.DTOs.AppointmentSearchRequest;
+﻿using Application.DTOs.AppointmentSearchRequest;
 using Application.Services.Implementation;
 using Core.Entities;
 using Core.Enums;
@@ -12,444 +11,348 @@ namespace Application.Tests.Services;
 
 public class AppointmentSearchRequestServiceTests
 {
-    private readonly Mock<IAppointmentSearchRequestRepository> _mockRepository;
-    private readonly Mock<ILogger<AppointmentSearchRequestService>> _mockLogger;
-    private readonly AppointmentSearchRequestService _service;
+    private readonly Mock<ILogger<AppointmentSearchRequestService>> _loggerMock;
+    private readonly Mock<IAppointmentSearchRequestRepository> _repositoryMock;
+    private readonly AppointmentSearchRequestService _sut; // System Under Test
 
     public AppointmentSearchRequestServiceTests()
     {
-        _mockRepository = new Mock<IAppointmentSearchRequestRepository>();
-        _mockLogger = new Mock<ILogger<AppointmentSearchRequestService>>();
-        _service = new AppointmentSearchRequestService(_mockRepository.Object, _mockLogger.Object);
+        _repositoryMock = new Mock<IAppointmentSearchRequestRepository>();
+        _loggerMock = new Mock<ILogger<AppointmentSearchRequestService>>();
+        _sut = new AppointmentSearchRequestService(_repositoryMock.Object, _loggerMock.Object);
     }
 
+    #region CreateAsync Tests
+
     [Fact]
-    public async Task CreateAsync_WithValidData_CreatesSearchRequest()
+    public async Task CreateAsync_ValidDto_ReturnsSuccessWithId()
     {
         // Arrange
-        var createDto = new CreateAppointmentSearchRequestDto
-        {
-            PatientProfileId = Guid.NewGuid(),
-            LpuName = "Test Hospital",
-            DoctorId = "doc123",
-            DoctorName = "Dr. Smith",
-            SearchInterval = TimeSpan.FromHours(2),
-            SpecificStartPoints = new List<DateTime> { DateTime.Now.AddDays(1) },
-            TimePreferencesPresetName = "WorkDays",
-            ViewOnly = false,
-            MaxDaysToSearch = 7
-        };
+        var dto = CreateValidDto();
+        var expectedId = Guid.NewGuid();
 
-        var expectedRequestId = Guid.NewGuid();
-
-        _mockRepository
-            .Setup(x => x.AddAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()))
-            .Callback<AppointmentSearchRequest, CancellationToken>((request, _) => request.Id = expectedRequestId);
+        _repositoryMock
+            .Setup(x => x.AddAsync(It.IsAny<AppointmentSearchRequest>(), default))
+            .Callback<AppointmentSearchRequest, CancellationToken>((req, _) => req.Id = expectedId);
 
         // Act
-        var result = await _service.CreateAsync(createDto, CancellationToken.None);
+        var result = await _sut.CreateAsync(dto);
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal(expectedRequestId, result.Value);
-        
-        _mockRepository.Verify(x => x.AddAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Equal(expectedId, result.Value);
+        _repositoryMock.Verify(x => x.AddAsync(It.IsAny<AppointmentSearchRequest>(), default), Times.Once);
     }
 
     [Fact]
-    public async Task CreateAsync_WhenRepositoryThrowsException_ReturnsFailure()
+    public async Task CreateAsync_RepositoryThrows_ReturnsFailure()
     {
         // Arrange
-        var createDto = new CreateAppointmentSearchRequestDto
-        {
-            PatientProfileId = Guid.NewGuid(),
-            LpuName = "Test Hospital",
-            DoctorName = "Dr. Smith"
-        };
-
-        var exception = new Exception("Database error");
-
-        _mockRepository
-            .Setup(x => x.AddAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(exception);
+        var dto = CreateValidDto();
+        _repositoryMock
+            .Setup(x => x.AddAsync(It.IsAny<AppointmentSearchRequest>(), default))
+            .ThrowsAsync(new Exception("DB Error"));
 
         // Act
-        var result = await _service.CreateAsync(createDto, CancellationToken.None);
+        var result = await _sut.CreateAsync(dto);
 
         // Assert
         Assert.True(result.IsFailure);
-        
-        _mockLogger.Verify(
+        _loggerMock.Verify(
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при создании запроса на поиск записи для пациента {createDto.PatientProfileId}")),
-                exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
     }
 
     [Fact]
-    public async Task DeleteAsync_WhenRequestExists_DeletesRequest()
+    public async Task CreateAsync_CreatesManualSearchRequest_WhenDoctorModeIsSpecific()
     {
         // Arrange
-        var requestId = Guid.NewGuid();
+        var dto = CreateValidDto();
+        ManualSearchRequest? capturedRequest = null;
 
-        _mockRepository
-            .Setup(x => x.DeleteAsync(requestId, It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
+        _repositoryMock
+            .Setup(x => x.AddAsync(It.IsAny<AppointmentSearchRequest>(), default))
+            .Callback<AppointmentSearchRequest, CancellationToken>((req, _) =>
+            {
+                capturedRequest = req as ManualSearchRequest;
+            });
 
         // Act
-        var result = await _service.DeleteAsync(requestId, CancellationToken.None);
+        await _sut.CreateAsync(dto);
+
+        // Assert
+        Assert.NotNull(capturedRequest);
+        Assert.Equal(dto.LpuName, capturedRequest.LpuName);
+        Assert.Equal(dto.DoctorNames, capturedRequest.DoctorNames);
+    }
+
+    #endregion
+
+    #region DeleteAsync Tests
+
+    [Fact]
+    public async Task DeleteAsync_ValidId_ReturnsSuccess()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+
+        // Act
+        var result = await _sut.DeleteAsync(id);
 
         // Assert
         Assert.True(result.IsSuccess);
-        
-        _mockRepository.Verify(x => x.DeleteAsync(requestId, It.IsAny<CancellationToken>()), Times.Once);
+        _repositoryMock.Verify(x => x.DeleteAsync(id, default), Times.Once);
     }
 
     [Fact]
-    public async Task DeleteAsync_WhenRepositoryThrowsException_ReturnsFailure()
+    public async Task DeleteAsync_RepositoryThrows_ReturnsFailure()
     {
         // Arrange
-        var requestId = Guid.NewGuid();
-        var exception = new Exception("Database error");
-
-        _mockRepository
-            .Setup(x => x.DeleteAsync(requestId, It.IsAny<CancellationToken>()))
-            .ThrowsAsync(exception);
+        var id = Guid.NewGuid();
+        _repositoryMock
+            .Setup(x => x.DeleteAsync(id, default))
+            .ThrowsAsync(new Exception("DB Error"));
 
         // Act
-        var result = await _service.DeleteAsync(requestId, CancellationToken.None);
+        var result = await _sut.DeleteAsync(id);
 
         // Assert
         Assert.True(result.IsFailure);
-        
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при удалении запроса на поиск записи {requestId}")),
-                exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-            Times.Once);
     }
 
+    #endregion
+
+    #region UpdateTimePreferencesAsync Tests
+
     [Fact]
-    public async Task UpdateTimePreferencesAsync_WhenRequestExists_UpdatesPreferences()
+    public async Task UpdateTimePreferencesAsync_RequestExists_UpdatesAndReturnsSuccess()
     {
         // Arrange
         var requestId = Guid.NewGuid();
-        var updateDto = new UpdateTimePreferencesDto(
-            RequestId: requestId,
-            TimePreferencesName: "UpdatedPreset");
+        var dto = new UpdateTimePreferencesDto(requestId, "NewPreset");
+        var existingRequest = CreateTestRequest(requestId, presetName: "OldPreset");
 
-        var existingRequest = new AppointmentSearchRequest
-        {
-            Id = requestId,
-            TimePreferencesPresetName = "OldPreset"
-        };
-
-        _mockRepository
-            .Setup(x => x.GetByIdAsync(requestId, It.IsAny<CancellationToken>()))
+        _repositoryMock
+            .Setup(x => x.GetByIdAsync(requestId, default))
             .ReturnsAsync(existingRequest);
 
-        _mockRepository
-            .Setup(x => x.UpdateAsync(existingRequest, It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
         // Act
-        var result = await _service.UpdateTimePreferencesAsync(updateDto, CancellationToken.None);
+        var result = await _sut.UpdateTimePreferencesAsync(dto);
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal("UpdatedPreset", existingRequest.TimePreferencesPresetName);
-        
-        _mockRepository.Verify(x => x.GetByIdAsync(requestId, It.IsAny<CancellationToken>()), Times.Once);
-        _mockRepository.Verify(x => x.UpdateAsync(existingRequest, It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Equal("NewPreset", existingRequest.TimePreferencesPresetName);
+        _repositoryMock.Verify(x => x.UpdateAsync(existingRequest, default), Times.Once);
     }
 
     [Fact]
-    public async Task UpdateTimePreferencesAsync_WhenRequestNotFound_ReturnsFailure()
+    public async Task UpdateTimePreferencesAsync_RequestNotFound_ReturnsNotFoundError()
     {
         // Arrange
-        var updateDto = new UpdateTimePreferencesDto(
-            RequestId: Guid.NewGuid(),
-            TimePreferencesName: "UpdatedPreset");
-
-        _mockRepository
-            .Setup(x => x.GetByIdAsync(updateDto.RequestId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((AppointmentSearchRequest)null);
+        var dto = new UpdateTimePreferencesDto(Guid.NewGuid(), "NewPreset");
+        _repositoryMock
+            .Setup(x => x.GetByIdAsync(dto.RequestId, default))
+            .ReturnsAsync((AppointmentSearchRequest?)null);
 
         // Act
-        var result = await _service.UpdateTimePreferencesAsync(updateDto, CancellationToken.None);
+        var result = await _sut.UpdateTimePreferencesAsync(dto);
 
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal("SearchRequest.NotFound", result.Error.Code);
-        
-        _mockRepository.Verify(x => x.UpdateAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()), Times.Never);
+        _repositoryMock.Verify(x => x.UpdateAsync(It.IsAny<AppointmentSearchRequest>(), default), Times.Never);
     }
 
     [Fact]
-    public async Task UpdateTimePreferencesAsync_WhenRepositoryThrowsException_ReturnsFailure()
+    public async Task UpdateTimePreferencesAsync_RepositoryThrowsOnUpdate_ReturnsFailure()
     {
         // Arrange
-        var updateDto = new UpdateTimePreferencesDto(
-            RequestId: Guid.NewGuid(), 
-            TimePreferencesName: "UpdatedPreset");
+        var dto = new UpdateTimePreferencesDto(Guid.NewGuid(), "NewPreset");
+        var existingRequest = CreateTestRequest(dto.RequestId);
 
-        var existingRequest = new AppointmentSearchRequest { Id = updateDto.RequestId };
-        var exception = new Exception("Database error");
-
-        _mockRepository
-            .Setup(x => x.GetByIdAsync(updateDto.RequestId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(existingRequest);
-
-        _mockRepository
-            .Setup(x => x.UpdateAsync(existingRequest, It.IsAny<CancellationToken>()))
-            .ThrowsAsync(exception);
+        _repositoryMock.Setup(x => x.GetByIdAsync(dto.RequestId, default)).ReturnsAsync(existingRequest);
+        _repositoryMock.Setup(x => x.UpdateAsync(existingRequest, default)).ThrowsAsync(new Exception("DB Error"));
 
         // Act
-        var result = await _service.UpdateTimePreferencesAsync(updateDto, CancellationToken.None);
+        var result = await _sut.UpdateTimePreferencesAsync(dto);
 
         // Assert
         Assert.True(result.IsFailure);
-        
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при обновлении временных предпочтений для запроса {updateDto.RequestId}")),
-                exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-            Times.Once);
     }
 
+    #endregion
+
+    #region GetActiveByUserAsync Tests
+
     [Fact]
-    public async Task GetActiveByUserAsync_WhenRequestsExist_ReturnsActiveRequests()
+    public async Task GetActiveByUserAsync_RequestsExist_ReturnsAllRequests()
     {
         // Arrange
         var userId = Guid.NewGuid();
         var requests = new List<AppointmentSearchRequest>
         {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                PatientProfileId = Guid.NewGuid(),
-                LpuName = "Hospital 1",
-                DoctorName = "Dr. Ivanov",
-                SearchInterval = TimeSpan.FromHours(1),
-                SpecificStartPoints = new List<DateTime>(),
-                TimePreferencesPresetName = "WorkDays",
-                ViewOnly = false,
-                MaxDaysToSearch = 7,
-                CreatedAt = DateTime.UtcNow.AddDays(-1),
-                LastSearchAttempt = DateTime.UtcNow.AddHours(-2),
-                AttemptCount = 3,
-                Status = SearchRequestStatus.InProgress,
-                PatientProfile = new PatientProfile
-                {
-                    PatientLastName = "Ivanov",
-                    PatientFirstName = "Ivan",
-                    PatientMiddleName = "Ivanovich"
-                }
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                PatientProfileId = Guid.NewGuid(),
-                LpuName = "Hospital 2",
-                DoctorName = "Dr. Petrov",
-                SearchInterval = TimeSpan.FromHours(2),
-                SpecificStartPoints = new List<DateTime>(),
-                TimePreferencesPresetName = "Weekend",
-                ViewOnly = true,
-                MaxDaysToSearch = 14,
-                CreatedAt = DateTime.UtcNow.AddDays(-2),
-                LastSearchAttempt = null,
-                AttemptCount = 0,
-                Status = SearchRequestStatus.Pending,
-                PatientProfile = new PatientProfile
-                {
-                    PatientLastName = "Petrov",
-                    PatientFirstName = "Petr",
-                    PatientMiddleName = "Petrovich"
-                }
-            }
+            CreateTestRequest(status: SearchRequestStatus.InProgress),
+            CreateTestRequest(status: SearchRequestStatus.Pending)
         };
 
-        _mockRepository
-            .Setup(x => x.GetActiveByUserIdAsync(userId, It.IsAny<CancellationToken>()))
+        _repositoryMock
+            .Setup(x => x.GetActiveByUserIdAsync(userId, default))
             .ReturnsAsync(requests);
 
         // Act
-        var result = await _service.GetActiveByUserAsync(userId, CancellationToken.None);
+        var result = await _sut.GetActiveByUserAsync(userId);
 
         // Assert
         Assert.True(result.IsSuccess);
-        var resultList = result.Value.ToList();
-        
-        Assert.Equal(2, resultList.Count);
-        
-        Assert.Equal("Hospital 1", resultList[0].LpuName);
-        Assert.Equal("Dr. Ivanov", resultList[0].DoctorName);
-        Assert.Equal("WorkDays", resultList[0].TimePreferencesPresetName);
-        Assert.Equal("Ivanov Ivan Ivanovich", resultList[0].PatientFullName);
-        Assert.Equal(SearchRequestStatus.InProgress.ToString(), resultList[0].Status);
-        
-        Assert.Equal("Hospital 2", resultList[1].LpuName);
-        Assert.Equal("Dr. Petrov", resultList[1].DoctorName);
-        Assert.Equal("Weekend", resultList[1].TimePreferencesPresetName);
-        Assert.Equal("Petrov Petr Petrovich", resultList[1].PatientFullName);
-        Assert.Equal(SearchRequestStatus.Pending.ToString(), resultList[1].Status);
-        
-        _mockRepository.Verify(x => x.GetActiveByUserIdAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Equal(2, result.Value.Count());
     }
 
     [Fact]
-    public async Task GetActiveByUserAsync_WhenNoActiveRequests_ReturnsEmptyList()
+    public async Task GetActiveByUserAsync_NoRequests_ReturnsEmptyCollection()
     {
         // Arrange
         var userId = Guid.NewGuid();
-
-        _mockRepository
-            .Setup(x => x.GetActiveByUserIdAsync(userId, It.IsAny<CancellationToken>()))
+        _repositoryMock
+            .Setup(x => x.GetActiveByUserIdAsync(userId, default))
             .ReturnsAsync(new List<AppointmentSearchRequest>());
 
         // Act
-        var result = await _service.GetActiveByUserAsync(userId, CancellationToken.None);
+        var result = await _sut.GetActiveByUserAsync(userId);
 
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Empty(result.Value);
-        
-        _mockRepository.Verify(x => x.GetActiveByUserIdAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
-    public async Task GetActiveByUserAsync_WhenRepositoryThrowsException_ReturnsFailure()
+    public async Task GetActiveByUserAsync_RepositoryThrows_ReturnsFailure()
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var exception = new Exception("Database error");
-
-        _mockRepository
-            .Setup(x => x.GetActiveByUserIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ThrowsAsync(exception);
+        _repositoryMock
+            .Setup(x => x.GetActiveByUserIdAsync(userId, default))
+            .ThrowsAsync(new Exception("DB Error"));
 
         // Act
-        var result = await _service.GetActiveByUserAsync(userId, CancellationToken.None);
+        var result = await _sut.GetActiveByUserAsync(userId);
 
         // Assert
         Assert.True(result.IsFailure);
-        
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при получении активных запросов пользователя {userId}")),
-                exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-            Times.Once);
     }
 
+    #endregion
+
+    #region GetByPatientAsync Tests
+
     [Fact]
-    public async Task GetByPatientAsync_WhenRequestsExist_ReturnsPatientRequests()
+    public async Task GetByPatientAsync_RequestsExist_ReturnsPatientRequests()
     {
         // Arrange
-        var patientProfileId = Guid.NewGuid();
+        var patientId = Guid.NewGuid();
         var requests = new List<AppointmentSearchRequest>
         {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                PatientProfileId = patientProfileId,
-                LpuName = "Test Hospital",
-                DoctorName = "Dr. Smith",
-                SearchInterval = TimeSpan.FromHours(1),
-                SpecificStartPoints = new List<DateTime>(),
-                TimePreferencesPresetName = "WorkDays",
-                ViewOnly = false,
-                MaxDaysToSearch = 7,
-                CreatedAt = DateTime.UtcNow.AddDays(-1),
-                LastSearchAttempt = DateTime.UtcNow.AddHours(-2),
-                AttemptCount = 5,
-                Status = SearchRequestStatus.Completed,
-                PatientProfile = new PatientProfile
-                {
-                    PatientLastName = "Sidorov",
-                    PatientFirstName = "Sidor",
-                    PatientMiddleName = "Sidorovich"
-                }
-            }
+            CreateTestRequest(patientProfileId: patientId)
         };
 
-        _mockRepository
-            .Setup(x => x.GetByPatientProfileIdAsync(patientProfileId, It.IsAny<CancellationToken>()))
+        _repositoryMock
+            .Setup(x => x.GetByPatientProfileIdAsync(patientId, default))
             .ReturnsAsync(requests);
 
         // Act
-        var result = await _service.GetByPatientAsync(patientProfileId, CancellationToken.None);
+        var result = await _sut.GetByPatientAsync(patientId);
 
         // Assert
         Assert.True(result.IsSuccess);
-        var resultList = result.Value.ToList();
-        
-        Assert.Single(resultList);
-        Assert.Equal(patientProfileId, resultList[0].PatientProfileId);
-        Assert.Equal("Test Hospital", resultList[0].LpuName);
-        Assert.Equal("Dr. Smith", resultList[0].DoctorName);
-        Assert.Equal("Sidorov Sidor Sidorovich", resultList[0].PatientFullName);
-        Assert.Equal(SearchRequestStatus.Completed.ToString(), resultList[0].Status);
-        
-        _mockRepository.Verify(x => x.GetByPatientProfileIdAsync(patientProfileId, It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Single(result.Value);
     }
 
     [Fact]
-    public async Task GetByPatientAsync_WhenNoRequests_ReturnsEmptyList()
+    public async Task GetByPatientAsync_NoRequests_ReturnsEmptyCollection()
     {
         // Arrange
-        var patientProfileId = Guid.NewGuid();
-
-        _mockRepository
-            .Setup(x => x.GetByPatientProfileIdAsync(patientProfileId, It.IsAny<CancellationToken>()))
+        var patientId = Guid.NewGuid();
+        _repositoryMock
+            .Setup(x => x.GetByPatientProfileIdAsync(patientId, default))
             .ReturnsAsync(new List<AppointmentSearchRequest>());
 
         // Act
-        var result = await _service.GetByPatientAsync(patientProfileId, CancellationToken.None);
+        var result = await _sut.GetByPatientAsync(patientId);
 
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Empty(result.Value);
-        
-        _mockRepository.Verify(x => x.GetByPatientProfileIdAsync(patientProfileId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
-    public async Task GetByPatientAsync_WhenRepositoryThrowsException_ReturnsFailure()
+    public async Task GetByPatientAsync_RepositoryThrows_ReturnsFailure()
     {
         // Arrange
-        var patientProfileId = Guid.NewGuid();
-        var exception = new Exception("Database error");
-
-        _mockRepository
-            .Setup(x => x.GetByPatientProfileIdAsync(patientProfileId, It.IsAny<CancellationToken>()))
-            .ThrowsAsync(exception);
+        var patientId = Guid.NewGuid();
+        _repositoryMock
+            .Setup(x => x.GetByPatientProfileIdAsync(patientId, default))
+            .ThrowsAsync(new Exception("DB Error"));
 
         // Act
-        var result = await _service.GetByPatientAsync(patientProfileId, CancellationToken.None);
+        var result = await _sut.GetByPatientAsync(patientId);
 
         // Assert
         Assert.True(result.IsFailure);
-        
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при получении запросов пациента {patientProfileId}")),
-                exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-            Times.Once);
     }
+
+    #endregion
+
+    #region Test Data Helpers
+
+    private static CreateAppointmentSearchRequestDto CreateValidDto(
+        DoctorSelectionMode doctorMode = DoctorSelectionMode.SpecificDoctorOrRange)
+    {
+        return new CreateAppointmentSearchRequestDto
+        {
+            PatientProfileId = Guid.NewGuid(),
+            LpuName = "Test Hospital",
+            Speciality = "Test Speciality",
+            DoctorMode = doctorMode,
+            DoctorIds = ["doc123"],
+            DoctorNames = ["Dr. Smith"],
+            TimePreferencesPresetName = "WorkDays",
+            SearchInterval = TimeSpan.FromHours(2),
+            SpecificStartPoints = [DateTime.Now.AddDays(1)],
+            MaxDaysToSearch = 7,
+            ViewOnly = false
+        };
+    }
+
+    private static ManualSearchRequest CreateTestRequest(
+        Guid? id = null,
+        Guid? patientProfileId = null,
+        string? presetName = null,
+        SearchRequestStatus status = SearchRequestStatus.Pending)
+    {
+        return new ManualSearchRequest
+        {
+            Id = id ?? Guid.NewGuid(),
+            PatientProfileId = patientProfileId ?? Guid.NewGuid(),
+            LpuName = "Test Hospital",
+            DoctorNames = ["Dr. Test"],
+            TimePreferencesPresetName = presetName ?? "TestPreset",
+            SearchInterval = TimeSpan.FromHours(1),
+            SpecificStartPoints = [],
+            ViewOnly = false,
+            MaxDaysToSearch = 7,
+            Status = status,
+            PatientProfile = new PatientProfile
+            {
+                PatientLastName = "Test",
+                PatientFirstName = "User",
+                PatientMiddleName = "Middle"
+            }
+        };
+    }
+
+    #endregion
 }

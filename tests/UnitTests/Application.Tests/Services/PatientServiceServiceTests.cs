@@ -1,5 +1,4 @@
-﻿using Application.Common.Results;
-using Application.DTOs.Patient;
+﻿using Application.DTOs.Patient;
 using Application.Services.Implementation;
 using Core.Entities;
 using Core.Interfaces.Repositories;
@@ -11,8 +10,8 @@ namespace Application.Tests.Services;
 
 public class PatientServiceTests
 {
-    private readonly Mock<IPatientRepository> _mockPatientRepository;
     private readonly Mock<ILogger<PatientService>> _mockLogger;
+    private readonly Mock<IPatientRepository> _mockPatientRepository;
     private readonly PatientService _patientService;
 
     public PatientServiceTests()
@@ -27,17 +26,17 @@ public class PatientServiceTests
     {
         // Arrange
         var createPatientDto = new CreatePatientDto(
-            UserId: Guid.NewGuid(),
-            LpuId: "123",
-            LpuShortName: "Test Hospital",
-            LpuAddress: "Test Address",
-            PatientId: "patient123",
-            PatientLastName: "Ivanov",
-            PatientFirstName: "Ivan",
-            PatientMiddleName: "Ivanovich",
-            PatientBirthdate: new DateTime(1990, 1, 1),
-            RecipientEmail: "test@test.com",
-            MobilePhoneNumber: "+79991234567"
+            Guid.NewGuid(),
+            "123",
+            "Test Hospital",
+            "Test Address",
+            "patient123",
+            "Ivanov",
+            "Ivan",
+            "Ivanovich",
+            new DateTime(1990, 1, 1),
+            "test@test.com",
+            "+79991234567"
         );
 
         var expectedPatientId = Guid.NewGuid();
@@ -52,8 +51,9 @@ public class PatientServiceTests
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Equal(expectedPatientId, result.Value);
-        
-        _mockPatientRepository.Verify(x => x.AddAsync(It.IsAny<PatientProfile>(), It.IsAny<CancellationToken>()), Times.Once);
+
+        _mockPatientRepository.Verify(x => x.AddAsync(It.IsAny<PatientProfile>(), It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [Fact]
@@ -61,17 +61,17 @@ public class PatientServiceTests
     {
         // Arrange
         var createPatientDto = new CreatePatientDto(
-            UserId: Guid.NewGuid(),
-            LpuId: "123",
-            LpuShortName: "Test Hospital",
-            LpuAddress: "Test Address",
-            PatientId: "patient123",
-            PatientLastName: "Ivanov",
-            PatientFirstName: "Ivan",
-            PatientMiddleName: "Ivanovich",
-            PatientBirthdate: new DateTime(1990, 1, 1),
-            RecipientEmail: "test@test.com",
-            MobilePhoneNumber: "+79991234567"
+            Guid.NewGuid(),
+            "123",
+            "Test Hospital",
+            "Test Address",
+            "patient123",
+            "Ivanov",
+            "Ivan",
+            "Ivanovich",
+            new DateTime(1990, 1, 1),
+            "test@test.com",
+            "+79991234567"
         );
 
         var exception = new Exception("Database error");
@@ -85,14 +85,14 @@ public class PatientServiceTests
 
         // Assert
         Assert.True(result.IsFailure);
-        
+
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Ошибка при добавлении PatientProfile")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Ошибка при добавлении PatientProfile")),
                 exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
     }
 
@@ -111,7 +111,7 @@ public class PatientServiceTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        
+
         _mockPatientRepository.Verify(x => x.DeleteAsync(patientId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -131,14 +131,14 @@ public class PatientServiceTests
 
         // Assert
         Assert.True(result.IsFailure);
-        
+
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при удалении пациента с id {patientId}")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Ошибка при удалении пациента с id {patientId}")),
                 exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
     }
 
@@ -165,7 +165,7 @@ public class PatientServiceTests
             {
                 Id = Guid.NewGuid(),
                 UserId = userId,
-                LpuShortName = "Hospital 2", 
+                LpuShortName = "Hospital 2",
                 PatientLastName = "Petrov",
                 PatientFirstName = "Petr",
                 PatientMiddleName = "Petrovich",
@@ -186,12 +186,12 @@ public class PatientServiceTests
         Assert.True(result.IsSuccess);
         var patients = result.Value.ToList();
         Assert.Equal(2, patients.Count);
-        
+
         Assert.Equal(patientProfiles[0].LpuShortName, patients[0].LpuShortName);
         Assert.Equal(patientProfiles[0].PatientLastName, patients[0].PatientLastName);
         Assert.Equal(patientProfiles[1].LpuShortName, patients[1].LpuShortName);
         Assert.Equal(patientProfiles[1].PatientLastName, patients[1].PatientLastName);
-        
+
         _mockPatientRepository.Verify(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -211,7 +211,7 @@ public class PatientServiceTests
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Empty(result.Value);
-        
+
         _mockPatientRepository.Verify(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -231,14 +231,15 @@ public class PatientServiceTests
 
         // Assert
         Assert.True(result.IsFailure);
-        
+
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при получении пациентов для пользователя с id {userId}")),
+                It.Is<It.IsAnyType>((v, t) =>
+                    v.ToString()!.Contains($"Ошибка при получении пациентов для пользователя с id {userId}")),
                 exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
     }
 
@@ -248,11 +249,12 @@ public class PatientServiceTests
         // Arrange
         var patientId = Guid.NewGuid();
         var basePatientProfileDto = new BasePatientProfileDto(
-            Id: patientId,
+            patientId,
             LpuId: "1",
             LpuShortName: "Updated Hospital",
+            PatientId: "1",
             PatientLastName: "UpdatedLastName",
-            PatientFirstName: "UpdatedFirstName", 
+            PatientFirstName: "UpdatedFirstName",
             PatientMiddleName: "UpdatedMiddleName",
             PatientBirthdate: new DateTime(1995, 5, 5),
             RecipientEmail: "updated@test.com",
@@ -265,7 +267,7 @@ public class PatientServiceTests
             LpuShortName = "Old Hospital",
             PatientLastName = "OldLastName",
             PatientFirstName = "OldFirstName",
-            PatientMiddleName = "OldMiddleName", 
+            PatientMiddleName = "OldMiddleName",
             PatientBirthdate = new DateTime(1990, 1, 1),
             RecipientEmail = "old@test.com",
             MobilePhoneNumber = "+79991111111"
@@ -284,7 +286,7 @@ public class PatientServiceTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        
+
         // Проверяем что данные обновились
         Assert.Equal(basePatientProfileDto.LpuShortName, existingPatient.LpuShortName);
         Assert.Equal(basePatientProfileDto.PatientLastName, existingPatient.PatientLastName);
@@ -293,7 +295,7 @@ public class PatientServiceTests
         Assert.Equal(basePatientProfileDto.PatientBirthdate, existingPatient.PatientBirthdate);
         Assert.Equal(basePatientProfileDto.RecipientEmail, existingPatient.RecipientEmail);
         Assert.Equal(basePatientProfileDto.MobilePhoneNumber, existingPatient.MobilePhoneNumber);
-        
+
         _mockPatientRepository.Verify(x => x.GetByIdAsync(patientId, It.IsAny<CancellationToken>()), Times.Once);
         _mockPatientRepository.Verify(x => x.UpdateAsync(existingPatient, It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -304,9 +306,10 @@ public class PatientServiceTests
         // Arrange
         var patientId = Guid.NewGuid();
         var basePatientProfileDto = new BasePatientProfileDto(
-            Id: patientId,
+            patientId,
             LpuId: "1",
             LpuShortName: "Updated Hospital",
+            PatientId: "1",
             PatientLastName: "UpdatedLastName",
             PatientFirstName: "UpdatedFirstName",
             PatientMiddleName: "UpdatedMiddleName",
@@ -317,7 +320,7 @@ public class PatientServiceTests
 
         _mockPatientRepository
             .Setup(x => x.GetByIdAsync(patientId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((PatientProfile)null);
+            .ReturnsAsync((PatientProfile?)null);
 
         // Act
         var result = await _patientService.Update(basePatientProfileDto, CancellationToken.None);
@@ -326,8 +329,9 @@ public class PatientServiceTests
         Assert.True(result.IsFailure);
         Assert.Equal("Patient.Not.Found", result.Error.Code);
         Assert.Equal("Patient not found", result.Error.Description);
-        
-        _mockPatientRepository.Verify(x => x.UpdateAsync(It.IsAny<PatientProfile>(), It.IsAny<CancellationToken>()), Times.Never);
+
+        _mockPatientRepository.Verify(x => x.UpdateAsync(It.IsAny<PatientProfile>(), It.IsAny<CancellationToken>()),
+            Times.Never);
     }
 
     [Fact]
@@ -336,9 +340,10 @@ public class PatientServiceTests
         // Arrange
         var patientId = Guid.NewGuid();
         var basePatientProfileDto = new BasePatientProfileDto(
-            Id: patientId,
+            patientId,
             LpuId: "1",
             LpuShortName: "Updated Hospital",
+            PatientId: "1",
             PatientLastName: "UpdatedLastName",
             PatientFirstName: "UpdatedFirstName",
             PatientMiddleName: "UpdatedMiddleName",
@@ -363,14 +368,15 @@ public class PatientServiceTests
 
         // Assert
         Assert.True(result.IsFailure);
-        
+
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при обновлении данных пациента с id {patientId}")),
+                It.Is<It.IsAnyType>((v, t) =>
+                    v.ToString()!.Contains($"Ошибка при обновлении данных пациента с id {patientId}")),
                 exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
     }
 }

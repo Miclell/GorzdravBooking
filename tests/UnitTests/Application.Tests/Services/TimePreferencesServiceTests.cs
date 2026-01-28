@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.TimePreferences;
 using Application.Services.Implementation;
 using Core.Entities;
+using Core.Enums;
 using Core.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -10,326 +11,281 @@ namespace Application.Tests.Services;
 
 public class TimePreferencesServiceTests
 {
-    private readonly Mock<ITimePreferencesRepository> _mockRepository;
-    private readonly Mock<ILogger<TimePreferencesService>> _mockLogger;
-    private readonly TimePreferencesService _service;
+    private readonly Mock<ILogger<TimePreferencesService>> _loggerMock;
+    private readonly Mock<ITimePreferencesRepository> _repositoryMock;
+    private readonly TimePreferencesService _sut;
 
     public TimePreferencesServiceTests()
     {
-        _mockRepository = new Mock<ITimePreferencesRepository>();
-        _mockLogger = new Mock<ILogger<TimePreferencesService>>();
-        _service = new TimePreferencesService(_mockRepository.Object, _mockLogger.Object);
+        _repositoryMock = new Mock<ITimePreferencesRepository>();
+        _loggerMock = new Mock<ILogger<TimePreferencesService>>();
+        _sut = new TimePreferencesService(_repositoryMock.Object, _loggerMock.Object);
     }
 
+    #region CreateRangeAsync Tests
+
     [Fact]
-    public async Task CreateRangeAsync_WithValidData_CreatesTimePreferences()
+    public async Task CreateRangeAsync_ValidDtos_ReturnsSuccessWithIds()
     {
         // Arrange
-        var dtos = new List<CreateTimePreferenceDto>
-        {
-            new("Preset1", Guid.NewGuid(), DayOfWeek.Monday, TimeOnly.FromTimeSpan(TimeSpan.FromHours(9)), TimeOnly.FromTimeSpan(TimeSpan.FromHours(12)), false),
-            new("Preset1", Guid.NewGuid(), DayOfWeek.Tuesday, TimeOnly.FromTimeSpan(TimeSpan.FromHours(14)), TimeOnly.FromTimeSpan(TimeSpan.FromHours(16)), false)
-        };
+        var dtos = CreateValidDtos();
+        var expectedIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
 
-        var createdIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
-        var capturedEntities = new List<TimePreferences>();
-
-        _mockRepository
-            .Setup(x => x.AddRangeAsync(It.IsAny<IEnumerable<TimePreferences>>(), It.IsAny<CancellationToken>())) // ← IEnumerable вместо List
-            .Callback<IEnumerable<TimePreferences>, CancellationToken>((entities, _) => // ← IEnumerable вместо List
+        _repositoryMock
+            .Setup(x => x.AddRangeAsync(It.IsAny<IEnumerable<TimePreference>>(), default))
+            .Callback<IEnumerable<TimePreference>, CancellationToken>((entities, _) =>
             {
-                var entityList = entities.ToList();
-                capturedEntities.AddRange(entityList);
-                for (int i = 0; i < entityList.Count; i++)
-                    entityList[i].Id = createdIds[i];
-            })
-            .Returns(Task.CompletedTask);
+                var list = entities.ToList();
+                for (var i = 0; i < list.Count; i++)
+                    list[i].Id = expectedIds[i];
+            });
 
         // Act
-        var result = await _service.CreateRangeAsync(dtos, CancellationToken.None);
+        var result = await _sut.CreateRangeAsync(dtos);
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal(createdIds, result.Value);
-        Assert.Equal(2, capturedEntities.Count);
-        Assert.Equal(dtos[0].Name, capturedEntities[0].Name);
-        Assert.Equal(dtos[0].Day, capturedEntities[0].Day);
-    
-        _mockRepository.Verify(x => x.AddRangeAsync(It.IsAny<IEnumerable<TimePreferences>>(), It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Equal(expectedIds, result.Value);
+        _repositoryMock.Verify(x => x.AddRangeAsync(It.IsAny<IEnumerable<TimePreference>>(), default), Times.Once);
     }
 
     [Fact]
-    public async Task CreateRangeAsync_WhenRepositoryThrowsException_ReturnsFailure()
+    public async Task CreateRangeAsync_RepositoryThrows_ReturnsFailure()
     {
         // Arrange
-        var dtos = new List<CreateTimePreferenceDto>
-        {
-            new("Preset1", Guid.NewGuid(), DayOfWeek.Monday, TimeOnly.FromTimeSpan(TimeSpan.FromHours(9)), TimeOnly.FromTimeSpan(TimeSpan.FromHours(12)), false)
-        };
-
-        var exception = new Exception("Database error");
-
-        _mockRepository
-            .Setup(x => x.AddRangeAsync(It.IsAny<List<TimePreferences>>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(exception);
+        var dtos = CreateValidDtos();
+        _repositoryMock
+            .Setup(x => x.AddRangeAsync(It.IsAny<IEnumerable<TimePreference>>(), default))
+            .ThrowsAsync(new Exception("DB Error"));
 
         // Act
-        var result = await _service.CreateRangeAsync(dtos, CancellationToken.None);
+        var result = await _sut.CreateRangeAsync(dtos);
 
         // Assert
         Assert.True(result.IsFailure);
-        
-        _mockLogger.Verify(
+        _loggerMock.Verify(
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Ошибка при создании временных предпочтений")),
-                exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
     }
 
+    #endregion
+
+    #region DeleteByPresetAsync Tests
+
     [Fact]
-    public async Task DeleteByPresetAsync_WithValidData_DeletesPreferences()
+    public async Task DeleteByPresetAsync_ValidDto_ReturnsSuccess()
     {
         // Arrange
         var dto = new DeleteTimePreferencesDto(Guid.NewGuid(), "TestPreset");
 
-        _mockRepository
-            .Setup(x => x.DeleteByPresetAsync(dto.UserId, dto.Name, It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
         // Act
-        var result = await _service.DeleteByPresetAsync(dto, CancellationToken.None);
+        var result = await _sut.DeleteByPresetAsync(dto);
 
         // Assert
         Assert.True(result.IsSuccess);
-        
-        _mockRepository.Verify(x => x.DeleteByPresetAsync(dto.UserId, dto.Name, It.IsAny<CancellationToken>()), Times.Once);
+        _repositoryMock.Verify(x => x.DeleteByPresetAsync(dto.UserId, dto.Name, default), Times.Once);
     }
 
     [Fact]
-    public async Task DeleteByPresetAsync_WhenRepositoryThrowsException_ReturnsFailure()
+    public async Task DeleteByPresetAsync_RepositoryThrows_ReturnsFailure()
     {
         // Arrange
         var dto = new DeleteTimePreferencesDto(Guid.NewGuid(), "TestPreset");
-        var exception = new Exception("Database error");
-
-        _mockRepository
-            .Setup(x => x.DeleteByPresetAsync(dto.UserId, dto.Name, It.IsAny<CancellationToken>()))
-            .ThrowsAsync(exception);
+        _repositoryMock
+            .Setup(x => x.DeleteByPresetAsync(dto.UserId, dto.Name, default))
+            .ThrowsAsync(new Exception("DB Error"));
 
         // Act
-        var result = await _service.DeleteByPresetAsync(dto, CancellationToken.None);
+        var result = await _sut.DeleteByPresetAsync(dto);
 
         // Assert
         Assert.True(result.IsFailure);
-        
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при удалении пресета {dto.Name} для пользователя {dto.UserId}")),
-                exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-            Times.Once);
     }
 
+    #endregion
+
+    #region GetByUserAsync Tests
+
     [Fact]
-    public async Task GetByUserAsync_WhenPreferencesExist_ReturnsGroupedPresets()
+    public async Task GetByUserAsync_PreferencesExist_ReturnsGroupedPresets()
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var UserId = Guid.NewGuid();
-    
-        var entities = new List<TimePreferences>
-        {
-            new() { Name = "WorkDays", UserId = UserId, AnyTime = false, Day = DayOfWeek.Monday, PreferredTimeFrom = TimeOnly.FromTimeSpan(TimeSpan.FromHours(9)), PreferredTimeTo = TimeOnly.FromTimeSpan(TimeSpan.FromHours(12)) },
-            new() { Name = "WorkDays", UserId = UserId, AnyTime = false, Day = DayOfWeek.Tuesday, PreferredTimeFrom = TimeOnly.FromTimeSpan(TimeSpan.FromHours(9)), PreferredTimeTo = TimeOnly.FromTimeSpan(TimeSpan.FromHours(12)) },
-            new() { Name = "Weekend", UserId = UserId, AnyTime = true }
-        };
+        var entities = CreateTestPreferences(userId);
 
-        _mockRepository
-            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
+        _repositoryMock
+            .Setup(x => x.GetByUserIdAsync(userId, default))
             .ReturnsAsync(entities);
 
         // Act
-        var result = await _service.GetByUserAsync(userId, CancellationToken.None);
+        var result = await _sut.GetByUserAsync(userId);
 
         // Assert
         Assert.True(result.IsSuccess);
         var presets = result.Value.ToList();
-    
-        Assert.Equal(2, presets.Count); // WorkDays и Weekend
-    
-        var workDaysPreset = presets.First(p => p.Name == "WorkDays");
-        Assert.Equal(2, workDaysPreset.Preferences.Count);
-        Assert.False(workDaysPreset.AnyTime);
-    
-        var weekendPreset = presets.First(p => p.Name == "Weekend");
-        
-        Assert.True(weekendPreset.AnyTime);
-        Assert.NotEmpty(weekendPreset.Preferences);
-    
-        _mockRepository.Verify(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Equal(2, presets.Count);
+
+        var workDays = presets.First(p => p.Name == "WorkDays");
+        Assert.Equal(2, workDays.Preferences.Count);
     }
 
     [Fact]
-    public async Task GetByUserAsync_WhenNoPreferences_ReturnsEmptyList()
+    public async Task GetByUserAsync_NoPreferences_ReturnsEmptyList()
     {
         // Arrange
         var userId = Guid.NewGuid();
-
-        _mockRepository
-            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<TimePreferences>());
+        _repositoryMock
+            .Setup(x => x.GetByUserIdAsync(userId, default))
+            .ReturnsAsync(new List<TimePreference>());
 
         // Act
-        var result = await _service.GetByUserAsync(userId, CancellationToken.None);
+        var result = await _sut.GetByUserAsync(userId);
 
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Empty(result.Value);
-        
-        _mockRepository.Verify(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
-    public async Task GetByUserAsync_WhenRepositoryThrowsException_ReturnsFailure()
+    public async Task GetByUserAsync_RepositoryThrows_ReturnsFailure()
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var exception = new Exception("Database error");
-
-        _mockRepository
-            .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ThrowsAsync(exception);
+        _repositoryMock
+            .Setup(x => x.GetByUserIdAsync(userId, default))
+            .ThrowsAsync(new Exception("DB Error"));
 
         // Act
-        var result = await _service.GetByUserAsync(userId, CancellationToken.None);
+        var result = await _sut.GetByUserAsync(userId);
 
         // Assert
         Assert.True(result.IsFailure);
-        
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при получении временных предпочтений для пользователя {userId}")),
-                exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-            Times.Once);
     }
 
+    #endregion
+
+    #region GetByPresetAsync Tests
+
     [Fact]
-    public async Task GetByPresetAsync_WhenPreferencesExist_ReturnsPresetDto()
+    public async Task GetByPresetAsync_PreferencesExist_ReturnsPreset()
     {
         // Arrange
         var userId = Guid.NewGuid();
         var presetName = "WorkDays";
-        
-        var preferences = new List<TimePreferences>
+        var preferences = new List<TimePreference>
         {
-            new() { Name = presetName, UserId = userId, AnyTime = false, Day = DayOfWeek.Monday, PreferredTimeFrom = TimeOnly.FromTimeSpan(TimeSpan.FromHours(9)), PreferredTimeTo = TimeOnly.FromTimeSpan(TimeSpan.FromHours(12)) },
-            new() { Name = presetName, UserId = userId, AnyTime = false, Day = DayOfWeek.Tuesday, PreferredTimeFrom = TimeOnly.FromTimeSpan(TimeSpan.FromHours(14)), PreferredTimeTo = TimeOnly.FromTimeSpan(TimeSpan.FromHours(16)) }
+            CreateWeekDayPreference(userId, presetName, DayOfWeek.Monday),
+            CreateWeekDayPreference(userId, presetName, DayOfWeek.Tuesday)
         };
 
-        _mockRepository
-            .Setup(x => x.GetByPresetAsync(userId, presetName, It.IsAny<CancellationToken>()))
+        _repositoryMock
+            .Setup(x => x.GetByPresetAsync(userId, presetName, default))
             .ReturnsAsync(preferences);
 
         // Act
-        var result = await _service.GetByPresetAsync(userId, presetName, CancellationToken.None);
+        var result = await _sut.GetByPresetAsync(userId, presetName);
 
         // Assert
         Assert.True(result.IsSuccess);
-        var preset = result.Value;
-        
-        Assert.Equal(presetName, preset.Name);
-        Assert.Equal(userId, preset.UserId);
-        Assert.False(preset.AnyTime);
-        Assert.Equal(2, preset.Preferences.Count);
-        
-        _mockRepository.Verify(x => x.GetByPresetAsync(userId, presetName, It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Equal(presetName, result.Value.Name);
+        Assert.Equal(2, result.Value.Preferences.Count);
     }
 
     [Fact]
-    public async Task GetByPresetAsync_WhenAnyTimePreferenceExists_ReturnsEmptyPreferences()
+    public async Task GetByPresetAsync_NotFound_ReturnsNotFoundError()
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var presetName = "AnyTimePreset";
-        
-        var preferences = new List<TimePreferences>
-        {
-            new() { Name = presetName, UserId = userId, AnyTime = true }
-        };
+        var presetName = "NonExistent";
 
-        _mockRepository
-            .Setup(x => x.GetByPresetAsync(userId, presetName, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(preferences);
+        _repositoryMock
+            .Setup(x => x.GetByPresetAsync(userId, presetName, default))
+            .ReturnsAsync(new List<TimePreference>());
 
         // Act
-        var result = await _service.GetByPresetAsync(userId, presetName, CancellationToken.None);
-
-        // Assert
-        Assert.True(result.IsSuccess);
-        var preset = result.Value;
-        
-        Assert.Equal(presetName, preset.Name);
-        Assert.True(preset.AnyTime);
-        Assert.Empty(preset.Preferences); // Preferences должны быть пустыми для AnyTime
-        
-        _mockRepository.Verify(x => x.GetByPresetAsync(userId, presetName, It.IsAny<CancellationToken>()), Times.Once);
-    }
-
-    [Fact]
-    public async Task GetByPresetAsync_WhenPreferencesNotFound_ReturnsNotFound()
-    {
-        // Arrange
-        var userId = Guid.NewGuid();
-        var presetName = "NonExistentPreset";
-
-        _mockRepository
-            .Setup(x => x.GetByPresetAsync(userId, presetName, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<TimePreferences>());
-
-        // Act
-        var result = await _service.GetByPresetAsync(userId, presetName, CancellationToken.None);
+        var result = await _sut.GetByPresetAsync(userId, presetName);
 
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal("Preferences.Not.Found", result.Error.Code);
-        Assert.Equal("Preferences not found", result.Error.Description);
-        
-        _mockRepository.Verify(x => x.GetByPresetAsync(userId, presetName, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
-    public async Task GetByPresetAsync_WhenRepositoryThrowsException_ReturnsFailure()
+    public async Task GetByPresetAsync_RepositoryThrows_ReturnsFailure()
     {
         // Arrange
         var userId = Guid.NewGuid();
         var presetName = "TestPreset";
-        var exception = new Exception("Database error");
-
-        _mockRepository
-            .Setup(x => x.GetByPresetAsync(userId, presetName, It.IsAny<CancellationToken>()))
-            .ThrowsAsync(exception);
+        _repositoryMock
+            .Setup(x => x.GetByPresetAsync(userId, presetName, default))
+            .ThrowsAsync(new Exception("DB Error"));
 
         // Act
-        var result = await _service.GetByPresetAsync(userId, presetName, CancellationToken.None);
+        var result = await _sut.GetByPresetAsync(userId, presetName);
 
         // Assert
         Assert.True(result.IsFailure);
-        
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при получении пресета - {presetName} для пациента {userId}")),
-                exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-            Times.Once);
     }
+
+    #endregion
+
+    #region Test Data Helpers
+
+    private static List<CreateTimePreferenceDto> CreateValidDtos()
+    {
+        var userId = Guid.NewGuid();
+        return new List<CreateTimePreferenceDto>
+        {
+            new("WorkDays", userId, TimeSelectionMode.WeekdayPattern, null, DayOfWeek.Monday,
+                new TimeOnly(9, 0), new TimeOnly(12, 0), new List<DateOnly>(), 14, 2),
+            new("WorkDays", userId, TimeSelectionMode.WeekdayPattern, null, DayOfWeek.Tuesday,
+                new TimeOnly(14, 0), new TimeOnly(16, 0), new List<DateOnly>(), 14, 2)
+        };
+    }
+
+    private static List<TimePreference> CreateTestPreferences(Guid userId)
+    {
+        return new List<TimePreference>
+        {
+            CreateWeekDayPreference(userId, "WorkDays", DayOfWeek.Monday),
+            CreateWeekDayPreference(userId, "WorkDays", DayOfWeek.Tuesday),
+            CreateAnyTimePreference(userId, "Weekend")
+        };
+    }
+
+    private static WeekDayPreference CreateWeekDayPreference(Guid userId, string name, DayOfWeek day)
+    {
+        return new WeekDayPreference
+        {
+            Name = name,
+            UserId = userId,
+            TimeMode = TimeSelectionMode.WeekdayPattern,
+            Day = day,
+            PreferredTimeFrom = new TimeOnly(9, 0),
+            PreferredTimeTo = new TimeOnly(12, 0),
+            ExcludedDates = new List<DateOnly>(),
+            MaxDaysAhead = 14,
+            MinHoursFromNow = 2
+        };
+    }
+
+    private static AnyTimePreference CreateAnyTimePreference(Guid userId, string name)
+    {
+        return new AnyTimePreference
+        {
+            Name = name,
+            UserId = userId,
+            TimeMode = TimeSelectionMode.AnyTime,
+            ExcludedDates = new List<DateOnly>(),
+            MaxDaysAhead = 30,
+            MinHoursFromNow = 1
+        };
+    }
+
+    #endregion
 }

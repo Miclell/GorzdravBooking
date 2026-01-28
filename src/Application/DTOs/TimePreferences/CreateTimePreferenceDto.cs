@@ -1,4 +1,5 @@
-﻿using StatefulMenu.Core.Attributes;
+﻿using Core.Enums;
+using StatefulMenu.Core.Attributes;
 
 namespace Application.DTOs.TimePreferences;
 
@@ -6,10 +7,12 @@ namespace Application.DTOs.TimePreferences;
 public record CreateTimePreferenceDto(
     string Name,
     Guid UserId,
+    TimeSelectionMode TimeMode,
+    DateOnly? Date,
     DayOfWeek? Day,
-    [property: InputField("Время с")] 
-    TimeOnly? PreferredTimeFrom,
-    [property: InputField("Время до")] 
-    TimeOnly? PreferredTimeTo,
-    bool AnyTime = false
+    [property: InputField("Время с")] TimeOnly? PreferredTimeFrom,
+    [property: InputField("Время до")] TimeOnly? PreferredTimeTo,
+    List<DateOnly>? ExcludedDates,
+    int MaxDaysAhead,
+    int MinHoursFromNow
 );

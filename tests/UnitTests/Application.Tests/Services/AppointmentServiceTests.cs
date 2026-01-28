@@ -2,28 +2,30 @@
 using Application.Services.Implementation;
 using Core.Entities;
 using Core.Interfaces.Repositories;
+using Core.Interfaces.Services;
 using Core.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
+using Appointment = Core.Entities.Appointment;
 
 namespace Application.Tests.Services;
 
 public class AppointmentServiceTests
 {
-    private readonly Mock<IAppointmentRepository> _mockAppointmentRepository;
-    private readonly Mock<Core.Interfaces.Services.IExternalAppointmentService> _mockExternalAppointmentService;
-    private readonly Mock<ILogger<AppointmentService>> _mockLogger;
     private readonly AppointmentService _appointmentService;
+    private readonly Mock<IAppointmentRepository> _mockAppointmentRepository;
+    private readonly Mock<IExternalAppointmentService> _mockExternalAppointmentService;
+    private readonly Mock<ILogger<AppointmentService>> _mockLogger;
 
     public AppointmentServiceTests()
     {
         _mockAppointmentRepository = new Mock<IAppointmentRepository>();
-        _mockExternalAppointmentService = new Mock<Core.Interfaces.Services.IExternalAppointmentService>();
+        _mockExternalAppointmentService = new Mock<IExternalAppointmentService>();
         _mockLogger = new Mock<ILogger<AppointmentService>>();
         _appointmentService = new AppointmentService(
-            _mockAppointmentRepository.Object, 
-            _mockExternalAppointmentService.Object, 
+            _mockAppointmentRepository.Object,
+            _mockExternalAppointmentService.Object,
             _mockLogger.Object);
     }
 
@@ -32,22 +34,22 @@ public class AppointmentServiceTests
     {
         // Arrange
         var createDto = new CreateAppointmentDto(
-            PatientProfileId: Guid.NewGuid(),
-            AppointmentId: "ext123",
-            VisitStart: new DateTime(2024, 1, 1, 10, 0, 0),
-            VisitEnd: new DateTime(2024, 1, 1, 11, 0, 0),
-            Address: "Test Address",
-            Number: "A101",
-            Room: "101",
-            Speciality: "Test Speciality",
-            Doctor: "Test Doctor"
+            Guid.NewGuid(),
+            "ext123",
+            new DateTime(2024, 1, 1, 10, 0, 0),
+            new DateTime(2024, 1, 1, 11, 0, 0),
+            "Test Address",
+            "A101",
+            "101",
+            "Test Speciality",
+            "Test Doctor"
         );
 
         var expectedAppointmentId = Guid.NewGuid();
 
         _mockAppointmentRepository
-            .Setup(x => x.AddAsync(It.IsAny<Core.Entities.Appointment>(), It.IsAny<CancellationToken>()))
-            .Callback<Core.Entities.Appointment, CancellationToken>((appointment, _) => appointment.Id = expectedAppointmentId);
+            .Setup(x => x.AddAsync(It.IsAny<Appointment>(), It.IsAny<CancellationToken>()))
+            .Callback<Appointment, CancellationToken>((appointment, _) => appointment.Id = expectedAppointmentId);
 
         // Act
         var result = await _appointmentService.CreateAsync(createDto, CancellationToken.None);
@@ -55,8 +57,9 @@ public class AppointmentServiceTests
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Equal(expectedAppointmentId, result.Value);
-        
-        _mockAppointmentRepository.Verify(x => x.AddAsync(It.IsAny<Core.Entities.Appointment>(), It.IsAny<CancellationToken>()), Times.Once);
+
+        _mockAppointmentRepository.Verify(x => x.AddAsync(It.IsAny<Appointment>(), It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [Fact]
@@ -64,21 +67,21 @@ public class AppointmentServiceTests
     {
         // Arrange
         var createDto = new CreateAppointmentDto(
-            PatientProfileId: Guid.NewGuid(),
-            AppointmentId: "ext123",
-            VisitStart: DateTime.Now,
-            VisitEnd: DateTime.Now.AddHours(1),
-            Address: "Test Address",
-            Number: "A101",
-            Room: "101",
-            Speciality: "Test Speciality",
-            Doctor: "Test Doctor"
+            Guid.NewGuid(),
+            "ext123",
+            DateTime.Now,
+            DateTime.Now.AddHours(1),
+            "Test Address",
+            "A101",
+            "101",
+            "Test Speciality",
+            "Test Doctor"
         );
 
         var exception = new Exception("Database error");
 
         _mockAppointmentRepository
-            .Setup(x => x.AddAsync(It.IsAny<Core.Entities.Appointment>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.AddAsync(It.IsAny<Appointment>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(exception);
 
         // Act
@@ -86,14 +89,16 @@ public class AppointmentServiceTests
 
         // Assert
         Assert.True(result.IsFailure);
-        
+
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при создании записи на прием для пациента {createDto.PatientProfileId}")),
+                It.Is<It.IsAnyType>((v, t) =>
+                    v.ToString()
+                        .Contains($"Ошибка при создании записи на прием для пациента {createDto.PatientProfileId}")),
                 exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
     }
 
@@ -102,7 +107,7 @@ public class AppointmentServiceTests
     {
         // Arrange
         var appointmentId = Guid.NewGuid();
-        var appointment = new Core.Entities.Appointment
+        var appointment = new Appointment
         {
             Id = appointmentId,
             AppointmentId = "ext123",
@@ -133,9 +138,11 @@ public class AppointmentServiceTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        
-        _mockAppointmentRepository.Verify(x => x.GetByIdAsync(appointmentId, It.IsAny<CancellationToken>()), Times.Once);
-        _mockExternalAppointmentService.Verify(x => x.CancelAppointmentAsync(It.IsAny<AppointmentСancelRequest>()), Times.Once);
+
+        _mockAppointmentRepository.Verify(x => x.GetByIdAsync(appointmentId, It.IsAny<CancellationToken>()),
+            Times.Once);
+        _mockExternalAppointmentService.Verify(x => x.CancelAppointmentAsync(It.IsAny<AppointmentСancelRequest>()),
+            Times.Once);
         _mockAppointmentRepository.Verify(x => x.DeleteAsync(appointmentId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -147,7 +154,7 @@ public class AppointmentServiceTests
 
         _mockAppointmentRepository
             .Setup(x => x.GetByIdAsync(appointmentId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Core.Entities.Appointment)null);
+            .ReturnsAsync((Appointment?)null);
 
         // Act
         var result = await _appointmentService.DeleteAsync(appointmentId, CancellationToken.None);
@@ -155,9 +162,11 @@ public class AppointmentServiceTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal("Appointment.NotFound", result.Error.Code);
-        
-        _mockExternalAppointmentService.Verify(x => x.CancelAppointmentAsync(It.IsAny<AppointmentСancelRequest>()), Times.Never);
-        _mockAppointmentRepository.Verify(x => x.DeleteAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
+
+        _mockExternalAppointmentService.Verify(x => x.CancelAppointmentAsync(It.IsAny<AppointmentСancelRequest>()),
+            Times.Never);
+        _mockAppointmentRepository.Verify(x => x.DeleteAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
+            Times.Never);
     }
 
     [Fact]
@@ -165,7 +174,7 @@ public class AppointmentServiceTests
     {
         // Arrange
         var appointmentId = Guid.NewGuid();
-        var appointment = new Core.Entities.Appointment
+        var appointment = new Appointment
         {
             Id = appointmentId,
             AppointmentId = "ext123",
@@ -190,17 +199,19 @@ public class AppointmentServiceTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal("External.Cancel.Failed", result.Error.Code);
-        
-        _mockExternalAppointmentService.Verify(x => x.CancelAppointmentAsync(It.IsAny<AppointmentСancelRequest>()), Times.Once);
-        _mockAppointmentRepository.Verify(x => x.DeleteAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
-        
+
+        _mockExternalAppointmentService.Verify(x => x.CancelAppointmentAsync(It.IsAny<AppointmentСancelRequest>()),
+            Times.Once);
+        _mockAppointmentRepository.Verify(x => x.DeleteAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Warning,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Не удалось отменить запись во внешней системе")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Не удалось отменить запись во внешней системе")),
+                It.IsAny<Exception?>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
     }
 
@@ -209,7 +220,7 @@ public class AppointmentServiceTests
     {
         // Arrange
         var appointmentId = Guid.NewGuid();
-        var appointment = new Core.Entities.Appointment
+        var appointment = new Appointment
         {
             Id = appointmentId,
             AppointmentId = "ext123",
@@ -234,14 +245,15 @@ public class AppointmentServiceTests
 
         // Assert
         Assert.True(result.IsFailure);
-        
+
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при удалении записи на прием {appointmentId}")),
+                It.Is<It.IsAnyType>((v, t) =>
+                    v.ToString()!.Contains($"Ошибка при удалении записи на прием {appointmentId}")),
                 exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
     }
 
@@ -250,7 +262,7 @@ public class AppointmentServiceTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var appointments = new List<Core.Entities.Appointment>
+        var appointments = new List<Appointment>
         {
             new()
             {
@@ -294,13 +306,13 @@ public class AppointmentServiceTests
         // Assert
         Assert.True(result.IsSuccess);
         var resultList = result.Value.ToList();
-        
+
         Assert.Equal(2, resultList.Count);
         Assert.Equal("Ivanov Ivan Ivanovich", resultList[0].PatientFullName);
         Assert.Equal("Hospital 1", resultList[0].LpuShortName);
         Assert.Equal("Petrov Petr Petrovich", resultList[1].PatientFullName);
         Assert.Equal("Hospital 2", resultList[1].LpuShortName);
-        
+
         _mockAppointmentRepository.Verify(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -312,7 +324,7 @@ public class AppointmentServiceTests
 
         _mockAppointmentRepository
             .Setup(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<Core.Entities.Appointment>());
+            .ReturnsAsync(new List<Appointment>());
 
         // Act
         var result = await _appointmentService.GetByUserAsync(userId, CancellationToken.None);
@@ -320,7 +332,7 @@ public class AppointmentServiceTests
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Empty(result.Value);
-        
+
         _mockAppointmentRepository.Verify(x => x.GetByUserIdAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -329,7 +341,7 @@ public class AppointmentServiceTests
     {
         // Arrange
         var patientProfileId = Guid.NewGuid();
-        var appointments = new List<Core.Entities.Appointment>
+        var appointments = new List<Appointment>
         {
             new()
             {
@@ -361,13 +373,14 @@ public class AppointmentServiceTests
         // Assert
         Assert.True(result.IsSuccess);
         var resultList = result.Value.ToList();
-        
+
         Assert.Single(resultList);
         Assert.Equal(patientProfileId, resultList[0].PatientProfileId);
         Assert.Equal("ext123", resultList[0].AppointmentId);
         Assert.Equal("Ivanov Ivan Ivanovich", resultList[0].PatientFullName);
-        
-        _mockAppointmentRepository.Verify(x => x.GetByPatientProfileIdAsync(patientProfileId, It.IsAny<CancellationToken>()), Times.Once);
+
+        _mockAppointmentRepository.Verify(
+            x => x.GetByPatientProfileIdAsync(patientProfileId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -375,7 +388,7 @@ public class AppointmentServiceTests
     {
         // Arrange
         var appointmentId = Guid.NewGuid();
-        var appointment = new Core.Entities.Appointment
+        var appointment = new Appointment
         {
             Id = appointmentId,
             PatientProfileId = Guid.NewGuid(),
@@ -404,13 +417,14 @@ public class AppointmentServiceTests
         // Assert
         Assert.True(result.IsSuccess);
         var dto = result.Value;
-        
+
         Assert.Equal(appointmentId, dto.Id);
         Assert.Equal("ext123", dto.AppointmentId);
         Assert.Equal("Ivanov Ivan Ivanovich", dto.PatientFullName);
         Assert.Equal("Test Hospital", dto.LpuShortName);
-        
-        _mockAppointmentRepository.Verify(x => x.GetByIdAsync(appointmentId, It.IsAny<CancellationToken>()), Times.Once);
+
+        _mockAppointmentRepository.Verify(x => x.GetByIdAsync(appointmentId, It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [Fact]
@@ -421,7 +435,7 @@ public class AppointmentServiceTests
 
         _mockAppointmentRepository
             .Setup(x => x.GetByIdAsync(appointmentId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Core.Entities.Appointment)null);
+            .ReturnsAsync((Appointment?)null);
 
         // Act
         var result = await _appointmentService.GetByIdAsync(appointmentId, CancellationToken.None);
@@ -429,8 +443,9 @@ public class AppointmentServiceTests
         // Assert
         Assert.True(result.IsFailure);
         Assert.Equal("Appointment.NotFound", result.Error.Code);
-        
-        _mockAppointmentRepository.Verify(x => x.GetByIdAsync(appointmentId, It.IsAny<CancellationToken>()), Times.Once);
+
+        _mockAppointmentRepository.Verify(x => x.GetByIdAsync(appointmentId, It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [Fact]
@@ -449,14 +464,14 @@ public class AppointmentServiceTests
 
         // Assert
         Assert.True(result.IsFailure);
-        
+
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains($"Ошибка при получении записи {appointmentId}")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Ошибка при получении записи {appointmentId}")),
                 exception,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
     }
 }

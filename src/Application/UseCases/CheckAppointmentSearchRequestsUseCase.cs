@@ -26,7 +26,7 @@ public class CheckAppointmentSearchRequestsUseCase(
             logger.LogDebug("Найдено {Count} активных запросов", appointmentSearchRequests.Count);
 
             foreach (var request in appointmentSearchRequests
-                         .Where(request => IsTimeToCheck(request, now) || true))
+                         .Where(request => IsTimeToCheck(request, now)))
                 try
                 {
                     logger.LogDebug("Обработка запроса {RequestId} для пациента {PatientId}", request.Id,
@@ -63,7 +63,8 @@ public class CheckAppointmentSearchRequestsUseCase(
 
     private static bool IsTimeToCheck(AppointmentSearchRequest request, DateTime now)
     {
-        if (request.SpecificStartPoints.Count != 0)
+        if (request.SpecificStartPoints != null
+            && request.SpecificStartPoints.Count != 0)
         {
             var nearest = request.SpecificStartPoints.Where(t => t > (request.LastSearchAttempt ?? request.CreatedAt))
                 .OrderBy(t => t)

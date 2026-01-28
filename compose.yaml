@@ -1,0 +1,13 @@
+﻿services:
+  web:
+    image: web
+    build:
+      context: .
+      dockerfile: src/Presentation/Web/Dockerfile
+
+  server:
+    image: server
+    build:
+      context: .
+      dockerfile: src/Presentation/Server/Dockerfile
+

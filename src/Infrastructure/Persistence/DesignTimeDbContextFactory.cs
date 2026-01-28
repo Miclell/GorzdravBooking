@@ -1,5 +1,4 @@
-﻿using Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
 namespace Infrastructure.Persistence;

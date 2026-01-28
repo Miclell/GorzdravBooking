@@ -1,19 +1,20 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Repositories;
+using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
 public class TimePreferencesRepository(AppDbContext context) : ITimePreferencesRepository
 {
-    public async Task<TimePreferences?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<TimePreference?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await context.TimePreferences
             .Include(p => p.User)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<TimePreferences>> GetByUserIdAsync(Guid userId,
+    public async Task<IEnumerable<TimePreference>> GetByUserIdAsync(Guid userId,
         CancellationToken cancellationToken = default)
     {
         return await context.TimePreferences
@@ -21,26 +22,26 @@ public class TimePreferencesRepository(AppDbContext context) : ITimePreferencesR
             .ToListAsync(cancellationToken);
     }
 
-    public async Task AddAsync(TimePreferences preferences, CancellationToken cancellationToken = default)
+    public async Task AddAsync(TimePreference preference, CancellationToken cancellationToken = default)
     {
-        await context.TimePreferences.AddAsync(preferences, cancellationToken);
+        await context.TimePreferences.AddAsync(preference, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task AddRangeAsync(IEnumerable<TimePreferences> preferences,
+    public async Task AddRangeAsync(IEnumerable<TimePreference> preferences,
         CancellationToken cancellationToken = default)
     {
         await context.TimePreferences.AddRangeAsync(preferences, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task UpdateAsync(TimePreferences preferences, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(TimePreference preference, CancellationToken cancellationToken = default)
     {
-        context.TimePreferences.Update(preferences);
+        context.TimePreferences.Update(preference);
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<TimePreferences>> GetByPresetAsync(Guid userId, string name,
+    public async Task<IEnumerable<TimePreference>> GetByPresetAsync(Guid userId, string name,
         CancellationToken cancellationToken = default)
     {
         return await context.TimePreferences

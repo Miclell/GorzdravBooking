@@ -2,9 +2,9 @@
 
 public enum SearchRequestStatus
 {
-    Pending,
-    InProgress,
-    Completed,
-    Failed,
-    Cancelled
+    Pending = 0, // zero attempts
+    InProgress = 1,
+    Completed = 2,
+    Failed = 3, // end time for searching
+    Cancelled = 4 // stopped by user
 }
