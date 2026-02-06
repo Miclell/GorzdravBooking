@@ -36,7 +36,7 @@ public static class SwaggerConfiguration
         });
     }
 
-    public static void UseSwaggerWithUI(this WebApplication app)
+    public static void UseSwaggerWithUi(this WebApplication app)
     {
         if (app.Environment.IsDevelopment())
         {

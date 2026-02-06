@@ -134,7 +134,14 @@ public class AppointmentSearchRequestServiceTests
     {
         // Arrange
         var requestId = Guid.NewGuid();
-        var dto = new UpdateTimePreferencesDto(requestId, "NewPreset");
+        var dto = new UpdatePreferencesDto(
+            requestId,
+            "NewPreset",
+            null,
+            TimeSpan.FromMinutes(5),
+            30,
+            false
+            );
         var existingRequest = CreateTestRequest(requestId, presetName: "OldPreset");
 
         _repositoryMock
@@ -154,7 +161,14 @@ public class AppointmentSearchRequestServiceTests
     public async Task UpdateTimePreferencesAsync_RequestNotFound_ReturnsNotFoundError()
     {
         // Arrange
-        var dto = new UpdateTimePreferencesDto(Guid.NewGuid(), "NewPreset");
+        var dto = new UpdatePreferencesDto(
+            Guid.NewGuid(),
+            "NewPreset",
+            null,
+            TimeSpan.FromMinutes(5),
+            30,
+            false
+        );
         _repositoryMock
             .Setup(x => x.GetByIdAsync(dto.RequestId, default))
             .ReturnsAsync((AppointmentSearchRequest?)null);
@@ -172,7 +186,14 @@ public class AppointmentSearchRequestServiceTests
     public async Task UpdateTimePreferencesAsync_RepositoryThrowsOnUpdate_ReturnsFailure()
     {
         // Arrange
-        var dto = new UpdateTimePreferencesDto(Guid.NewGuid(), "NewPreset");
+        var dto = new UpdatePreferencesDto(
+            Guid.NewGuid(),
+            "NewPreset",
+            null,
+            TimeSpan.FromMinutes(5),
+            30,
+            false
+        );
         var existingRequest = CreateTestRequest(dto.RequestId);
 
         _repositoryMock.Setup(x => x.GetByIdAsync(dto.RequestId, default)).ReturnsAsync(existingRequest);

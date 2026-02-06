@@ -39,6 +39,27 @@ public class UserService(
         }
     }
 
+    public async Task<Result<Guid>> Validate(BaseUserDto baseUserDto, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var existing = await userRepository.GetByUsernameAsync(baseUserDto.Username, cancellationToken);
+
+            if (existing == null ||
+                !passwordHasher.VerifyPassword(
+                    baseUserDto.Password, 
+                    existing.PasswordHash))
+                return Error.Conflict("User.UsernameOrPass.NotValid", "Имя пользователя или пароль неверные!");
+
+            return existing.Id;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Ошибка при входе User с {Username} - {e}", baseUserDto.Username, e);
+            return Error.Failure($"{e}", "Ошибка");
+        }
+    }
+
     public async Task<Result> Delete(Guid userId, CancellationToken cancellationToken = default)
     {
         try

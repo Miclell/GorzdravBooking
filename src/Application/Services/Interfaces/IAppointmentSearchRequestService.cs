@@ -10,7 +10,7 @@ public interface IAppointmentSearchRequestService
 
     Task<Result> DeleteAsync(Guid requestId, CancellationToken cancellationToken = default);
 
-    Task<Result> UpdateTimePreferencesAsync(UpdateTimePreferencesDto updateDto,
+    Task<Result> UpdateTimePreferencesAsync(UpdatePreferencesDto updateDto,
         CancellationToken cancellationToken = default);
 
     Task<Result<IEnumerable<AppointmentSearchRequestDto>>> GetActiveByUserAsync(Guid userId,
