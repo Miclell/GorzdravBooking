@@ -11,17 +11,6 @@ public class UserController(
     IUserService userService,
     ILogger<UserController> logger) : ControllerBase
 {
-    [HttpPost("create")]
-    public async Task<IActionResult> CreateUser([FromBody] BaseUserDto request)
-    {
-        var result = await userService.Create(request);
-
-        if (result.IsSuccess)
-            return Ok(result.Value);
-
-        return BadRequest(result.Error);
-    }
-
     [HttpDelete("{userId:guid}")]
     public async Task<IActionResult> DeleteUser(Guid userId)
     {

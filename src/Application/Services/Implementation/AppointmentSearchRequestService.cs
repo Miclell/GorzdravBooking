@@ -67,7 +67,7 @@ public class AppointmentSearchRequestService(
     }
 
     public async Task<Result> UpdateTimePreferencesAsync(
-        UpdateTimePreferencesDto updateDto,
+        UpdatePreferencesDto updateDto,
         CancellationToken cancellationToken = default)
     {
         try
@@ -77,6 +77,10 @@ public class AppointmentSearchRequestService(
                 return Error.Failure("SearchRequest.NotFound", "Search request not found");
 
             request.TimePreferencesPresetName = updateDto.TimePreferencesName;
+            request.SpecificStartPoints = updateDto.SpecificStartPoints;
+            request.SearchInterval = updateDto.SearchInternaval;
+            request.MaxDaysToSearch = updateDto.MaxDaysToSearch;
+            request.ViewOnly = updateDto.ViewOnly;
             await appointmentSearchRequestRepository.UpdateAsync(request, cancellationToken);
 
             return Result.Success();
