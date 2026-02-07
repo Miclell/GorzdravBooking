@@ -1,14 +1,10 @@
-﻿using Core.Enums;
+﻿using Core.Entities.Common;
+using Core.Enums;
 
 namespace Core.Entities;
 
-public abstract class AppointmentSearchRequest
+public abstract class AppointmentSearchRequest : IPatientOwnedEntity
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
-
-    public Guid PatientProfileId { get; set; }
-    public PatientProfile PatientProfile { get; set; } = null!;
-
     public string LpuName { get; set; } = null!;
     public string Speciality { get; set; } = null!;
     public DoctorSelectionMode DoctorMode { get; set; } = DoctorSelectionMode.SpecificDoctorOrRange;
@@ -26,4 +22,8 @@ public abstract class AppointmentSearchRequest
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // TODO проверить настройку чтобы GMT +3 был
     public DateTime? LastSearchAttempt { get; set; }
     public int AttemptCount { get; set; } = 0;
+    public Guid Id { get; set; } = Guid.NewGuid();
+
+    public Guid PatientProfileId { get; set; }
+    public PatientProfile PatientProfile { get; set; } = null!;
 }

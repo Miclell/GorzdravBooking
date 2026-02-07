@@ -8,15 +8,15 @@ public static class SwaggerConfiguration
     {
         services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "GorzravBooking API", Version = "v1" });
 
-            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            c.AddSecurityDefinition("Cookie", new OpenApiSecurityScheme
             {
-                Description = "JWT Authorization header using the Bearer scheme",
-                Name = "Authorization",
-                In = ParameterLocation.Header,
+                Description = "Cookie authentication using GorzdravBooking.Cookie",
+                Name = "GorzdravBooking.Cookie",
+                In = ParameterLocation.Cookie,
                 Type = SecuritySchemeType.ApiKey,
-                Scheme = "Bearer"
+                Scheme = "Cookie"
             });
 
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -27,7 +27,7 @@ public static class SwaggerConfiguration
                         Reference = new OpenApiReference
                         {
                             Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
+                            Id = "Cookie"
                         }
                     },
                     Array.Empty<string>()
@@ -38,10 +38,10 @@ public static class SwaggerConfiguration
 
     public static void UseSwaggerWithUi(this WebApplication app)
     {
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
+        if (!app.Environment.IsDevelopment())
+            return;
+
+        app.UseSwagger();
+        app.UseSwaggerUI(options => { options.EnablePersistAuthorization(); });
     }
 }

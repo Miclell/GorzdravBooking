@@ -12,7 +12,7 @@ public static class LoggerConfiguration
                 //AddProductionLogging(logging);
             });
     }
-    
+
     private static void AddDebugLogging(ILoggingBuilder logging)
     {
         logging.AddConsole(_ => { })

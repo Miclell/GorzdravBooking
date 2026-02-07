@@ -127,14 +127,13 @@ public class AppointmentCoordinator(
     {
         if (request is ManualSearchRequest manualSearchRequest)
         {
-            
             var appointments = new List<(string Doctor, Appointment Appointment)>();
             if (request.DoctorMode == DoctorSelectionMode.SpecificDoctorOrRange)
             {
                 if (request.DoctorIds == null || request.DoctorNames == null)
                     throw new InvalidOperationException(
                         "DoctorIds and DoctorNames must be set for SpecificDoctorOrRange mode");
-                
+
                 foreach (var (doctorId, doctorName) in request.DoctorIds
                              .Zip(request.DoctorNames))
                 {
@@ -146,9 +145,11 @@ public class AppointmentCoordinator(
                 }
             }
             else
+            {
                 appointments.AddRange(await externalAppointmentService.GetBySpecialityAsync(
                     int.Parse(manualSearchRequest.PatientProfile.LpuId),
                     request.Speciality));
+            }
 
             return appointments;
         }

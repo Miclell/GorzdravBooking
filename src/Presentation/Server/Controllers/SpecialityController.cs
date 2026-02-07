@@ -12,6 +12,8 @@ public class SpecialityController(
     ILogger<SpecialityController> logger) : ControllerBase
 {
     [HttpGet("{lpuId:int}")]
-    public async Task<ActionResult<List<MedicalSpeciality>>> GetSpecialitiesByLpu(int lpuId) =>
-        await specialtyService.GetByLpuAsync(lpuId);
+    public async Task<ActionResult<List<MedicalSpeciality>>> GetSpecialitiesByLpu(int lpuId)
+    {
+        return await specialtyService.GetByLpuAsync(lpuId);
+    }
 }

@@ -1,10 +1,9 @@
-﻿namespace Core.Entities;
+﻿using Core.Entities.Common;
 
-public class PatientProfile
+namespace Core.Entities;
+
+public class PatientProfile : IOwnedEntity
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
-
-    public Guid UserId { get; set; }
     public User User { get; set; } = null!;
 
     public ICollection<AppointmentSearchRequest> AppointmentSearchRequests { get; set; } = [];
@@ -20,4 +19,7 @@ public class PatientProfile
     public string PatientFirstName { get; set; } = null!;
     public string PatientMiddleName { get; set; } = null!;
     public DateTime PatientBirthdate { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
+
+    public Guid UserId { get; set; }
 }
