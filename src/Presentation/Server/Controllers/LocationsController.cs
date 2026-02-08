@@ -13,10 +13,14 @@ public class LocationsController(
     ILogger<LocationsController> logger) : ControllerBase
 {
     [HttpGet("districts")]
-    public async Task<ActionResult<List<District>>> GetDistricts() =>
-        await districtService.GetDistrictsAsync();
+    public async Task<ActionResult<List<District>>> GetDistricts()
+    {
+        return await districtService.GetDistrictsAsync();
+    }
 
     [HttpGet("district/{districtId}/lpus")]
-    public async Task<ActionResult<List<Lpu>>> GetLpusByDistrict(string districtId) =>
-        await lpuService.GetByDistrictAsync(districtId);
+    public async Task<ActionResult<List<Lpu>>> GetLpusByDistrict(string districtId)
+    {
+        return await lpuService.GetByDistrictAsync(districtId);
+    }
 }

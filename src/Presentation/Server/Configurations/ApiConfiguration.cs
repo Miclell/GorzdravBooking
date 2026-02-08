@@ -11,7 +11,7 @@ public static class ApiConfiguration
     public static void ConfigureApi(this IServiceCollection services, IConfiguration configuration)
     {
         services.ConfigureRoutes();
-        services.ConfigureAuthentication(configuration);
+        services.ConfigureCookieAuthentication(configuration);
         services.ConfigureSwagger();
 
         services.AddInfrastructure();

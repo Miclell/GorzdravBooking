@@ -47,7 +47,7 @@ public class UserService(
 
             if (existing == null ||
                 !passwordHasher.VerifyPassword(
-                    baseUserDto.Password, 
+                    baseUserDto.Password,
                     existing.PasswordHash))
                 return Error.Conflict("User.UsernameOrPass.NotValid", "Имя пользователя или пароль неверные!");
 

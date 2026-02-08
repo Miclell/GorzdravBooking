@@ -12,13 +12,13 @@ public class DoctorSelectionProvider(
     IDataService dataService,
     IServiceProvider serviceProvider) : IMenuProvider
 {
-    public async Task<MenuState> CreateMenuAsync(CancellationToken cancellationToken = default)
+    public Task<MenuState> CreateMenuAsync(CancellationToken cancellationToken = default)
     {
         List<ReferralDoctor>? doctors;
         if (!dataService.TryGet<bool>("IsAnotherDoctor", out _))
         {
             dataService.TryGet<ReferralSpeciality>(nameof(ReferralSpeciality), out var speciality);
-            doctors = speciality.Doctors; // TODO 
+            doctors = speciality!.Doctors; // TODO 
             dataService.Set("ToChoseDoctors", doctors);
         }
         else
@@ -37,6 +37,7 @@ public class DoctorSelectionProvider(
                 new MenuItem(c.Title, _ => c.ExecuteAsync(cancellationToken)))
             .ToList();
 
-        return new MenuState("Выберите специальность", items, header: HeaderFactorySetup.SetupHeader());
+        return Task.FromResult(new MenuState("Выберите специальность", items,
+            header: HeaderFactorySetup.SetupHeader()));
     }
 }
