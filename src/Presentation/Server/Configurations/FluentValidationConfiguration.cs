@@ -1,13 +1,15 @@
-﻿using FluentValidation.AspNetCore;
+﻿using FluentValidation;
+using FluentValidation.AspNetCore;
 using Server.Validators.User;
 
 namespace Server.Configurations;
 
 public static class FluentValidationConfiguration
 {
-    [Obsolete("Obsolete")]
-    public static void ConfigureFluentValidation(this IMvcBuilder mvcBuilder)
+    public static void ConfigureFluentValidation(this IServiceCollection services)
     {
-        mvcBuilder.AddFluentValidation(fv => { fv.RegisterValidatorsFromAssemblyContaining<BaseUserDtoValidator>(); });
+        services.AddFluentValidationAutoValidation();
+        services.AddFluentValidationClientsideAdapters();
+        services.AddValidatorsFromAssemblyContaining<BaseUserDtoValidator>();
     }
 }
