@@ -1,13 +1,52 @@
+# .NET
 bin/
 obj/
 /packages/
-riderModule.iml
+*.user
 /_ReSharper.Caches/
-.idea
-.vs
-GorzdravBooking.sln.DotSettings.user
+riderModule.iml
+
+# IDE
+.idea/
+.vs/
+.vscode/*
+!.vscode/extensions.json
+
+# Databases
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
 identifier.sqlite
-src/Infrastructure/GorzdravBooking.db
+
+# Temporary
 src/Infrastructure/ApiClient/ApiService.cs
 src/Infrastructure/Http/HttpClientFactorySetup.cs
-src/Presentation/Server/GorzdravBooking.db
+
+# Frontend - Node
+node_modules/
+*.local
+
+# Frontend - Build
+dist/
+dist-ssr/
+.vite/
+
+# Frontend - Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+
+# Editor
+*.suo
+*.ntvs*
+*.njsproj
+*.sln.DotSettings.user
+*.sw?
