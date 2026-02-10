@@ -1,12 +1,9 @@
-﻿namespace Core.Entities;
+﻿using Core.Entities.Common;
 
-public class Appointment
+namespace Core.Entities;
+
+public class Appointment : IPatientOwnedEntity
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
-
-    public Guid PatientProfileId { get; set; }
-    public PatientProfile PatientProfile { get; set; } = null!;
-
     public string AppointmentId { get; set; } = null!;
     public DateTime VisitStart { get; set; }
     public DateTime VisitEnd { get; set; }
@@ -15,4 +12,8 @@ public class Appointment
     public string? Room { get; set; }
     public string Speciality { get; set; } = null!;
     public string Doctor { get; set; } = null!;
+    public Guid Id { get; set; } = Guid.NewGuid();
+
+    public Guid PatientProfileId { get; set; }
+    public PatientProfile PatientProfile { get; set; } = null!;
 }

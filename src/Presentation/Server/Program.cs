@@ -10,17 +10,32 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        builder.Host.ConfigureLogging();
         builder.Services.ConfigureApi(builder.Configuration);
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowReact", policy =>
+            {
+                policy.WithOrigins("http://localhost:5173") // Vite порт
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+            });
+        });
 
         var app = builder.Build();
 
         // Swagger
-        app.UseSwaggerWithUI();
+        app.UseSwaggerWithUi();
 
         app.UseHttpsRedirection();
+        app.MapControllers();
+
+        app.UseCors("AllowReact");
+        app.UseRouting();
+
         app.UseAuthentication();
         app.UseAuthorization();
-        app.MapControllers();
 
         // Migrations TODO вынести
         using (var scope = app.Services.CreateScope())

@@ -1,7 +1,9 @@
 ﻿using Core.Events.Common;
+using Core.Interfaces.Auth;
 using Core.Interfaces.Repositories;
 using Core.Interfaces.Security;
 using Core.Interfaces.Services;
+using Infrastructure.Auth;
 using Infrastructure.Events;
 using Infrastructure.Persistence;
 using Infrastructure.Repositories;
@@ -46,6 +48,10 @@ public static class DependencyInjection
 
         // Events
         services.AddSingleton<IEventBus, InMemoryEventBus>();
+
+        // Auth
+        services.AddScoped<IOwnershipChecker, OwnershipChecker>();
+        services.AddScoped<IAuthorizationProvider, AuthorizationProvider>();
 
         return services;
     }

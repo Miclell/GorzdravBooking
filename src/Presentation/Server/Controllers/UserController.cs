@@ -1,30 +1,25 @@
 ﻿using Application.DTOs.User;
 using Application.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Server.Auth;
 using Server.Configurations.Common;
 
 namespace Server.Controllers;
 
 [ApiController]
+[Authorize]
+[RequireUserClaims]
 [Route($"{ApiRoutes.ApiV1Prefix}/[controller]")]
 public class UserController(
     IUserService userService,
     ILogger<UserController> logger) : ControllerBase
 {
-    [HttpPost("create")]
-    public async Task<IActionResult> CreateUser([FromBody] BaseUserDto request)
+    [HttpDelete]
+    public async Task<IActionResult> DeleteUser()
     {
-        var result = await userService.Create(request);
+        var userId = (Guid)HttpContext.Items["UserId"]!;
 
-        if (result.IsSuccess)
-            return Ok(result.Value);
-
-        return BadRequest(result.Error);
-    }
-
-    [HttpDelete("{userId:guid}")]
-    public async Task<IActionResult> DeleteUser(Guid userId)
-    {
         var result = await userService.Delete(userId);
 
         if (result.IsSuccess)
@@ -33,11 +28,12 @@ public class UserController(
         return BadRequest(result.Error);
     }
 
-    [HttpPut("{userId:guid}/password")]
+    [HttpPut("password")]
     public async Task<IActionResult> UpdatePassword(
-        Guid userId,
         [FromBody] UpdatePasswordRequest request)
     {
+        var userId = (Guid)HttpContext.Items["UserId"]!;
+
         var result = await userService.UpdatePassword(userId, request.NewPassword);
 
         if (result.IsSuccess)
