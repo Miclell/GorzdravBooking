@@ -1,8 +1,9 @@
-# GorzdravBooking
+![Logo](./docs/logo.svg)
 
 ____
 
-![Tests](https://github.com/Miclell/GorzdravBooking/actions/workflows/dotnet.yml/badge.svg)
+![Demo](https://img.shields.io/badge/⚠️%20Demo%20Project-Non--functional%20(ToS%20limitations)-orange?style=for-the-badge)
+![Tests](https://github.com/Miclell/GorzdravBooking/actions/workflows/dotnet.yml/badge.svg) ![License](https://img.shields.io/badge/license-MIT-green) ![DotNet](https://img.shields.io/badge/.NET-9.0-512BD4?logo=dotnet) ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
 
 ____
 
@@ -25,7 +26,7 @@ GorzdravBooking автоматизирует процесс записи к вр
 
 ## Текущее состояние
 - ✅ Реализован консольный вариант
-- ❌ React фронтенд
+- ✅ React фронтенд
 - ❌ Telegram bot
 
 ## Установка и запуск
@@ -48,7 +49,3 @@ ____
 
 ## Лицензия
 MIT — см. [LICENSE](./LICENSE).
-
-____
-
-#### Примечание: Данный проект является демонстрационным и не предназначен для реального использования с production-системами.

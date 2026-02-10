@@ -1,0 +1,26 @@
+<svg width="900" height="220" viewBox="0 0 900 220" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradTextSpace" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    <filter id="glowSpace" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feColorMatrix in="blur" type="matrix"
+        values="0 0 0 0 0.063
+                0 0 0 0 0.898
+                0 0 0 0 0.651
+                0 0 0 0.6 0" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="100%" height="100%" fill="none"/>
+  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central"
+        fill="url(#gradTextSpace)" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif"
+        font-weight="700" font-size="72" letter-spacing="0.08em" filter="url(#glowSpace)">
+    Gorzdrav Booking
+  </text>
+</svg>

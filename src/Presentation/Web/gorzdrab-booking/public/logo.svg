@@ -1,0 +1,17 @@
+<svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#10b981" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+  <rect width="160" height="160" rx="40" fill="url(#gradBg)" filter="url(#shadow)"/>
+  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central"
+        fill="#020617" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif"
+        font-weight="900" font-size="88">
+    G
+  </text>
+</svg>
