@@ -19,10 +19,11 @@ public static class ApiConfiguration
         services.AddHostedService<AppointmentSchedulerWorker>();
 
         services.AddControllers(options =>
-            {
-                options.Conventions.Add(new RouteTokenTransformerConvention(
-                    new KebabCaseParameterTransformer()));
-            })
-            .ConfigureFluentValidation();
+        {
+            options.Conventions.Add(new RouteTokenTransformerConvention(
+                new KebabCaseParameterTransformer()));
+        });
+
+        services.ConfigureFluentValidation();
     }
 }
