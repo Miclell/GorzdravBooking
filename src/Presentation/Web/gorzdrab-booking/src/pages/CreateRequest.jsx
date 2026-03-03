@@ -42,14 +42,7 @@ function CreateRequest() {
   const [viewOnly, setViewOnly] = useState(false);
   const [specificPoints, setSpecificPoints] = useState([]);
 
-  const [savedPresets, setSavedPresets] = useState(() => {
-    try {
-      const raw = localStorage.getItem('gorzdrav_time_presets');
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [presetNames, setPresetNames] = useState([]);
   const [selectedPresetName, setSelectedPresetName] = useState('');
 
   const restoredForm = location.state?.restoredRequestForm;
@@ -60,11 +53,11 @@ function CreateRequest() {
   );
 
   const presetOptions = useMemo(() => {
-    const names = savedPresets.map(p => p.name);
+    const names = [...presetNames];
     if (updateRequestId && currentPreset && !names.includes(currentPreset))
       names.push(currentPreset);
     return names.map(name => ({ value: name, label: name }));
-  }, [savedPresets, updateRequestId, currentPreset]);
+  }, [presetNames, updateRequestId, currentPreset]);
 
   // Загрузка пациентов
   useEffect(() => {
@@ -123,14 +116,12 @@ function CreateRequest() {
     }
   }, [restoredForm]);
 
-  // Сохранение списка пресетов в localStorage
+  // Загрузка пресетов из API
   useEffect(() => {
-    try {
-      localStorage.setItem('gorzdrav_time_presets', JSON.stringify(savedPresets));
-    } catch {
-      // ignore
-    }
-  }, [savedPresets]);
+    api.getAllTimePreferences()
+      .then(presets => setPresetNames((presets || []).map(p => p.name).filter(Boolean).sort()))
+      .catch(() => setPresetNames([]));
+  }, []);
 
   // Загрузка специальностей после выбора пациента
   useEffect(() => {
@@ -220,10 +211,10 @@ function CreateRequest() {
       }
 
       const todayIso = new Date().toISOString().split('T')[0];
-      const specificStartPoints =
-        specificPoints
+      const filteredStartPoints = specificPoints
           .filter(p => p.time)
-          .map(p => new Date(`${todayIso}T${p.time}`)) || null;
+          .map(p => new Date(`${todayIso}T${p.time}`));
+      const specificStartPoints = filteredStartPoints.length ? filteredStartPoints : null;
 
       const toTimeSpan = minutes => {
         const total = Math.max(0, Number(minutes) || 0);
@@ -288,10 +279,10 @@ function CreateRequest() {
     );
 
     const todayIso = new Date().toISOString().split('T')[0];
-    const specificStartPoints =
-      specificPoints
+    const filteredPoints = specificPoints
         .filter(p => p.time)
-        .map(p => new Date(`${todayIso}T${p.time}`)) || null;
+        .map(p => new Date(`${todayIso}T${p.time}`));
+    const specificStartPoints = filteredPoints.length ? filteredPoints : null;
 
     const toTimeSpan = minutes => {
       const total = Math.max(0, Number(minutes) || 0);
@@ -586,7 +577,7 @@ function CreateRequest() {
                 placeholder="Выберите пресет"
                 size="sm"
               />
-              {savedPresets.length === 0 && (
+              {presetNames.length === 0 && (
                 <p className="mt-2 text-[11px] text-slate-400">
                   Создайте пресет в разделе «Временные предпочтения».
                 </p>

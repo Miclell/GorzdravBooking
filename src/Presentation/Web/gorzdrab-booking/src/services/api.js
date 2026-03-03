@@ -134,6 +134,9 @@ export const createTimePreferences = async preferences => {
   });
 };
 
+export const getAllTimePreferences = async () =>
+  apiCall('/api/v1/time-preferences');
+
 export const getTimePreferences = async presetName =>
   apiCall(`/api/v1/time-preferences/${encodeURIComponent(presetName)}`);
 

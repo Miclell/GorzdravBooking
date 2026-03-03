@@ -46,25 +46,11 @@ function TimePreferences() {
   const loadPresetNames = useCallback(async () => {
     setLoading(true);
     try {
-      let fromStorage = [];
-      try {
-        const raw = localStorage.getItem(PRESETS_STORAGE_KEY);
-        fromStorage = raw ? JSON.parse(raw) : [];
-      } catch {
-        fromStorage = [];
-      }
-      const fromRequests = [];
-      try {
-        const requests = await api.getRequests();
-        (requests || []).forEach(r => {
-          if (r.timePreferencesPresetName && !fromRequests.includes(r.timePreferencesPresetName))
-            fromRequests.push(r.timePreferencesPresetName);
-        });
-      } catch {
-        // ignore
-      }
-      const names = [...new Set([...fromStorage.map(p => p.name), ...fromRequests])].filter(Boolean).sort();
+      const presets = await api.getAllTimePreferences();
+      const names = (presets || []).map(p => p.name).filter(Boolean).sort();
       setPresetNames(names);
+    } catch {
+      setPresetNames([]);
     } finally {
       setLoading(false);
     }
@@ -217,7 +203,6 @@ function TimePreferences() {
     setDeleting(true);
     try {
       await api.deleteTimePreferences(deleteModal);
-      removePresetFromStorage(deleteModal);
       setDeleteModal(null);
       loadPresetNames();
     } catch (err) {
