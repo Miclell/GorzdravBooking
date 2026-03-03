@@ -50,3 +50,6 @@ lerna-debug.log*
 *.njsproj
 *.sln.DotSettings.user
 *.sw?
+
+# Auto Claude data directory
+.auto-claude/

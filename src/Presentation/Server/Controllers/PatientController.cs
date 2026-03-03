@@ -13,7 +13,8 @@ namespace Server.Controllers;
 
 [ApiController]
 [Route($"{ApiRoutes.ApiV1Prefix}/[controller]")]
-public class PatientController(
+public class 
+    PatientController(
     IPatientService patientService,
     IExternalPatientService externalPatientService,
     IAuthorizationProvider authorizationProvider,

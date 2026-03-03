@@ -16,7 +16,6 @@ const WEEKDAYS = [
   { value: 0, label: 'Вс' },
 ];
 
-const PRESETS_STORAGE_KEY = 'gorzdrav_time_presets';
 
 const defaultForm = () => ({
   name: '',
@@ -60,31 +59,6 @@ function TimePreferences() {
     loadPresetNames();
   }, [loadPresetNames]);
 
-  const savePresetsToStorage = useCallback(name => {
-    try {
-      const raw = localStorage.getItem(PRESETS_STORAGE_KEY);
-      const list = raw ? JSON.parse(raw) : [];
-      if (!list.some(p => p.name === name))
-        list.push({ name, mode: TIME_MODE.ANY, createdAt: new Date().toISOString() });
-      localStorage.setItem(PRESETS_STORAGE_KEY, JSON.stringify(list));
-    } catch {
-      // ignore
-    }
-  }, []);
-
-  const removePresetFromStorage = useCallback(name => {
-    try {
-      const raw = localStorage.getItem(PRESETS_STORAGE_KEY);
-      const list = raw ? JSON.parse(raw) : [];
-      localStorage.setItem(
-        PRESETS_STORAGE_KEY,
-        JSON.stringify(list.filter(p => p.name !== name)),
-      );
-    } catch {
-      // ignore
-    }
-  }, []);
-
   const buildPayload = useCallback(
     (presetName) => {
       if (!userId) return [];
@@ -96,7 +70,7 @@ function TimePreferences() {
             userId,
             timeMode: TIME_MODE.ANY,
             date: null,
-            day: 0,
+            day: null,
             preferredTimeFrom: null,
             preferredTimeTo: null,
             excludedDates: null,
@@ -124,7 +98,7 @@ function TimePreferences() {
         userId,
         timeMode: TIME_MODE.DATES,
         date: pref.date || null,
-        day: 0,
+        day: null,
         preferredTimeFrom: pref.from || null,
         preferredTimeTo: pref.to || null,
         excludedDates: null,

@@ -727,9 +727,7 @@ function Dashboard() {
                 appointmentToCancel.doctor || appointmentToCancel.doctorName || 'Врач не указан';
               const start = appointmentToCancel.visitStart
                 ? new Date(appointmentToCancel.visitStart)
-                : appointmentToCancel.date
-                  ? new Date(appointmentToCancel.date)
-                  : null;
+                : null;
               const dateTime = start ? start.toLocaleString('ru-RU') : '—';
 
               return (
