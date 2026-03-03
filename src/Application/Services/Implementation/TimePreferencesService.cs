@@ -26,7 +26,7 @@ public class TimePreferencesService(
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка при создании временных предпочтений");
-            return Error.Failure(e.ToString(), "Failed to create time preferences");
+            return Error.Failure("UnexpectedError", "Failed to create time preferences");
         }
     }
 
@@ -47,7 +47,7 @@ public class TimePreferencesService(
             logger.LogError(e, "Ошибка при удалении пресета {PresetName} для пользователя {UserId}", dto.Name,
                 dto.UserId);
 
-            return Error.Failure(e.ToString(), "Failed to delete time preferences");
+            return Error.Failure("UnexpectedError", "Failed to delete time preferences");
         }
     }
 
@@ -82,7 +82,7 @@ public class TimePreferencesService(
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка при получении временных предпочтений для пользователя {UserId}", userId);
-            return Error.Failure(e.ToString(), "Failed to get time preferences");
+            return Error.Failure("UnexpectedError", "Failed to get time preferences");
         }
     }
 
@@ -116,7 +116,10 @@ public class TimePreferencesService(
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка при получении пресета - {Name} для пациента {UserId}", name, userId);
-            return Error.Failure(e.ToString(), "Failed to get time preferences");
+            return Error.Failure("UnexpectedError", "Failed to get time preferences");
+        }
+    }
+
     public async Task<Result> UpdatePresetAsync(List<CreateTimePreferenceDto> dtos,
         CancellationToken cancellationToken = default)
     {

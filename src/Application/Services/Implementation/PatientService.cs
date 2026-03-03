@@ -40,7 +40,7 @@ public class PatientService(
         {
             logger.LogError(e, "Ошибка при добавлении PatientProfile для User с id {UserId} - {e}",
                 createPatientDto.UserId, e);
-            return Error.Failure($"{e}", "Ошибка");
+            return Error.Failure("UnexpectedError", "Ошибка");
         }
     }
 
@@ -54,7 +54,7 @@ public class PatientService(
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка при удалении пациента с id {PatientId}", patientId);
-            return Error.Failure(e.ToString(), "Ошибка");
+            return Error.Failure("UnexpectedError", "Ошибка");
         }
     }
 
@@ -83,7 +83,7 @@ public class PatientService(
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка при получении пациентов для пользователя с id {UserId}", userId);
-            return Error.Failure(e.ToString(), "Ошибка");
+            return Error.Failure("UnexpectedError", "Ошибка");
         }
     }
 
@@ -112,7 +112,7 @@ public class PatientService(
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка при обновлении данных пациента с id {PatientProfile}", patientProfile.Id);
-            return Error.Failure(e.ToString(), "Ошибка");
+            return Error.Failure("UnexpectedError", "Ошибка");
         }
     }
 
@@ -140,7 +140,7 @@ public class PatientService(
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка при получении пациента с id {PatientId}", patientId);
-            return Error.Failure(e.ToString(), "Ошибка");
+            return Error.Failure("UnexpectedError", "Ошибка");
         }
     }
 }

@@ -48,7 +48,7 @@ public class AppointmentSearchRequestService(
         {
             logger.LogError(e, "Ошибка при создании запроса на поиск записи для пациента {PatientProfileId}",
                 createDto.PatientProfileId);
-            return Error.Failure(e.ToString(), "Failed to create search request");
+            return Error.Failure("UnexpectedError", "Failed to create search request");
         }
     }
 
@@ -62,7 +62,7 @@ public class AppointmentSearchRequestService(
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка при удалении запроса на поиск записи {RequestId}", requestId);
-            return Error.Failure(e.ToString(), "Failed to delete search request");
+            return Error.Failure("UnexpectedError", "Failed to delete search request");
         }
     }
 
@@ -89,7 +89,7 @@ public class AppointmentSearchRequestService(
         {
             logger.LogError(e, "Ошибка при обновлении временных предпочтений для запроса {RequestId}",
                 updateDto.RequestId);
-            return Error.Failure(e.ToString(), "Failed to update time preferences");
+            return Error.Failure("UnexpectedError", "Failed to update time preferences");
         }
     }
 
@@ -108,7 +108,7 @@ public class AppointmentSearchRequestService(
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка при получении активных запросов пользователя {UserId}", userId);
-            return Error.Failure(e.ToString(), "Failed to get active search requests");
+            return Error.Failure("UnexpectedError", "Failed to get active search requests");
         }
     }
 
@@ -129,7 +129,7 @@ public class AppointmentSearchRequestService(
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка при получении запросов пациента {PatientProfileId}", patientProfileId);
-            return Error.Failure(e.ToString(), "Failed to get patient search requests");
+            return Error.Failure("UnexpectedError", "Failed to get patient search requests");
         }
     }
 }

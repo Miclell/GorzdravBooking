@@ -41,7 +41,7 @@ public class AppointmentService(
         {
             logger.LogError(e, "Ошибка при создании записи на прием для пациента {PatientProfileId}",
                 createDto.PatientProfileId);
-            return Error.Failure(e.ToString(), "Failed to create appointment");
+            return Error.Failure("UnexpectedError", "Failed to create appointment");
         }
     }
 
@@ -78,7 +78,7 @@ public class AppointmentService(
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка при удалении записи на прием {AppointmentId}", appointmentId);
-            return Error.Failure(e.ToString(), "Failed to delete appointment");
+            return Error.Failure("UnexpectedError", "Failed to delete appointment");
         }
     }
 
@@ -105,7 +105,7 @@ public class AppointmentService(
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка при получении записей пользователя {UserId}", userId);
-            return Error.Failure(e.ToString(), "Failed to get user appointments");
+            return Error.Failure("UnexpectedError", "Failed to get user appointments");
         }
     }
 
@@ -135,7 +135,7 @@ public class AppointmentService(
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка при получении записей пациента {PatientProfileId}", patientProfileId);
-            return Error.Failure(e.ToString(), "Failed to get patient appointments");
+            return Error.Failure("UnexpectedError", "Failed to get patient appointments");
         }
     }
 
@@ -167,7 +167,7 @@ public class AppointmentService(
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка при получении записи {AppointmentId}", appointmentId);
-            return Error.Failure(e.ToString(), "Failed to get appointment");
+            return Error.Failure("UnexpectedError", "Failed to get appointment");
         }
     }
 }

@@ -47,7 +47,7 @@ public class AppointmentCoordinator(
         catch (Exception e)
         {
             logger.LogError(e, "Booking appointment error for patient {PatientId}", request.PatientProfile.PatientId);
-            return Error.Failure(e.ToString(), "Booking appointment error");
+            return Error.Failure("UnexpectedError", "Booking appointment error");
         }
     }
 

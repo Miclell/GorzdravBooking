@@ -35,7 +35,7 @@ public class UserService(
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка при добавление User с {Username} - {e}", baseUserDto.Username, e);
-            return Error.Failure($"{e}", "Ошибка");
+            return Error.Failure("UnexpectedError", "Ошибка");
         }
     }
 
@@ -56,7 +56,7 @@ public class UserService(
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка при входе User с {Username} - {e}", baseUserDto.Username, e);
-            return Error.Failure($"{e}", "Ошибка");
+            return Error.Failure("UnexpectedError", "Ошибка");
         }
     }
 
@@ -70,7 +70,7 @@ public class UserService(
         catch (Exception e)
         {
             logger.LogError(e, "Database error deleting user {UserId}", userId);
-            return Error.Failure(e.ToString(), "Ошибка");
+            return Error.Failure("UnexpectedError", "Ошибка");
         }
     }
 
@@ -92,7 +92,7 @@ public class UserService(
         catch (Exception e)
         {
             logger.LogError(e, "Database error update user {UserId} password", userId);
-            return Error.Failure(e.ToString(), "Ошибка");
+            return Error.Failure("UnexpectedError", "Ошибка");
         }
     }
 }

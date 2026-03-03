@@ -52,7 +52,7 @@ public class ProcessReferralUseCase(
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка проверки валидности запроса на запись по направлению");
-            return Error.Failure(e.ToString(), "Failed to validate referral request");
+            return Error.Failure("UnexpectedError", "Failed to validate referral request");
         }
     }
 }
