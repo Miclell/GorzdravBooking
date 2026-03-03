@@ -18,7 +18,7 @@ public class UpdatePreferencesDtoValidator : AbstractValidator<UpdatePreferences
             .Must(points => points is not { Count: 0 })
             .WithMessage("Конкретные точки старта не должны быть пустым списком");
 
-        RuleFor(x => x.SearchInternaval)
+        RuleFor(x => x.SearchInterval)
             .Must(interval => interval > TimeSpan.Zero)
             .WithMessage("Интервал поиска должен быть больше 0")
             .Must(interval => interval <= TimeSpan.FromHours(24))

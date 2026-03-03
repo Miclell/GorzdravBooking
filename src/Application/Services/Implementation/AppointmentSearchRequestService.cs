@@ -78,7 +78,7 @@ public class AppointmentSearchRequestService(
 
             request.TimePreferencesPresetName = updateDto.TimePreferencesName;
             request.SpecificStartPoints = updateDto.SpecificStartPoints;
-            request.SearchInterval = updateDto.SearchInternaval;
+            request.SearchInterval = updateDto.SearchInterval;
             request.MaxDaysToSearch = updateDto.MaxDaysToSearch;
             request.ViewOnly = updateDto.ViewOnly;
             await appointmentSearchRequestRepository.UpdateAsync(request, cancellationToken);

@@ -229,7 +229,7 @@ function CreateRequest() {
           requestId: updateRequestId,
           timePreferencesName: presetName,
           specificStartPoints,
-          searchInternaval: toTimeSpan(searchIntervalMinutes),
+          searchInterval: toTimeSpan(searchIntervalMinutes),
           maxDaysToSearch,
           viewOnly,
         });
