@@ -111,7 +111,7 @@ function Dashboard() {
     setCheckingPatient(true);
     try {
       const patientId = await api.findPatientId({
-        lpuId: newPatient.lpuId,
+        lpuId: newPatient.lpuId.toString(),
         lastName: newPatient.patientLastName,
         firstName: newPatient.patientFirstName,
         middleName: newPatient.patientMiddleName,
@@ -156,8 +156,8 @@ function Dashboard() {
         patientFirstName: newPatient.patientFirstName,
         patientMiddleName: newPatient.patientMiddleName,
         patientBirthdate: newPatient.patientBirthdate,
-        recipientEmail: newPatient.recipientEmail,
-        mobilePhoneNumber: newPatient.mobilePhoneNumber,
+        recipientEmail: newPatient.recipientEmail || null,
+        mobilePhoneNumber: newPatient.mobilePhoneNumber || null,
       });
 
       setIsModalOpen(false);
@@ -516,7 +516,7 @@ function Dashboard() {
                 value={newPatient.lpuId}
                 onChange={v => setNewPatient(prev => ({ ...prev, lpuId: v }))}
                 options={lpus.map(l => ({
-                  value: l.id,
+                  value: String(l.id),
                   label: l.lpuShortName || l.lpuFullName || String(l.id),
                 }))}
                 placeholder="Выберите поликлинику"
@@ -546,24 +546,26 @@ function Dashboard() {
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-medium text-slate-300">
-                    Имя
+                    Имя *
                   </label>
                   <input
                     name="patientFirstName"
                     value={newPatient.patientFirstName}
                     onChange={handleInputChange}
                     className="input-field"
+                    required
                   />
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-medium text-slate-300">
-                    Отчество
+                    Отчество *
                   </label>
                   <input
                     name="patientMiddleName"
                     value={newPatient.patientMiddleName}
                     onChange={handleInputChange}
                     className="input-field"
+                    required
                   />
                 </div>
                 <div>
