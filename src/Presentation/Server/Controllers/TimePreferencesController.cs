@@ -33,6 +33,16 @@ public class TimePreferencesController(
         return BadRequest(result.Error);
     }
 
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<TimePreferencesPresetDto>>> GetAll()
+    {
+        var userId = (Guid)HttpContext.Items["UserId"]!;
+        var result = await timePreferencesService.GetByUserAsync(userId);
+        if (result.IsSuccess)
+            return Ok(result.Value);
+        return BadRequest(result.Error);
+    }
+
     [HttpGet("{name}")]
     public async Task<ActionResult<TimePreferencesPresetDto>> Get(string name)
     {
