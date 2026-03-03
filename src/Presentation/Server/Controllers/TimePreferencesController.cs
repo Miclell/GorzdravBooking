@@ -46,6 +46,22 @@ public class TimePreferencesController(
         return BadRequest();
     }
 
+    [HttpPut]
+    public async Task<ActionResult> Update([FromBody] List<CreateTimePreferenceDto> request)
+    {
+        var userId = (Guid)HttpContext.Items["UserId"]!;
+        
+        if (request.Any(tp => tp.UserId != userId))
+            return Forbid();
+        
+        var result = await timePreferencesService.UpdatePresetAsync(request);
+        
+        if (result.IsSuccess)
+            return Ok();
+
+        return BadRequest();
+    }
+
     [HttpDelete]
     public async Task<ActionResult> Delete([FromBody] DeleteTimePreferencesDto request)
     {

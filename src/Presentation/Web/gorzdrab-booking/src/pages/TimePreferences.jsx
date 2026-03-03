@@ -198,8 +198,11 @@ function TimePreferences() {
     }
     setSubmitting(true);
     try {
-      await api.createTimePreferences(payload);
-      savePresetsToStorage(presetName);
+      if (editingName) {
+        await api.updateTimePreferences(editingName, payload);
+      } else {
+        await api.createTimePreferences(payload);
+      }
       setFormOpen(false);
       loadPresetNames();
     } catch (err) {

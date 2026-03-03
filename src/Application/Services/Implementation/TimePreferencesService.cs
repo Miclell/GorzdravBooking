@@ -117,6 +117,20 @@ public class TimePreferencesService(
         {
             logger.LogError(e, "Ошибка при получении пресета - {Name} для пациента {UserId}", name, userId);
             return Error.Failure(e.ToString(), "Failed to get time preferences");
+    public async Task<Result> UpdatePresetAsync(List<CreateTimePreferenceDto> dtos,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var timePreferences = dtos.Select(dto => dto.ToEntity()).ToList();
+            await timePreferencesRepository.UpdatePresetAsync(timePreferences, cancellationToken);
+
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Ошибка при обновлении пресета {Name} для пользователя {UserId]}", dtos.FirstOrDefault()?.Name, dtos.FirstOrDefault()?.UserId);
+            return Error.Failure("UnexpectedError", "Failed to update time preferences");
         }
     }
 }

@@ -35,9 +35,18 @@ public class TimePreferencesRepository(AppDbContext context) : ITimePreferencesR
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task UpdateAsync(TimePreference preference, CancellationToken cancellationToken = default)
+    public async Task UpdatePresetAsync(IEnumerable<TimePreference> preferences,
+        CancellationToken cancellationToken = default)
     {
-        context.TimePreferences.Update(preference);
+        var newPreferences = preferences as TimePreference[] ?? preferences.ToArray();
+        var first = newPreferences.FirstOrDefault();
+        if (first == null) return;
+
+        var existing = context.TimePreferences
+            .Where(tp => tp.UserId == first.UserId && tp.Name == first.Name);
+        context.TimePreferences.RemoveRange(existing);
+
+        await context.TimePreferences.AddRangeAsync(newPreferences, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
     }
 

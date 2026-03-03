@@ -8,7 +8,7 @@ public interface ITimePreferencesRepository
     Task<IEnumerable<TimePreference>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
     Task AddAsync(TimePreference preference, CancellationToken cancellationToken = default);
     Task AddRangeAsync(IEnumerable<TimePreference> preferences, CancellationToken cancellationToken = default);
-    Task UpdateAsync(TimePreference preference, CancellationToken cancellationToken = default);
+    Task UpdatePresetAsync(IEnumerable<TimePreference> preferences, CancellationToken cancellationToken = default);
 
     Task<IEnumerable<TimePreference>> GetByPresetAsync(Guid userId, string name,
         CancellationToken cancellationToken = default);

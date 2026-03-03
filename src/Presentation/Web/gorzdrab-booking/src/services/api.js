@@ -137,6 +137,12 @@ export const createTimePreferences = async preferences => {
 export const getTimePreferences = async presetName =>
   apiCall(`/api/v1/time-preferences/${encodeURIComponent(presetName)}`);
 
+export const updateTimePreferences = async (presetName, preferences) =>
+  apiCall('/api/v1/time-preferences', {
+    method: 'PUT',
+    body: JSON.stringify(preferences),
+  });
+
 export const deleteTimePreferences = async presetName => {
   const userId = getCurrentUserId();
   if (!userId) throw new Error('Не авторизован');

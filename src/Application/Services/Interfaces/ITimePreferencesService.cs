@@ -15,4 +15,7 @@ public interface ITimePreferencesService
 
     Task<Result<TimePreferencesPresetDto>> GetByPresetAsync(Guid userId, string name,
         CancellationToken cancellationToken = default);
+
+    Task<Result> UpdatePresetAsync(List<CreateTimePreferenceDto> dtos,
+        CancellationToken cancellationToken = default);
 }
