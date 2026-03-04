@@ -33,8 +33,18 @@ function CreateRequest() {
   const [success, setSuccess] = useState('');
 
   const [mode, setMode] = useState('referral'); // 'referral' | 'manual'
-  const [referralNumber, setReferralNumber] = useState('');
   const [doctorMode, setDoctorMode] = useState(DOCTOR_MODE.ANY);
+
+  // Referral-specific state
+  const [referralNumber, setReferralNumber] = useState('');
+  const [referralLastName, setReferralLastName] = useState('');
+  const [referralValidating, setReferralValidating] = useState(false);
+  const [referralValidated, setReferralValidated] = useState(false);
+  const [referralPatient, setReferralPatient] = useState(null);
+  const [referralSpecialities, setReferralSpecialities] = useState([]);
+  const [referralSelectedSpecialityId, setReferralSelectedSpecialityId] = useState('');
+  const [referralDoctorMode, setReferralDoctorMode] = useState(DOCTOR_MODE.ANY);
+  const [referralSelectedDoctorIds, setReferralSelectedDoctorIds] = useState([]);
 
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [searchIntervalMinutes, setSearchIntervalMinutes] = useState(60);
@@ -59,18 +69,17 @@ function CreateRequest() {
     return names.map(name => ({ value: name, label: name }));
   }, [presetNames, updateRequestId, currentPreset]);
 
-  // Загрузка пациентов
+  // Загрузка пациентов (только для ручного режима)
   useEffect(() => {
     const load = async () => {
       setLoading(true);
       try {
-        // В режиме изменения пресета пациентов не нужно грузить
         if (!updateRequestId) {
           const data = await api.getPatients();
           setPatients(data || []);
         }
       } catch (e) {
-        setError('Не удалось загрузить список пациентов.');
+        // ignore — пациенты нужны только для ручного режима
       } finally {
         setLoading(false);
       }
@@ -81,39 +90,18 @@ function CreateRequest() {
   // Восстановление состояния формы после возврата из настроек пресетов
   useEffect(() => {
     if (!restoredForm) return;
-    if (restoredForm.selectedPatientId) {
-      setSelectedPatientId(restoredForm.selectedPatientId);
-    }
-    if (restoredForm.mode) {
-      setMode(restoredForm.mode);
-    }
-    if (typeof restoredForm.referralNumber === 'string') {
-      setReferralNumber(restoredForm.referralNumber);
-    }
-    if (restoredForm.selectedSpecialityId) {
-      setSelectedSpecialityId(restoredForm.selectedSpecialityId);
-    }
-    if (typeof restoredForm.doctorMode === 'number') {
-      setDoctorMode(restoredForm.doctorMode);
-    }
-    if (Array.isArray(restoredForm.selectedDoctorIds)) {
-      setSelectedDoctorIds(restoredForm.selectedDoctorIds);
-    }
-    if (typeof restoredForm.searchIntervalMinutes === 'number') {
-      setSearchIntervalMinutes(restoredForm.searchIntervalMinutes);
-    }
-    if (typeof restoredForm.maxDaysToSearch === 'number') {
-      setMaxDaysToSearch(restoredForm.maxDaysToSearch);
-    }
-    if (typeof restoredForm.viewOnly === 'boolean') {
-      setViewOnly(restoredForm.viewOnly);
-    }
-    if (Array.isArray(restoredForm.specificPoints)) {
-      setSpecificPoints(restoredForm.specificPoints);
-    }
-    if (typeof restoredForm.selectedPresetName === 'string') {
-      setSelectedPresetName(restoredForm.selectedPresetName);
-    }
+    if (restoredForm.selectedPatientId) setSelectedPatientId(restoredForm.selectedPatientId);
+    if (restoredForm.mode) setMode(restoredForm.mode);
+    if (typeof restoredForm.referralNumber === 'string') setReferralNumber(restoredForm.referralNumber);
+    if (typeof restoredForm.referralLastName === 'string') setReferralLastName(restoredForm.referralLastName);
+    if (restoredForm.selectedSpecialityId) setSelectedSpecialityId(restoredForm.selectedSpecialityId);
+    if (typeof restoredForm.doctorMode === 'number') setDoctorMode(restoredForm.doctorMode);
+    if (Array.isArray(restoredForm.selectedDoctorIds)) setSelectedDoctorIds(restoredForm.selectedDoctorIds);
+    if (typeof restoredForm.searchIntervalMinutes === 'number') setSearchIntervalMinutes(restoredForm.searchIntervalMinutes);
+    if (typeof restoredForm.maxDaysToSearch === 'number') setMaxDaysToSearch(restoredForm.maxDaysToSearch);
+    if (typeof restoredForm.viewOnly === 'boolean') setViewOnly(restoredForm.viewOnly);
+    if (Array.isArray(restoredForm.specificPoints)) setSpecificPoints(restoredForm.specificPoints);
+    if (typeof restoredForm.selectedPresetName === 'string') setSelectedPresetName(restoredForm.selectedPresetName);
   }, [restoredForm]);
 
   // Загрузка пресетов из API
@@ -123,7 +111,7 @@ function CreateRequest() {
       .catch(() => setPresetNames([]));
   }, []);
 
-  // Загрузка специальностей после выбора пациента
+  // Загрузка специальностей после выбора пациента (ручной режим)
   useEffect(() => {
     const loadSpecialities = async () => {
       if (updateRequestId) return;
@@ -132,7 +120,6 @@ function CreateRequest() {
         setSelectedSpecialityId('');
         return;
       }
-
       try {
         const specs = await api.getSpecialities(selectedPatient.lpuId);
         setSpecialities(specs || []);
@@ -140,35 +127,25 @@ function CreateRequest() {
         setError('Не удалось загрузить специальности для выбранной поликлиники.');
       }
     };
-
     loadSpecialities();
   }, [selectedPatient, updateRequestId]);
 
-  // Загрузка врачей при выборе специальности и режиме "конкретные врачи"
+  // Загрузка врачей при выборе специальности (ручной режим)
   useEffect(() => {
     const loadDoctors = async () => {
       if (updateRequestId) return;
-      if (
-        !selectedPatient?.lpuId ||
-        !selectedSpecialityId ||
-        doctorMode !== DOCTOR_MODE.SPECIFIC
-      ) {
+      if (!selectedPatient?.lpuId || !selectedSpecialityId || doctorMode !== DOCTOR_MODE.SPECIFIC) {
         setDoctors([]);
         setSelectedDoctorIds([]);
         return;
       }
-
       try {
-        const docs = await api.getDoctors(
-          selectedPatient.lpuId,
-          selectedSpecialityId,
-        );
+        const docs = await api.getDoctors(selectedPatient.lpuId, selectedSpecialityId);
         setDoctors(docs || []);
       } catch (e) {
         setError('Не удалось загрузить список врачей.');
       }
     };
-
     loadDoctors();
   }, [selectedPatient, selectedSpecialityId, doctorMode, updateRequestId]);
 
@@ -182,6 +159,35 @@ function CreateRequest() {
     setSelectedDoctorIds(prev =>
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id],
     );
+  };
+
+  const toggleReferralDoctor = id => {
+    setReferralSelectedDoctorIds(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id],
+    );
+  };
+
+  const handleValidateReferral = async () => {
+    if (!referralNumber.trim() || !referralLastName.trim()) {
+      setError('Укажите номер направления и фамилию пациента.');
+      return;
+    }
+    setReferralValidating(true);
+    setError('');
+    setReferralValidated(false);
+    try {
+      const result = await api.validateReferral(referralNumber.trim(), referralLastName.trim());
+      setReferralPatient(result.patientProfile);
+      setReferralSpecialities(result.specialities || []);
+      setReferralSelectedSpecialityId('');
+      setReferralSelectedDoctorIds([]);
+      setReferralDoctorMode(DOCTOR_MODE.ANY);
+      setReferralValidated(true);
+    } catch (e) {
+      setError('Не удалось проверить направление. Проверьте номер и фамилию пациента.');
+    } finally {
+      setReferralValidating(false);
+    }
   };
 
   const addSpecificPoint = () => {
@@ -198,11 +204,19 @@ function CreateRequest() {
     setSpecificPoints(prev => prev.filter((_, i) => i !== index));
   };
 
+  const toTimeSpan = minutes => {
+    const total = Math.max(0, Number(minutes) || 0);
+    const h = String(Math.floor(total / 60)).padStart(2, '0');
+    const m = String(total % 60).padStart(2, '0');
+    return `${h}:${m}:00`;
+  };
+
   const handleSubmit = async e => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
+    // Режим обновления пресета
     if (updateRequestId) {
       const presetName = selectedPresetName?.trim();
       if (!presetName) {
@@ -215,13 +229,6 @@ function CreateRequest() {
           .filter(p => p.time)
           .map(p => new Date(`${todayIso}T${p.time}`));
       const specificStartPoints = filteredStartPoints.length ? filteredStartPoints : null;
-
-      const toTimeSpan = minutes => {
-        const total = Math.max(0, Number(minutes) || 0);
-        const h = String(Math.floor(total / 60)).padStart(2, '0');
-        const m = String(total % 60).padStart(2, '0');
-        return `${h}:${m}:00`;
-      };
 
       setSubmitting(true);
       try {
@@ -243,80 +250,88 @@ function CreateRequest() {
       return;
     }
 
-    if (!selectedPatient) {
-      setError('Выберите пациента.');
-      return;
-    }
-
-    if (mode === 'referral' && !referralNumber.trim()) {
-      setError('Укажите номер направления.');
-      return;
-    }
-
-    if (mode === 'manual' && !selectedSpecialityId) {
-      setError('Выберите специальность.');
-      return;
-    }
-
-    if (
-      mode === 'manual' &&
-      doctorMode === DOCTOR_MODE.SPECIFIC &&
-      selectedDoctorIds.length === 0
-    ) {
-      setError('Выберите хотя бы одного врача или переключите режим на «любой врач».');
-      return;
-    }
-
     if (!selectedPresetName?.trim()) {
       setError('Выберите пресет временных предпочтений или создайте его в разделе «Временные предпочтения».');
       return;
     }
 
     const presetName = selectedPresetName.trim();
-    const specialityEntity = specialities.find(s => s.id === selectedSpecialityId);
-    const selectedDoctorsFull = doctors.filter(d =>
-      selectedDoctorIds.includes(d.id),
-    );
-
     const todayIso = new Date().toISOString().split('T')[0];
     const filteredPoints = specificPoints
         .filter(p => p.time)
         .map(p => new Date(`${todayIso}T${p.time}`));
     const specificStartPoints = filteredPoints.length ? filteredPoints : null;
 
-    const toTimeSpan = minutes => {
-      const total = Math.max(0, Number(minutes) || 0);
-      const h = String(Math.floor(total / 60)).padStart(2, '0');
-      const m = String(total % 60).padStart(2, '0');
-      return `${h}:${m}:00`;
-    };
+    let requestBody;
 
-    const requestBody = {
-      patientProfileId: selectedPatient.id,
-      referralNumber: mode === 'referral' ? referralNumber.trim() : null,
-      lpuName: selectedPatient.lpuShortName || selectedPatient.lpuId || null,
-      speciality:
-        mode === 'manual'
-          ? specialityEntity?.name || specialityEntity?.ferId || null
-          : null,
-      doctorMode:
-        mode === 'manual' && doctorMode === DOCTOR_MODE.SPECIFIC
-          ? DOCTOR_MODE.SPECIFIC
-          : DOCTOR_MODE.ANY,
-      doctorIds:
-        mode === 'manual' && doctorMode === DOCTOR_MODE.SPECIFIC
-          ? selectedDoctorsFull.map(d => d.id)
-          : null,
-      doctorNames:
-        mode === 'manual' && doctorMode === DOCTOR_MODE.SPECIFIC
-          ? selectedDoctorsFull.map(d => d.name)
-          : null,
-      timePreferencesPresetName: presetName,
-      searchInterval: toTimeSpan(searchIntervalMinutes),
-      specificStartPoints,
-      maxDaysToSearch,
-      viewOnly,
-    };
+    if (mode === 'referral') {
+      if (!referralValidated || !referralPatient) {
+        setError('Сначала проверьте направление, нажав кнопку «Проверить направление».');
+        return;
+      }
+      if (!referralSelectedSpecialityId) {
+        setError('Выберите специальность из направления.');
+        return;
+      }
+      if (referralDoctorMode === DOCTOR_MODE.SPECIFIC && referralSelectedDoctorIds.length === 0) {
+        setError('Выберите хотя бы одного врача или переключитесь на режим «Любой врач».');
+        return;
+      }
+
+      const referralSpeciality = referralSpecialities.find(
+        s => String(s.id) === String(referralSelectedSpecialityId),
+      );
+      const referralSelectedDoctors = referralSpeciality?.doctors?.filter(
+        d => referralSelectedDoctorIds.includes(d.id),
+      ) || [];
+
+      requestBody = {
+        patientProfileId: referralPatient.id,
+        referralNumber: referralNumber.trim(),
+        lpuName: referralPatient.lpuShortName || null,
+        speciality: referralSpeciality?.name || referralSpeciality?.ferId || null,
+        doctorMode: referralDoctorMode,
+        doctorIds: referralDoctorMode === DOCTOR_MODE.SPECIFIC ? referralSelectedDoctorIds : null,
+        doctorNames: referralDoctorMode === DOCTOR_MODE.SPECIFIC ? referralSelectedDoctors.map(d => d.name) : null,
+        timePreferencesPresetName: presetName,
+        searchInterval: toTimeSpan(searchIntervalMinutes),
+        specificStartPoints,
+        maxDaysToSearch,
+        viewOnly,
+      };
+    } else {
+      // Ручной режим
+      if (!selectedPatient) {
+        setError('Выберите пациента.');
+        return;
+      }
+      if (!selectedSpecialityId) {
+        setError('Выберите специальность.');
+        return;
+      }
+      if (doctorMode === DOCTOR_MODE.SPECIFIC && selectedDoctorIds.length === 0) {
+        setError('Выберите хотя бы одного врача или переключите режим на «любой врач».');
+        return;
+      }
+
+      const specialityEntity = specialities.find(s => s.id === selectedSpecialityId);
+      const selectedDoctorsFull = doctors.filter(d => selectedDoctorIds.includes(d.id));
+
+      requestBody = {
+        patientProfileId: selectedPatient.id,
+        referralNumber: null,
+        lpuName: selectedPatient.lpuShortName || selectedPatient.lpuId || null,
+        speciality: specialityEntity?.name || specialityEntity?.ferId || null,
+        doctorMode: doctorMode === DOCTOR_MODE.SPECIFIC ? DOCTOR_MODE.SPECIFIC : DOCTOR_MODE.ANY,
+        doctorIds: doctorMode === DOCTOR_MODE.SPECIFIC ? selectedDoctorsFull.map(d => d.id) : null,
+        doctorNames: doctorMode === DOCTOR_MODE.SPECIFIC ? selectedDoctorsFull.map(d => d.name) : null,
+        timePreferencesPresetName: presetName,
+        searchInterval: toTimeSpan(searchIntervalMinutes),
+        specificStartPoints,
+        maxDaysToSearch,
+        viewOnly,
+      };
+    }
 
     setSubmitting(true);
     try {
@@ -345,7 +360,7 @@ function CreateRequest() {
           <p className="mt-1 text-xs text-slate-400 sm:text-sm">
             {updateRequestId
               ? 'Выберите готовый пресет или создайте новый, затем сохраните изменения.'
-              : 'Выберите пациента, укажите тип запроса, врача и временные предпочтения.'}
+              : 'Выберите тип запроса, заполните данные и укажите временные предпочтения.'}
           </p>
         </div>
 
@@ -385,46 +400,7 @@ function CreateRequest() {
             )}
 
             <div className="space-y-3">
-              <div>
-                <label className="mb-2 block text-xs font-medium uppercase tracking-[0.16em] text-slate-300">
-                  Пациент *
-                </label>
-                <Select
-                  value={selectedPatientId}
-                  onChange={setSelectedPatientId}
-                  options={patients.map(p => ({
-                    value: p.id,
-                    label: [
-                      [
-                        p.patientLastName,
-                        p.patientFirstName && `${p.patientFirstName[0]}.`,
-                        p.patientMiddleName && `${p.patientMiddleName[0]}.`,
-                      ]
-                        .filter(Boolean)
-                        .join(' '),
-                      p.lpuShortName || 'ЛПУ',
-                    ].join(' · '),
-                  }))}
-                  placeholder="Выберите пациента"
-                  required
-                />
-              </div>
-
-              {selectedPatient && (
-                <div className="rounded-xl border border-emerald-500/30 bg-slate-950/60 px-3 py-2 text-[11px] text-slate-300">
-                  <p>
-                    <span className="font-medium text-slate-100">Пациент:</span>{' '}
-                    {[selectedPatient.patientLastName, selectedPatient.patientFirstName, selectedPatient.patientMiddleName]
-                      .filter(Boolean)
-                      .join(' ') || selectedPatient.patientFullName || selectedPatient.id}
-                  </p>
-                  <p>
-                    <span className="font-medium text-slate-100">Поликлиника:</span>{' '}
-                    {selectedPatient.lpuShortName || '—'}
-                  </p>
-                </div>
-              )}
-
+              {/* Переключатель режима */}
               <div>
                 <label className="mb-2 block text-xs font-medium uppercase tracking-[0.16em] text-slate-300">
                   Тип запроса
@@ -455,23 +431,49 @@ function CreateRequest() {
                 </div>
               </div>
 
-              {mode === 'referral' && (
-                <div>
-                  <label className="mb-2 block text-xs font-medium uppercase tracking-[0.16em] text-slate-300">
-                    Номер направления *
-                  </label>
-                  <input
-                    value={referralNumber}
-                    onChange={e => setReferralNumber(e.target.value)}
-                    className="input-field"
-                    placeholder="Например, 1234567890"
-                    required
-                  />
-                </div>
-              )}
-
+              {/* Ручной режим: выбор пациента, специальности, врача */}
               {mode === 'manual' && (
                 <>
+                  <div>
+                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.16em] text-slate-300">
+                      Пациент *
+                    </label>
+                    <Select
+                      value={selectedPatientId}
+                      onChange={setSelectedPatientId}
+                      options={patients.map(p => ({
+                        value: p.id,
+                        label: [
+                          [
+                            p.patientLastName,
+                            p.patientFirstName && `${p.patientFirstName[0]}.`,
+                            p.patientMiddleName && `${p.patientMiddleName[0]}.`,
+                          ]
+                            .filter(Boolean)
+                            .join(' '),
+                          p.lpuShortName || 'ЛПУ',
+                        ].join(' · '),
+                      }))}
+                      placeholder="Выберите пациента"
+                      required
+                    />
+                  </div>
+
+                  {selectedPatient && (
+                    <div className="rounded-xl border border-emerald-500/30 bg-slate-950/60 px-3 py-2 text-[11px] text-slate-300">
+                      <p>
+                        <span className="font-medium text-slate-100">Пациент:</span>{' '}
+                        {[selectedPatient.patientLastName, selectedPatient.patientFirstName, selectedPatient.patientMiddleName]
+                          .filter(Boolean)
+                          .join(' ') || selectedPatient.id}
+                      </p>
+                      <p>
+                        <span className="font-medium text-slate-100">Поликлиника:</span>{' '}
+                        {selectedPatient.lpuShortName || '—'}
+                      </p>
+                    </div>
+                  )}
+
                   <div>
                     <label className="mb-2 block text-xs font-medium uppercase tracking-[0.16em] text-slate-300">
                       Специальность *
@@ -541,9 +543,7 @@ function CreateRequest() {
                             {doc.nearestDate && (
                               <span className="ml-1 text-[10px] text-slate-400">
                                 (c{' '}
-                                {new Date(doc.nearestDate).toLocaleDateString(
-                                  'ru-RU',
-                                )}
+                                {new Date(doc.nearestDate).toLocaleDateString('ru-RU')}
                                 )
                               </span>
                             )}
@@ -551,6 +551,153 @@ function CreateRequest() {
                         </label>
                       ))}
                     </div>
+                  )}
+                </>
+              )}
+
+              {/* Режим направления */}
+              {mode === 'referral' && (
+                <>
+                  <div>
+                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.16em] text-slate-300">
+                      Номер направления *
+                    </label>
+                    <input
+                      value={referralNumber}
+                      onChange={e => {
+                        setReferralNumber(e.target.value);
+                        setReferralValidated(false);
+                      }}
+                      className="input-field"
+                      placeholder="Например, 1234567890"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-xs font-medium uppercase tracking-[0.16em] text-slate-300">
+                      Фамилия пациента *
+                    </label>
+                    <input
+                      value={referralLastName}
+                      onChange={e => {
+                        setReferralLastName(e.target.value);
+                        setReferralValidated(false);
+                      }}
+                      className="input-field"
+                      placeholder="Например, Иванов"
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleValidateReferral}
+                    disabled={referralValidating}
+                    className="btn-secondary w-full justify-center text-xs"
+                  >
+                    {referralValidating ? 'Проверяем...' : 'Проверить направление'}
+                  </button>
+
+                  {referralValidated && referralPatient && (
+                    <>
+                      {/* Карточка пациента из направления */}
+                      <div className="rounded-xl border border-emerald-500/30 bg-slate-950/60 px-3 py-2 text-[11px] text-slate-300">
+                        <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-emerald-400">
+                          Пациент найден
+                        </p>
+                        <p>
+                          <span className="font-medium text-slate-100">ФИО:</span>{' '}
+                          {[referralPatient.patientLastName, referralPatient.patientFirstName, referralPatient.patientMiddleName]
+                            .filter(Boolean)
+                            .join(' ') || '—'}
+                        </p>
+                        <p>
+                          <span className="font-medium text-slate-100">Поликлиника:</span>{' '}
+                          {referralPatient.lpuShortName || '—'}
+                        </p>
+                      </div>
+
+                      {/* Специальность из направления — обязательна всегда */}
+                      <div>
+                        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.16em] text-slate-300">
+                          Специальность из направления *
+                        </label>
+                        <Select
+                          value={referralSelectedSpecialityId}
+                          onChange={id => {
+                            setReferralSelectedSpecialityId(id);
+                            setReferralSelectedDoctorIds([]);
+                          }}
+                          options={referralSpecialities.map(s => ({
+                            value: String(s.id),
+                            label: s.name || String(s.id),
+                          }))}
+                          placeholder="Выберите специальность"
+                        />
+                      </div>
+
+                      {/* Выбор режима врача */}
+                      <div>
+                        <label className="mb-2 block text-xs font-medium uppercase tracking-[0.16em] text-slate-300">
+                          Выбор врача
+                        </label>
+                        <div className="inline-flex gap-1 rounded-full bg-slate-900/80 p-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setReferralDoctorMode(DOCTOR_MODE.ANY);
+                              setReferralSelectedDoctorIds([]);
+                            }}
+                            className={`inline-flex items-center rounded-full px-3 py-1.5 text-[11px] font-medium transition ${
+                              referralDoctorMode === DOCTOR_MODE.ANY
+                                ? 'bg-emerald-500 text-slate-950'
+                                : 'text-slate-300 hover:bg-slate-800/80'
+                            }`}
+                          >
+                            Любой врач
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setReferralDoctorMode(DOCTOR_MODE.SPECIFIC)}
+                            className={`inline-flex items-center rounded-full px-3 py-1.5 text-[11px] font-medium transition ${
+                              referralDoctorMode === DOCTOR_MODE.SPECIFIC
+                                ? 'bg-emerald-500 text-slate-950'
+                                : 'text-slate-300 hover:bg-slate-800/80'
+                            }`}
+                          >
+                            Конкретный врач
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Список врачей — только в режиме SPECIFIC */}
+                      {referralDoctorMode === DOCTOR_MODE.SPECIFIC && referralSelectedSpecialityId && (() => {
+                        const spec = referralSpecialities.find(
+                          s => String(s.id) === String(referralSelectedSpecialityId),
+                        );
+                        const docs = spec?.doctors || [];
+                        return (
+                          <div className="max-h-52 space-y-1 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-xs text-slate-200">
+                            {docs.length === 0 && (
+                              <p className="text-slate-400">Нет врачей по данной специальности.</p>
+                            )}
+                            {docs.map(doc => (
+                              <label
+                                key={doc.id}
+                                className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1 hover:bg-slate-900"
+                              >
+                                <input
+                                  type="checkbox"
+                                  className="h-3 w-3 rounded border-slate-600 bg-slate-900"
+                                  checked={referralSelectedDoctorIds.includes(doc.id)}
+                                  onChange={() => toggleReferralDoctor(doc.id)}
+                                />
+                                <span>{doc.name}</span>
+                              </label>
+                            ))}
+                          </div>
+                        );
+                      })()}
+                    </>
                   )}
                 </>
               )}
@@ -565,6 +712,17 @@ function CreateRequest() {
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">
               Временные предпочтения
             </h3>
+
+            {updateRequestId && error && (
+              <div className="mb-3 rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-xs text-rose-100">
+                {error}
+              </div>
+            )}
+            {updateRequestId && success && (
+              <div className="mb-3 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-xs text-emerald-100">
+                {success}
+              </div>
+            )}
 
             <div className="mb-3">
               <label className="mb-1 block text-xs font-medium text-slate-300">
@@ -595,6 +753,7 @@ function CreateRequest() {
                         selectedPatientId,
                         mode,
                         referralNumber,
+                        referralLastName,
                         selectedSpecialityId,
                         doctorMode,
                         selectedDoctorIds,
@@ -748,4 +907,3 @@ function CreateRequest() {
 }
 
 export default CreateRequest;
-

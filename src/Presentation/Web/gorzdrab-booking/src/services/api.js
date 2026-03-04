@@ -91,6 +91,13 @@ export const getDoctors = async (lpuId, specialityId) => {
   return apiCall(`/api/v1/doctor/${lpuId}/${specialityId}`);
 };
 
+// === REFERRAL ===
+export const validateReferral = async (referralNumber, lastName) =>
+  apiCall('/api/v1/referral/validate', {
+    method: 'POST',
+    body: JSON.stringify({ referralNumber, lastName }),
+  });
+
 // === REQUESTS ===
 export const getRequests = async () =>
   apiCall('/api/v1/appointment-search-request');
