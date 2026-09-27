@@ -12,7 +12,8 @@ namespace Infrastructure.Tests.Persistence;
 
 public sealed class DatabaseInitializationTests : IDisposable
 {
-    private readonly string _directory = Path.Combine(Path.GetTempPath(), "GorzdravBooking.Tests", Guid.NewGuid().ToString("N"));
+    private readonly string _directory =
+        Path.Combine(Path.GetTempPath(), "GorzdravBooking.Tests", Guid.NewGuid().ToString("N"));
 
     private ServiceProvider CreateServices()
     {
@@ -21,7 +22,8 @@ public sealed class DatabaseInitializationTests : IDisposable
             ["ConnectionStrings:GorzdravBooking"] = $"Data Source={Path.Combine(_directory, "test.db")};Pooling=False"
         }).Build();
         return new ServiceCollection().AddSingleton<IConfiguration>(configuration)
-            .AddLogging().AddInfrastructure().BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+            .AddLogging().AddInfrastructure()
+            .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
     }
 
     [Fact]
@@ -77,6 +79,6 @@ public sealed class DatabaseInitializationTests : IDisposable
     public void Dispose()
     {
         if (Directory.Exists(_directory))
-            Directory.Delete(_directory, recursive: true);
+            Directory.Delete(_directory, true);
     }
 }

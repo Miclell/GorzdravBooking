@@ -1,6 +1,7 @@
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Server.Configurations;
+using ServiceDefaults;
 
 namespace Server;
 
@@ -11,13 +12,15 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Host.ConfigureLogging();
+        builder.AddServiceDefaults();
         builder.Services.ConfigureApi(builder.Configuration);
+        builder.Services.AddHealthChecks().AddCheck<DatabaseHealthCheck>("database");
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("AllowReact", policy =>
             {
                 policy.WithOrigins(builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-                    ?? ["http://localhost:5173"])
+                                   ?? ["http://localhost:5173"])
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
@@ -36,6 +39,7 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
+        app.MapDefaultEndpoints();
         await app.Services.MigrateDatabaseAsync();
 
         await app.RunAsync();

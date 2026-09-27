@@ -13,7 +13,9 @@ public static class AuthConfiguration
                 options.SlidingExpiration = true;
 
                 options.Cookie.HttpOnly = true;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SecurePolicy = configuration.GetValue<bool>("Authentication:AllowInsecureLocalhost")
+                    ? CookieSecurePolicy.SameAsRequest
+                    : CookieSecurePolicy.Always;
                 options.Cookie.SameSite = SameSiteMode.Strict;
                 options.Cookie.Name = "GorzdravBooking.Cookie";
 
