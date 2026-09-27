@@ -124,6 +124,34 @@ public class ExternalAppointmentServiceTests
     }
 
     [Fact]
+    public async Task GetBySpecialityAsync_NoAvailableAppointments_SkipsDoctor()
+    {
+        // Arrange
+        const int lpuId = 1;
+        const string specialtyId = "specialty_123";
+        var doctor = new Doctor { Id = "doctor_1", Name = "Иванов Иван Иванович" };
+
+        _mockDoctorService
+            .Setup(x => x.GetBySpecialtyAsync(lpuId, specialtyId))
+            .ReturnsAsync([doctor]);
+
+        _fakeApiService.SetupGetResponse(
+            $"schedule/lpu/{lpuId}/doctor/{doctor.Id}/appointments",
+            new ApiResponse<List<Appointment>>
+            {
+                Success = false,
+                ErrorCode = 39,
+                Message = "Нет свободных талонов"
+            });
+
+        // Act
+        var result = await _externalAppointmentService.GetBySpecialityAsync(lpuId, specialtyId);
+
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact]
     public async Task GetBySpecialityAsync_NoDoctors_ReturnsEmptyList()
     {
         // Arrange
@@ -287,6 +315,28 @@ public class ExternalAppointmentServiceTests
                 _externalAppointmentService.GetByDoctorAsync(lpuId, doctorId));
 
         Assert.Contains("Ошибка при получении номерков: Doctor not found", exception.Message);
+    }
+
+    [Fact]
+    public async Task GetByDoctorAsync_NoAvailableAppointments_ReturnsEmptyList()
+    {
+        // Arrange
+        const int lpuId = 1;
+        const string doctorId = "doctor_123";
+        var uri = $"schedule/lpu/{lpuId}/doctor/{doctorId}/appointments";
+
+        _fakeApiService.SetupGetResponse(uri, new ApiResponse<List<Appointment>>
+        {
+            Success = false,
+            ErrorCode = 39,
+            Message = "Нет свободных талонов"
+        });
+
+        // Act
+        var result = await _externalAppointmentService.GetByDoctorAsync(lpuId, doctorId);
+
+        // Assert
+        Assert.Empty(result);
     }
 
     [Fact]

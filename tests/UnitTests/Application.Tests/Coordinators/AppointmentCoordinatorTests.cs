@@ -19,12 +19,14 @@ public class AppointmentCoordinatorTests
 {
     private readonly Mock<IAppointmentService> _appointmentServiceMock;
     private readonly Mock<IExternalAppointmentService> _externalServiceMock;
+    private readonly Mock<IExternalSpecialtyService> _externalSpecialtyServiceMock;
     private readonly AppointmentCoordinator _sut;
     private readonly Mock<ITimePreferencesService> _timePreferencesServiceMock;
 
     public AppointmentCoordinatorTests()
     {
         _externalServiceMock = new Mock<IExternalAppointmentService>();
+        _externalSpecialtyServiceMock = new Mock<IExternalSpecialtyService>();
         _timePreferencesServiceMock = new Mock<ITimePreferencesService>();
         _appointmentServiceMock = new Mock<IAppointmentService>();
         var timeProviderMock = new FakeTimeProvider(
@@ -34,10 +36,50 @@ public class AppointmentCoordinatorTests
 
         _sut = new AppointmentCoordinator(
             _externalServiceMock.Object,
+            _externalSpecialtyServiceMock.Object,
             _timePreferencesServiceMock.Object,
             _appointmentServiceMock.Object,
             timeProviderMock,
             loggerMock.Object);
+    }
+
+    [Fact]
+    public async Task CreateCompleteAppointmentAsync_AnyDoctor_ResolvesSpecialtyNameToId()
+    {
+        // Arrange
+        var request = CreateTestRequest();
+        request.Speciality = "Дерматолог";
+        request.DoctorMode = DoctorSelectionMode.AnyOfSpeciality;
+        request.DoctorIds = null;
+        request.DoctorNames = null;
+        var timePreferences = CreateTimePreferences(request.PatientProfile.UserId);
+
+        _timePreferencesServiceMock
+            .Setup(x => x.GetByPresetAsync(request.PatientProfile.UserId, request.TimePreferencesPresetName, default))
+            .ReturnsAsync(Result.Success(timePreferences));
+
+        _externalSpecialtyServiceMock
+            .Setup(x => x.GetByLpuAsync(123))
+            .ReturnsAsync([
+                new MedicalSpeciality
+                {
+                    Id = "7741",
+                    FerId = "95",
+                    Name = "Дерматолог"
+                }
+            ]);
+
+        _externalServiceMock
+            .Setup(x => x.GetBySpecialityAsync(123, "7741"))
+            .ReturnsAsync([]);
+
+        // Act
+        var result = await _sut.CreateCompleteAppointmentAsync(request);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.False(result.Value);
+        _externalServiceMock.Verify(x => x.GetBySpecialityAsync(123, "7741"), Times.Once);
     }
 
     [Fact]

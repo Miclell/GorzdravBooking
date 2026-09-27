@@ -165,6 +165,10 @@ public class FakeApiService(FakeApiDataService dataService) : IApiService
         {
             var lpuId = int.Parse(match.Groups[1].Value);
             var specialtyId = Uri.UnescapeDataString(match.Groups[2].Value);
+
+            if (dataService.GetSpecialty(specialtyId) == null)
+                return ErrorResponse<TResponse>($"Specialty '{specialtyId}' was not found");
+
             var doctors = dataService.GetDoctorsBySpecialty(lpuId, specialtyId);
             return SuccessResponse<TResponse>(doctors);
         }
