@@ -1,26 +1,29 @@
 <Solution>
-  <Folder Name="/Solution Items/">
-    <File Path="Directory.Build.props" />
-    <File Path="Directory.Packages.props" />
-    <File Path="global.json" />
-    <File Path="dotnet-tools.json" />
-    <File Path="README.md" />
-    <File Path="compose.yaml" />
-  </Folder>
-  <Folder Name="/src/">
-    <Project Path="src/Application/Application.csproj" />
-    <Project Path="src/Core/Core.csproj" />
-    <Project Path="src/Infrastructure/Infrastructure.csproj" />
-  </Folder>
-  <Folder Name="/src/Presentation/">
-    <Project Path="src/Presentation/CLI/CLI.csproj" />
-    <Project Path="src/Presentation/Server/Server.csproj" />
-  </Folder>
-  <Folder Name="/tests/" />
-  <Folder Name="/tests/EndToEndTests/" />
-  <Folder Name="/tests/IntegrationTests/" />
-  <Folder Name="/tests/UnitTests/">
-    <Project Path="tests/UnitTests/Application.Tests/Application.Tests.csproj" />
-    <Project Path="tests/UnitTests/Infrastructure.Tests/Infrastructure.Tests.csproj" />
-  </Folder>
+    <Folder Name="/Solution Items/">
+        <File Path="Directory.Build.props" />
+        <File Path="Directory.Packages.props" />
+        <File Path="global.json" />
+        <File Path="dotnet-tools.json" />
+        <File Path="README.md" />
+        <File Path="compose.yaml" />
+    </Folder>
+    <Folder Name="/_build/">
+        <Project Path="_build/_build.csproj"/>
+    </Folder>
+    <Folder Name="/src/">
+        <Project Path="src/Application/Application.csproj" />
+        <Project Path="src/Core/Core.csproj" />
+        <Project Path="src/Infrastructure/Infrastructure.csproj" />
+    </Folder>
+    <Folder Name="/src/Presentation/">
+        <Project Path="src/Presentation/CLI/CLI.csproj" />
+        <Project Path="src/Presentation/Server/Server.csproj" />
+    </Folder>
+    <Folder Name="/tests/" />
+    <Folder Name="/tests/EndToEndTests/" />
+    <Folder Name="/tests/IntegrationTests/" />
+    <Folder Name="/tests/UnitTests/">
+        <Project Path="tests/UnitTests/Application.Tests/Application.Tests.csproj" />
+        <Project Path="tests/UnitTests/Infrastructure.Tests/Infrastructure.Tests.csproj" />
+    </Folder>
 </Solution>

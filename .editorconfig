@@ -1,0 +1,11 @@
+[_build/Build.cs]
+# NUKE discovers Target properties on the build instance; making them static breaks dependency discovery.
+dotnet_diagnostic.CA1822.severity = none
+resharper_member_can_be_made_static_local_highlighting = none
+
+# NUKE target and parameter names are part of its command-line API, and Build.cs has no application namespace.
+resharper_inconsistent_naming_highlighting = none
+resharper_check_namespace_highlighting = none
+
+# NUKE populates the nullable Runtime field through reflection; its explicit default avoids CS0649.
+resharper_redundant_default_member_initializer_highlighting = none
