@@ -63,3 +63,6 @@ lerna-debug.log*
 
 # Auto Claude data directory
 .auto-claude/
+
+# Empty artifact left by a local CLI invocation (currently locked by that process)
+/--db-type
