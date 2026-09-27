@@ -55,7 +55,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasDatabaseName("IX_Users_CreatedAt");
 
         // Optional: Check constraints
-        builder.HasCheckConstraint("CK_Users_Username_Length",
-            @"LENGTH(""username"") >= 3");
+        builder.ToTable(table => table.HasCheckConstraint("CK_Users_Username_Length",
+            @"LENGTH(""username"") >= 3"));
     }
 }

@@ -1,4 +1,10 @@
 # .NET
+artifacts/
+.nuke/temp/
+.nuke/build.schema.json
+TestResults/
+data/
+*.bak
 bin/
 obj/
 /packages/
@@ -7,6 +13,10 @@ obj/
 riderModule.iml
 
 # IDE
+kanban/
+.claude/settings.local.json
+**/.vscode/*
+!**/.vscode/extensions.json
 .idea/
 .vs/
 .vscode/*

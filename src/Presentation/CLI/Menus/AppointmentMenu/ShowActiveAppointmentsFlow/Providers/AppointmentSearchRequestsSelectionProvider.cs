@@ -29,7 +29,7 @@ public class AppointmentSearchRequestsSelectionProvider(IServiceProvider service
         return Task.FromResult(new MenuState($"Выберите действие для запроса " +
                                              $"{appointment!.LpuName}" +
                                              $"{appointment.DoctorNames} | " +
-                                             $"{appointment.TimePreferencesPresetName}", items,
+                                             $"{appointment!.TimePreferencesPresetName}", items,
             header: HeaderFactorySetup.SetupHeader()));
     }
 }

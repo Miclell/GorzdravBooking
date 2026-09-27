@@ -15,8 +15,7 @@ namespace Server.Controllers;
 [Route($"{ApiRoutes.ApiV1Prefix}/[controller]")]
 public class AppointmentSearchRequestController(
     IAppointmentSearchRequestService appointmentSearchRequestService,
-    IAuthorizationProvider authorizationProvider,
-    ILogger<AppointmentSearchRequestController> logger) : ControllerBase
+    IAuthorizationProvider authorizationProvider) : ControllerBase
 {
     [HttpPost("create")]
     public async Task<ActionResult<Guid>> Create([FromBody] CreateAppointmentSearchRequestDto request)

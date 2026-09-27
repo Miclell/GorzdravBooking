@@ -15,8 +15,7 @@ namespace Server.Controllers;
 [Route($"{ApiRoutes.ApiV1Prefix}/[controller]")]
 public class AppointmentController(
     IAppointmentService appointmentService,
-    IAuthorizationProvider authorizationProvider,
-    ILogger<AppointmentController> logger) : ControllerBase
+    IAuthorizationProvider authorizationProvider) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<AppointmentListItemDto>> Get()

@@ -81,10 +81,10 @@ public class PatientProfileConfiguration : IEntityTypeConfiguration<PatientProfi
             .HasDatabaseName("IX_PatientProfiles_UserId_PatientId_Unique");
 
         // Check constraints
-        builder.HasCheckConstraint("CK_PatientProfiles_Email_Format",
-            @"""RecipientEmail"" IS NULL OR ""RecipientEmail"" LIKE '%@%.%'");
+        builder.ToTable(table => table.HasCheckConstraint("CK_PatientProfiles_Email_Format",
+            @"""RecipientEmail"" IS NULL OR ""RecipientEmail"" LIKE '%@%.%'"));
 
-        builder.HasCheckConstraint("CK_PatientProfiles_Birthdate",
-            @"""PatientBirthdate"" <= CURRENT_DATE");
+        builder.ToTable(table => table.HasCheckConstraint("CK_PatientProfiles_Birthdate",
+            @"""PatientBirthdate"" <= CURRENT_DATE"));
     }
 }

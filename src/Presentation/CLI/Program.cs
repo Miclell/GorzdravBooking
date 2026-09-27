@@ -22,7 +22,8 @@ public static class Program
     {
         Console.OutputEncoding = Encoding.UTF8;
 
-        var host = Host.CreateDefaultBuilder(args)
+        var migrateOnly = args.Contains("--migrate-only", StringComparer.Ordinal);
+        using var host = Host.CreateDefaultBuilder(args.Where(arg => arg != "--migrate-only").ToArray())
             .ConfigureLogging(logging =>
             {
                 logging.ClearProviders();
@@ -38,11 +39,12 @@ public static class Program
             })
             .Build();
 
+        await host.Services.MigrateDatabaseAsync();
+        if (migrateOnly)
+            return;
+
         using (var scope = host.Services.CreateScope())
         {
-            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            await db.Database.MigrateAsync();
-
             var appSettingsService = scope.ServiceProvider.GetRequiredService<IAppSettingsService>();
             await appSettingsService.AppInitializeAsync();
         }

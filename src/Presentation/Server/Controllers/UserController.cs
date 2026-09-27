@@ -12,8 +12,7 @@ namespace Server.Controllers;
 [RequireUserClaims]
 [Route($"{ApiRoutes.ApiV1Prefix}/[controller]")]
 public class UserController(
-    IUserService userService,
-    ILogger<UserController> logger) : ControllerBase
+    IUserService userService) : ControllerBase
 {
     [HttpDelete]
     public async Task<IActionResult> DeleteUser()

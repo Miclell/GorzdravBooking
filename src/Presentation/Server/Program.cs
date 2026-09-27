@@ -16,7 +16,8 @@ public class Program
         {
             options.AddPolicy("AllowReact", policy =>
             {
-                policy.WithOrigins("http://localhost:5173") // Vite порт
+                policy.WithOrigins(builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+                    ?? ["http://localhost:5173"])
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
@@ -28,21 +29,14 @@ public class Program
         // Swagger
         app.UseSwaggerWithUi();
 
-        app.UseHttpsRedirection();
-        app.MapControllers();
-
-        app.UseCors("AllowReact");
+        if (!app.Environment.IsDevelopment())
+            app.UseHttpsRedirection();
         app.UseRouting();
-
+        app.UseCors("AllowReact");
         app.UseAuthentication();
         app.UseAuthorization();
-
-        // Migrations TODO вынести
-        using (var scope = app.Services.CreateScope())
-        {
-            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            await db.Database.MigrateAsync();
-        }
+        app.MapControllers();
+        await app.Services.MigrateDatabaseAsync();
 
         await app.RunAsync();
     }

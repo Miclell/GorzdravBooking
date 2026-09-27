@@ -95,7 +95,7 @@ public class AppointmentServiceTests
                 LogLevel.Error,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) =>
-                    v.ToString()
+                    (v.ToString() ?? string.Empty)
                         .Contains($"Ошибка при создании записи на прием для пациента {createDto.PatientProfileId}")),
                 exception,
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
