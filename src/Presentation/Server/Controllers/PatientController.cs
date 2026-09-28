@@ -17,8 +17,7 @@ public class
     PatientController(
     IPatientService patientService,
     IExternalPatientService externalPatientService,
-    IAuthorizationProvider authorizationProvider,
-    ILogger<PatientController> logger) : ControllerBase
+    IAuthorizationProvider authorizationProvider) : ControllerBase
 {
     [Authorize]
     [RequireUserClaims]

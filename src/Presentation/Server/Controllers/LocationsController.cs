@@ -9,8 +9,7 @@ namespace Server.Controllers;
 [Route($"{ApiRoutes.ApiV1Prefix}/[controller]")]
 public class LocationsController(
     IExternalDistrictService districtService,
-    IExternalLpuService lpuService,
-    ILogger<LocationsController> logger) : ControllerBase
+    IExternalLpuService lpuService) : ControllerBase
 {
     [HttpGet("districts")]
     public async Task<ActionResult<List<District>>> GetDistricts()

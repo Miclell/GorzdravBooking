@@ -17,6 +17,10 @@ public class CreateAppointmentSearchRequestDtoValidator : AbstractValidator<Crea
         RuleFor(x => x.Speciality)
             .NotEmpty().WithMessage("Специальность обязательна");
 
+        RuleFor(x => x.SpecialityId)
+            .NotEmpty().WithMessage("ID специальности обязателен для ручного поиска")
+            .When(x => string.IsNullOrWhiteSpace(x.ReferralNumber));
+
         RuleFor(x => x.DoctorMode)
             .IsInEnum().WithMessage("Неверный режим выбора врача");
 

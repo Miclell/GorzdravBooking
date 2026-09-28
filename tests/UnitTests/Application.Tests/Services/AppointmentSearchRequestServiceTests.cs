@@ -69,6 +69,37 @@ public class AppointmentSearchRequestServiceTests
     }
 
     [Fact]
+    public async Task CreateAsync_ManualRequestWithoutSpecialityId_ReturnsValidationError()
+    {
+        var dto = CreateValidDto();
+        dto.SpecialityId = null;
+
+        var result = await _sut.CreateAsync(dto);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("SearchRequest.SpecialityIdRequired", result.Error.Code);
+        _repositoryMock.Verify(x => x.AddAsync(
+            It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task CreateAsync_ReferralRequest_DoesNotRequireSpecialityId()
+    {
+        var dto = CreateValidDto();
+        dto.ReferralNumber = "referral-123";
+        dto.SpecialityId = null;
+        AppointmentSearchRequest? capturedRequest = null;
+        _repositoryMock.Setup(x => x.AddAsync(It.IsAny<AppointmentSearchRequest>(), default))
+            .Callback<AppointmentSearchRequest, CancellationToken>((request, _) => capturedRequest = request);
+
+        var result = await _sut.CreateAsync(dto);
+
+        Assert.True(result.IsSuccess);
+        Assert.IsType<ReferralSearchRequest>(capturedRequest);
+        Assert.Null(capturedRequest.SpecialityId);
+    }
+
+    [Fact]
     public async Task CreateAsync_CreatesManualSearchRequest_WhenDoctorModeIsSpecific()
     {
         // Arrange
@@ -88,6 +119,8 @@ public class AppointmentSearchRequestServiceTests
         // Assert
         Assert.NotNull(capturedRequest);
         Assert.Equal(dto.LpuName, capturedRequest.LpuName);
+        Assert.Equal(dto.Speciality, capturedRequest.Speciality);
+        Assert.Equal(dto.SpecialityId, capturedRequest.SpecialityId);
         Assert.Equal(dto.DoctorNames, capturedRequest.DoctorNames);
     }
 
@@ -337,6 +370,7 @@ public class AppointmentSearchRequestServiceTests
             PatientProfileId = Guid.NewGuid(),
             LpuName = "Test Hospital",
             Speciality = "Test Speciality",
+            SpecialityId = "92134141",
             DoctorMode = doctorMode,
             DoctorIds = ["doc123"],
             DoctorNames = ["Dr. Smith"],

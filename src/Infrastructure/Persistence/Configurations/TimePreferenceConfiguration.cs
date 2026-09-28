@@ -64,9 +64,9 @@ public class TimePreferenceConfiguration : IEntityTypeConfiguration<TimePreferen
             .HasDatabaseName("IX_TimePreferences_UserId_Name");
 
         // Check constraints
-        builder.HasCheckConstraint("CK_TimePreferences_TimeRange",
+        builder.ToTable(table => table.HasCheckConstraint("CK_TimePreferences_TimeRange",
             @"(""PreferredTimeFrom"" IS NULL AND ""PreferredTimeTo"" IS NULL) OR 
               (""PreferredTimeFrom"" IS NOT NULL AND ""PreferredTimeTo"" IS NOT NULL AND 
-               ""PreferredTimeFrom"" < ""PreferredTimeTo"")");
+               ""PreferredTimeFrom"" < ""PreferredTimeTo"")"));
     }
 }

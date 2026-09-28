@@ -1,0 +1,15 @@
+﻿<Project>
+    <!-- SDK VERSION CHECKER -->
+    <Target Name="CheckSdkVersion" BeforeTargets="Build">
+        <Error
+                Condition="$([MSBuild]::VersionLessThan('$(NETCoreSdkVersion)', '10.0.0'))"
+                Text="Требуется .NET SDK 10.0.0 или выше. Текущая версия: $(NETCoreSdkVersion)"
+        />
+    </Target>
+
+    <!-- EXCLUDE NUKE -->
+    <PropertyGroup Condition="$(MSBuildProjectName.Contains('_build'))">
+        <IsPublishable>false</IsPublishable>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+</Project>

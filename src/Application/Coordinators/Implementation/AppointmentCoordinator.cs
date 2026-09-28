@@ -146,9 +146,14 @@ public class AppointmentCoordinator(
             }
             else
             {
+                var lpuId = int.Parse(manualSearchRequest.PatientProfile.LpuId);
+                var specialtyId = manualSearchRequest.SpecialityId;
+                if (string.IsNullOrWhiteSpace(specialtyId))
+                    throw new InvalidOperationException("Specialty ID is required for manual search requests");
+
                 appointments.AddRange(await externalAppointmentService.GetBySpecialityAsync(
-                    int.Parse(manualSearchRequest.PatientProfile.LpuId),
-                    request.Speciality));
+                    lpuId,
+                    specialtyId));
             }
 
             return appointments;

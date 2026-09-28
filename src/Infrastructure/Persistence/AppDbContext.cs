@@ -17,18 +17,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Appointment> Appointments { get; set; }
     public DbSet<AppSetting> AppSettings { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        // Включаем логирование SQL запросов в консоль
-        optionsBuilder
-            .EnableSensitiveDataLogging() // Показывает значения параметров
-            .LogTo(Console.WriteLine, LogLevel.Trace) // Логи в консоль
-            .LogTo(message => Debug.WriteLine(message), LogLevel.Trace); // Логи в Debug output
-
-
-        base.OnConfiguring(optionsBuilder);
-    }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

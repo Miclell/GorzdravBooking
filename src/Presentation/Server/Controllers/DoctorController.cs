@@ -8,8 +8,7 @@ namespace Server.Controllers;
 [ApiController]
 [Route($"{ApiRoutes.ApiV1Prefix}/[controller]")]
 public class DoctorController(
-    IExternalDoctorService doctorService,
-    ILogger<DoctorController> logger) : ControllerBase
+    IExternalDoctorService doctorService) : ControllerBase
 {
     [HttpGet("{lpuId:int}/{specialityId}")]
     public async Task<ActionResult<List<Doctor>>> GetBySpeciality(int lpuId, string specialityId)

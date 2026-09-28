@@ -7,6 +7,7 @@ public abstract class AppointmentSearchRequest : IPatientOwnedEntity
 {
     public string LpuName { get; set; } = null!;
     public string Speciality { get; set; } = null!;
+    public string? SpecialityId { get; set; }
     public DoctorSelectionMode DoctorMode { get; set; } = DoctorSelectionMode.SpecificDoctorOrRange;
     public List<string>? DoctorIds { get; set; }
     public List<string>? DoctorNames { get; set; }

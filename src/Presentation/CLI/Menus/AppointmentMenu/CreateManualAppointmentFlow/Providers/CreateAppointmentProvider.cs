@@ -30,6 +30,7 @@ public class CreateAppointmentProvider(IServiceProvider serviceProvider) : IMenu
             PatientProfileId = patient!.Id,
             LpuName = patient.LpuShortName,
             Speciality = speciality!.Name,
+            SpecialityId = speciality.Id,
             DoctorMode = isAnyOfSpeciality
                 ? DoctorSelectionMode.AnyOfSpeciality
                 : DoctorSelectionMode.SpecificDoctorOrRange,

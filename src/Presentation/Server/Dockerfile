@@ -1,23 +1,13 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-USER $APP_UID
-WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
-
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-ARG BUILD_CONFIGURATION=Release
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["src/Presentation/Server/Server.csproj", "src/Presentation/Server/"]
-RUN dotnet restore "src/Presentation/Server/Server.csproj"
 COPY . .
-WORKDIR "/src/src/Presentation/Server"
-RUN dotnet build "./Server.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet publish src/Presentation/Server/Server.csproj -c Release -o /app/publish /p:UseAppHost=false
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Server.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-FROM base AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+RUN mkdir /data && chown $APP_UID /data
+ENV ConnectionStrings__GorzdravBooking="Data Source=/data/GorzdravBooking.db"
+USER $APP_UID
+EXPOSE 8080
+COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "Server.dll"]

@@ -322,6 +322,7 @@ function CreateRequest() {
         referralNumber: null,
         lpuName: selectedPatient.lpuShortName || selectedPatient.lpuId || null,
         speciality: specialityEntity?.name || specialityEntity?.ferId || null,
+        specialityId: specialityEntity?.id || null,
         doctorMode: doctorMode === DOCTOR_MODE.SPECIFIC ? DOCTOR_MODE.SPECIFIC : DOCTOR_MODE.ANY,
         doctorIds: doctorMode === DOCTOR_MODE.SPECIFIC ? selectedDoctorsFull.map(d => d.id) : null,
         doctorNames: doctorMode === DOCTOR_MODE.SPECIFIC ? selectedDoctorsFull.map(d => d.name) : null,

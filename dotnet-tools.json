@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "slopwatch.cmd": {
+      "version": "0.4.2",
+      "commands": [
+        "slopwatch"
+      ],
+      "rollForward": false
+    },
+    "nuke.globaltool": {
+      "version": "10.1.0",
+      "commands": [
+        "nuke"
+      ],
+      "rollForward": false
+    },
+    "dotnet-ef": {
+      "version": "10.0.12",
+      "commands": [
+        "dotnet-ef"
+      ],
+      "rollForward": false
+    },
+    "aspire.cli": {
+      "version": "13.5.4",
+      "commands": [
+        "aspire"
+      ],
+      "rollForward": false
+    }
+  }
+}

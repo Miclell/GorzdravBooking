@@ -101,7 +101,7 @@ public class UserServiceTests
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Ошибка при добавление User")),
+                It.Is<It.IsAnyType>((v, t) => (v == null ? string.Empty : v.ToString() ?? string.Empty).Contains("Ошибка при добавление User")),
                 It.IsAny<Exception?>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()!),
             Times.Once);
@@ -147,7 +147,7 @@ public class UserServiceTests
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Database error deleting user {userId}")),
+                It.Is<It.IsAnyType>((v, t) => (v == null ? string.Empty : v.ToString() ?? string.Empty).Contains($"Database error deleting user {userId}")),
                 exception,
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()!),
             Times.Once);
@@ -243,7 +243,7 @@ public class UserServiceTests
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Database error update user {userId} password")),
+                It.Is<It.IsAnyType>((v, t) => (v == null ? string.Empty : v.ToString() ?? string.Empty).Contains($"Database error update user {userId} password")),
                 exception,
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()!),
             Times.Once);

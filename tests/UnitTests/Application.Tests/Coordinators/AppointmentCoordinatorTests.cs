@@ -41,6 +41,35 @@ public class AppointmentCoordinatorTests
     }
 
     [Fact]
+    public async Task CreateCompleteAppointmentAsync_AnyDoctor_UsesStoredSpecialtyId()
+    {
+        // Arrange
+        var request = CreateTestRequest();
+        request.Speciality = "Дерматолог";
+        request.SpecialityId = "7741";
+        request.DoctorMode = DoctorSelectionMode.AnyOfSpeciality;
+        request.DoctorIds = null;
+        request.DoctorNames = null;
+        var timePreferences = CreateTimePreferences(request.PatientProfile.UserId);
+
+        _timePreferencesServiceMock
+            .Setup(x => x.GetByPresetAsync(request.PatientProfile.UserId, request.TimePreferencesPresetName, default))
+            .ReturnsAsync(Result.Success(timePreferences));
+
+        _externalServiceMock
+            .Setup(x => x.GetBySpecialityAsync(123, "7741"))
+            .ReturnsAsync([]);
+
+        // Act
+        var result = await _sut.CreateCompleteAppointmentAsync(request);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.False(result.Value);
+        _externalServiceMock.Verify(x => x.GetBySpecialityAsync(123, "7741"), Times.Once);
+    }
+
+    [Fact]
     public async Task CreateCompleteAppointmentAsync_TimePreferencesNotFound_ReturnsFailure()
     {
         // Arrange

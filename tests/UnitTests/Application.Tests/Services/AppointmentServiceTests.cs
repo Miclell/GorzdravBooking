@@ -95,7 +95,7 @@ public class AppointmentServiceTests
                 LogLevel.Error,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) =>
-                    v.ToString()
+                    (v == null ? string.Empty : v.ToString() ?? string.Empty)
                         .Contains($"Ошибка при создании записи на прием для пациента {createDto.PatientProfileId}")),
                 exception,
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
@@ -209,7 +209,7 @@ public class AppointmentServiceTests
             x => x.Log(
                 LogLevel.Warning,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Не удалось отменить запись во внешней системе")),
+                It.Is<It.IsAnyType>((v, t) => (v == null ? string.Empty : v.ToString() ?? string.Empty).Contains("Не удалось отменить запись во внешней системе")),
                 It.IsAny<Exception?>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
@@ -251,7 +251,7 @@ public class AppointmentServiceTests
                 LogLevel.Error,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) =>
-                    v.ToString()!.Contains($"Ошибка при удалении записи на прием {appointmentId}")),
+                    (v == null ? string.Empty : v.ToString() ?? string.Empty).Contains($"Ошибка при удалении записи на прием {appointmentId}")),
                 exception,
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
@@ -469,7 +469,7 @@ public class AppointmentServiceTests
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Ошибка при получении записи {appointmentId}")),
+                It.Is<It.IsAnyType>((v, t) => (v == null ? string.Empty : v.ToString() ?? string.Empty).Contains($"Ошибка при получении записи {appointmentId}")),
                 exception,
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);

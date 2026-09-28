@@ -13,9 +13,7 @@ namespace Server.Controllers;
 [RequireUserClaims]
 [Route($"{ApiRoutes.ApiV1Prefix}/[controller]")]
 public class TimePreferencesController(
-    ITimePreferencesService timePreferencesService,
-    IAuthorizationProvider authorizationProvider,
-    ILogger<TimePreferencesController> logger) : ControllerBase
+    ITimePreferencesService timePreferencesService) : ControllerBase
 {
     [HttpPost("create")]
     public async Task<ActionResult<List<Guid>>> Create([FromBody] List<CreateTimePreferenceDto> request)

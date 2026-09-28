@@ -1,13 +1,16 @@
-﻿services:
-  web:
-    image: web
-    build:
-      context: .
-      dockerfile: src/Presentation/Web/Dockerfile
-
+services:
   server:
-    image: server
+    image: gorzdravbooking-server:local
     build:
       context: .
       dockerfile: src/Presentation/Server/Dockerfile
+    ports:
+      - "5023:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    volumes:
+      - gorzdrav-data:/data
+
+volumes:
+  gorzdrav-data:
 

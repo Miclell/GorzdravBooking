@@ -18,12 +18,12 @@ public class AppointmentSchedulerWorker(
     {
         await eventBus.PublishAsync(new SearchServiceStatusChanged(true, true), stoppingToken);
 
-        logger.LogDebug("Сервис запущен в {Time}", DateTime.Now);
+        logger.LogInformation("Планировщик записей запущен");
 
         while (!stoppingToken.IsCancellationRequested)
         {
             var startTime = DateTime.UtcNow;
-            logger.LogDebug("Запуск проверки записей в {Time}", startTime);
+            logger.LogInformation("Запуск проверки записей в {Time}", startTime);
 
             try
             {

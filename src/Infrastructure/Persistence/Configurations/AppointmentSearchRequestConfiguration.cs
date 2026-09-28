@@ -38,6 +38,9 @@ public class AppointmentSearchRequestConfiguration : IEntityTypeConfiguration<Ap
             .IsRequired()
             .HasMaxLength(300);
 
+        builder.Property(asr => asr.SpecialityId)
+            .HasMaxLength(100);
+
         builder.Property(asr => asr.DoctorMode)
             .IsRequired()
             .HasConversion<string>();

@@ -11,6 +11,7 @@ using Infrastructure.Security;
 using Infrastructure.Services;
 using Infrastructure.Stubs;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure;
@@ -20,11 +21,12 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
         // Database
-        services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlite("Data Source=GorzdravBooking.db"));
+        services.AddDbContext<AppDbContext>((provider, options) =>
+            options.UseSqlite(DatabaseConfiguration.GetConnectionString(
+                provider.GetRequiredService<IConfiguration>())));
 
         // ApiClient
-        //services.AddGorzdravClient();
+        // services.AddGorzdravClient(); // Local, unpublished real client.
         services.AddFakeGorzdravClient();
 
         // Services

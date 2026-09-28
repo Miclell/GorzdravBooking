@@ -11,6 +11,8 @@ public class ExternalAppointmentService(
     IApiService apiService,
     IExternalDoctorService externalDoctorService) : IExternalAppointmentService
 {
+    private const int NoAvailableAppointmentsErrorCode = 39;
+
     public async Task<List<(string Doctor, Appointment Appointment)>> GetBySpecialityAsync(int lpuId,
         string specialtyId)
     {
@@ -23,9 +25,10 @@ public class ExternalAppointmentService(
                 await apiService.GetAsync<List<Appointment>>(
                     GorzdravApiEndpoints.AppointmentsByDoctor(lpuId, doctor.Id));
 
+            if (response.ErrorCode == NoAvailableAppointmentsErrorCode)
+                continue;
+
             if (!response.Success)
-                //continue;
-                // TODO найти оптимальное решение
                 throw new HttpRequestException($"Ошибка при получении номерков: {response.Message}");
 
             if (response.Result != null) result.AddRange(response.Result.Select(a => (doctor.Name, a)));
@@ -38,6 +41,9 @@ public class ExternalAppointmentService(
     {
         var response =
             await apiService.GetAsync<List<Appointment>>(GorzdravApiEndpoints.AppointmentsByDoctor(lpuId, doctorId));
+
+        if (response.ErrorCode == NoAvailableAppointmentsErrorCode)
+            return [];
 
         if (!response.Success)
             throw new HttpRequestException($"Ошибка при получении номерков: {response.Message}");

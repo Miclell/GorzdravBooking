@@ -12,6 +12,7 @@ public class CreateAppointmentSearchRequestDto
 
     public string LpuName { get; set; } = null!;
     public string Speciality { get; set; } = null!;
+    public string? SpecialityId { get; set; }
     public DoctorSelectionMode DoctorMode { get; set; }
     public List<string>? DoctorIds { get; set; }
     public List<string>? DoctorNames { get; set; }
