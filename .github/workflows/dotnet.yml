@@ -29,6 +29,6 @@ jobs:
       - name: Restore local tools
         run: dotnet tool restore
       - name: Build and test .NET projects
-        run: dotnet nuke --target Test
+        run: dotnet nuke --target Test --verbosity normal
       - name: Check source with Slopwatch
-        run: dotnet nuke --target Slopwatch
+        run: dotnet nuke --target Slopwatch --verbosity normal
