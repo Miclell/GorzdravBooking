@@ -6,6 +6,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Xunit;
 
 namespace Infrastructure.Tests.Persistence;
@@ -21,9 +22,12 @@ public sealed class DatabaseInitializationTests : IDisposable
         {
             ["ConnectionStrings:GorzdravBooking"] = $"Data Source={Path.Combine(_directory, "test.db")};Pooling=False"
         }).Build();
-        return new ServiceCollection().AddSingleton<IConfiguration>(configuration)
-            .AddLogging().AddInfrastructure()
-            .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
+        var services = new ServiceCollection().AddSingleton<IConfiguration>(configuration)
+            .AddLogging().AddInfrastructure();
+        services.RemoveAll<IApiService>();
+        services.TryAddSingleton<FakeApiDataService>();
+        services.AddScoped<IApiService, FakeApiService>();
+        return services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
     }
 
     [Fact]
