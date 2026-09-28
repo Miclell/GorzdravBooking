@@ -7,10 +7,11 @@ using CLI.Menus;
 using Core.Events.Common;
 using Infrastructure;
 using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Events;
 using StatefulMenu;
 using StatefulMenu.Core.Interfaces;
 
@@ -23,13 +24,19 @@ public static class Program
         Console.OutputEncoding = Encoding.UTF8;
 
         var migrateOnly = args.Contains("--migrate-only", StringComparer.Ordinal);
-        using var host = Host.CreateDefaultBuilder(args.Where(arg => arg != "--migrate-only").ToArray())
-            .ConfigureLogging(logging =>
-            {
-                logging.ClearProviders();
-                AddDebugLogging(logging);
-                //AddProductionLogging(logging);
-            })
+        using var host = Host.CreateDefaultBuilder([.. args.Where(arg => arg != "--migrate-only")])
+            .ConfigureLogging(logging => logging.ClearProviders())
+            .UseSerilog((_, _, logging) => logging
+                .MinimumLevel.Information()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("System", LogEventLevel.Warning)
+                .WriteTo.File(
+                    Path.Combine(AppContext.BaseDirectory, "logs", "cli-.log"),
+                    rollingInterval: RollingInterval.Day,
+                    fileSizeLimitBytes: 10 * 1024 * 1024,
+                    rollOnFileSizeLimit: true,
+                    retainedFileCountLimit: 7,
+                    shared: true))
             .ConfigureServices((_, services) =>
             {
                 services.AddInfrastructure();
@@ -64,43 +71,5 @@ public static class Program
         {
             await host.StopAsync();
         }
-    }
-
-    private static void AddDebugLogging(ILoggingBuilder logging)
-    {
-        logging.AddConsole(_ => { })
-            .AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning)
-            .AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning)
-            .AddFilter("System.Net.Http", LogLevel.Warning)
-            .AddFilter("Default", LogLevel.Information)
-            .AddFilter("Infrastructure", LogLevel.Debug)
-            .AddFilter("Core", LogLevel.Debug)
-            .AddFilter("Application", LogLevel.Debug)
-            .AddFilter("CLI", LogLevel.Debug);
-    }
-
-    private static void AddProductionLogging(ILoggingBuilder logging)
-    {
-        logging.AddConsole(_ => { });
-
-        logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.None);
-        logging.AddFilter("Microsoft.EntityFrameworkCore.Database", LogLevel.None);
-        logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.None);
-        logging.AddFilter("Microsoft.EntityFrameworkCore.Infrastructure", LogLevel.None);
-        logging.AddFilter("Microsoft.EntityFrameworkCore.Query", LogLevel.None);
-        logging.AddFilter("Microsoft.EntityFrameworkCore.Update", LogLevel.None);
-
-        logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.None);
-        logging.AddFilter("Microsoft.AspNetCore.Hosting", LogLevel.None);
-        logging.AddFilter("Microsoft.AspNetCore.Routing", LogLevel.None);
-
-        logging.AddFilter("System.Net.Http.HttpClient", LogLevel.None);
-        logging.AddFilter("System.Net.Http.HttpClient.*", LogLevel.None);
-
-        logging.AddFilter("Default", LogLevel.Information);
-        logging.AddFilter("Infrastructure", LogLevel.Information);
-        logging.AddFilter("Core", LogLevel.Information);
-        logging.AddFilter("Application", LogLevel.Information);
-        logging.AddFilter("CLI", LogLevel.Information);
     }
 }
