@@ -15,7 +15,7 @@ namespace Infrastructure.Persistence.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.8");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.12");
 
             modelBuilder.Entity("Core.Entities.AppSetting", b =>
                 {
@@ -147,6 +147,10 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<string>("Speciality")
                         .IsRequired()
                         .HasMaxLength(300)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SpecialityId")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.PrimitiveCollection<string>("SpecificStartPoints")

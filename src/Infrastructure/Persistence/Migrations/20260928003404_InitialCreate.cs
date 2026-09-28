@@ -131,6 +131,7 @@ namespace Infrastructure.Persistence.Migrations
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     LpuName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
                     Speciality = table.Column<string>(type: "TEXT", maxLength: 300, nullable: false),
+                    SpecialityId = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
                     DoctorMode = table.Column<string>(type: "TEXT", nullable: false),
                     DoctorIds = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
                     DoctorNames = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),

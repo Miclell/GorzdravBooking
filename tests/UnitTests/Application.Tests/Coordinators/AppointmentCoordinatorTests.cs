@@ -19,14 +19,12 @@ public class AppointmentCoordinatorTests
 {
     private readonly Mock<IAppointmentService> _appointmentServiceMock;
     private readonly Mock<IExternalAppointmentService> _externalServiceMock;
-    private readonly Mock<IExternalSpecialtyService> _externalSpecialtyServiceMock;
     private readonly AppointmentCoordinator _sut;
     private readonly Mock<ITimePreferencesService> _timePreferencesServiceMock;
 
     public AppointmentCoordinatorTests()
     {
         _externalServiceMock = new Mock<IExternalAppointmentService>();
-        _externalSpecialtyServiceMock = new Mock<IExternalSpecialtyService>();
         _timePreferencesServiceMock = new Mock<ITimePreferencesService>();
         _appointmentServiceMock = new Mock<IAppointmentService>();
         var timeProviderMock = new FakeTimeProvider(
@@ -36,7 +34,6 @@ public class AppointmentCoordinatorTests
 
         _sut = new AppointmentCoordinator(
             _externalServiceMock.Object,
-            _externalSpecialtyServiceMock.Object,
             _timePreferencesServiceMock.Object,
             _appointmentServiceMock.Object,
             timeProviderMock,
@@ -44,11 +41,12 @@ public class AppointmentCoordinatorTests
     }
 
     [Fact]
-    public async Task CreateCompleteAppointmentAsync_AnyDoctor_ResolvesSpecialtyNameToId()
+    public async Task CreateCompleteAppointmentAsync_AnyDoctor_UsesStoredSpecialtyId()
     {
         // Arrange
         var request = CreateTestRequest();
         request.Speciality = "Дерматолог";
+        request.SpecialityId = "7741";
         request.DoctorMode = DoctorSelectionMode.AnyOfSpeciality;
         request.DoctorIds = null;
         request.DoctorNames = null;
@@ -57,17 +55,6 @@ public class AppointmentCoordinatorTests
         _timePreferencesServiceMock
             .Setup(x => x.GetByPresetAsync(request.PatientProfile.UserId, request.TimePreferencesPresetName, default))
             .ReturnsAsync(Result.Success(timePreferences));
-
-        _externalSpecialtyServiceMock
-            .Setup(x => x.GetByLpuAsync(123))
-            .ReturnsAsync([
-                new MedicalSpeciality
-                {
-                    Id = "7741",
-                    FerId = "95",
-                    Name = "Дерматолог"
-                }
-            ]);
 
         _externalServiceMock
             .Setup(x => x.GetBySpecialityAsync(123, "7741"))

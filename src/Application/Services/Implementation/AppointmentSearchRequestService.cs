@@ -19,6 +19,10 @@ public class AppointmentSearchRequestService(
     {
         try
         {
+            if (createDto.ReferralNumber is null && string.IsNullOrWhiteSpace(createDto.SpecialityId))
+                return Error.Validation("SearchRequest.SpecialityIdRequired",
+                    "Specialty ID is required for manual search requests");
+
             AppointmentSearchRequest request;
             if (createDto.ReferralNumber != null)
                 request = new ReferralSearchRequest
@@ -31,6 +35,7 @@ public class AppointmentSearchRequestService(
             request.PatientProfileId = createDto.PatientProfileId;
             request.LpuName = createDto.LpuName;
             request.Speciality = createDto.Speciality;
+            request.SpecialityId = createDto.SpecialityId;
             request.DoctorMode = createDto.DoctorMode;
             request.DoctorIds = createDto.DoctorIds;
             request.DoctorNames = createDto.DoctorNames;

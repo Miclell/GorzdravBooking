@@ -13,7 +13,6 @@ namespace Application.Coordinators.Implementation;
 
 public class AppointmentCoordinator(
     IExternalAppointmentService externalAppointmentService,
-    IExternalSpecialtyService externalSpecialtyService,
     ITimePreferencesService timePreferencesService,
     IAppointmentService appointmentService,
     TimeProvider timeProvider,
@@ -148,7 +147,9 @@ public class AppointmentCoordinator(
             else
             {
                 var lpuId = int.Parse(manualSearchRequest.PatientProfile.LpuId);
-                var specialtyId = await ResolveSpecialtyIdAsync(lpuId, request.Speciality);
+                var specialtyId = manualSearchRequest.SpecialityId;
+                if (string.IsNullOrWhiteSpace(specialtyId))
+                    throw new InvalidOperationException("Specialty ID is required for manual search requests");
 
                 appointments.AddRange(await externalAppointmentService.GetBySpecialityAsync(
                     lpuId,
@@ -188,21 +189,6 @@ public class AppointmentCoordinator(
         }
 
         throw new NotSupportedException();
-    }
-
-    private async Task<string> ResolveSpecialtyIdAsync(int lpuId, string specialty)
-    {
-        var specialties = await externalSpecialtyService.GetByLpuAsync(lpuId);
-        var matchingSpecialty = specialties.FirstOrDefault(candidate =>
-            string.Equals(candidate.Id, specialty, StringComparison.OrdinalIgnoreCase)
-            || string.Equals(candidate.FerId, specialty, StringComparison.OrdinalIgnoreCase)
-            || string.Equals(candidate.Name, specialty, StringComparison.CurrentCultureIgnoreCase));
-
-        if (matchingSpecialty == null)
-            throw new InvalidOperationException(
-                $"Specialty '{specialty}' was not found for LPU '{lpuId}'");
-
-        return matchingSpecialty.Id;
     }
 
     private static (string Doctor, Appointment Appointment)? TryGetPreferAppointment(
