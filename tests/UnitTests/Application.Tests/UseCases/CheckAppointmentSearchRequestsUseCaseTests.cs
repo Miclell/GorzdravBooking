@@ -142,4 +142,45 @@ public class CheckAppointmentSearchRequestsUseCaseTests
             x => x.CreateCompleteAppointmentAsync(It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()),
             Times.Once);
     }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenIntervalHasNotElapsed_DoesNotProcessRequest()
+    {
+        var request = new ManualSearchRequest
+        {
+            LastSearchAttempt = DateTime.UtcNow.AddMinutes(-5),
+            SearchInterval = TimeSpan.FromHours(1),
+            SpecificStartPoints = []
+        };
+
+        _mockRepo.Setup(x => x.GetActiveAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([request]);
+
+        await _useCase.ExecuteAsync();
+
+        _mockCoordinator.Verify(x => x.CreateCompleteAppointmentAsync(
+            It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mockRepo.Verify(x => x.UpdateAsync(
+            It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenSpecificStartPointIsInFuture_DoesNotProcessRequest()
+    {
+        var request = new ManualSearchRequest
+        {
+            CreatedAt = DateTime.UtcNow.AddHours(-1),
+            SpecificStartPoints = [DateTime.UtcNow.AddHours(1)]
+        };
+
+        _mockRepo.Setup(x => x.GetActiveAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([request]);
+
+        await _useCase.ExecuteAsync();
+
+        _mockCoordinator.Verify(x => x.CreateCompleteAppointmentAsync(
+            It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mockRepo.Verify(x => x.UpdateAsync(
+            It.IsAny<AppointmentSearchRequest>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
 }
