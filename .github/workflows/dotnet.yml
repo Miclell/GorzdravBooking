@@ -13,22 +13,80 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  check:
-    name: check-${{ matrix.os }}
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-          - os: windows-latest
-    runs-on: ${{ matrix.os }}
+  slopwatch:
+    name: Slopwatch
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-      - name: Restore local tools
-        run: dotnet tool restore
-      - name: Build and test .NET projects
-        run: dotnet nuke --target Test --verbosity normal
-      - name: Check source with Slopwatch
-        run: dotnet nuke --target Slopwatch --verbosity normal
+      - name: Check source
+        run: |
+          dotnet tool restore
+          dotnet nuke --target Slopwatch --verbosity normal
+
+  unit-tests:
+    name: Unit tests
+    needs: slopwatch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Run unit tests
+        run: |
+          dotnet tool restore
+          dotnet nuke --target Test --verbosity normal
+
+  cli:
+    name: Build CLI (${{ matrix.runtime }})
+    needs: unit-tests
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [linux-x64, win-x64]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Publish CLI
+        run: |
+          dotnet tool restore
+          dotnet nuke --target CLI --runtime ${{ matrix.runtime }} --verbosity normal
+
+  server:
+    name: Build server
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Publish server
+        run: |
+          dotnet tool restore
+          dotnet nuke --target Server --verbosity normal
+
+  frontend:
+    name: Build frontend
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: src/Presentation/Web/gorzdrab-booking/package-lock.json
+      - name: Build frontend
+        run: |
+          dotnet tool restore
+          dotnet nuke --target Frontend --verbosity normal

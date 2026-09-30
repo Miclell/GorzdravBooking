@@ -5,10 +5,15 @@
         <File Path="global.json" />
         <File Path="dotnet-tools.json" />
         <File Path="README.md" />
-        <File Path="compose.yaml" />
     </Folder>
     <Folder Name="/_build/">
-        <Project Path="_build/_build.csproj"/>
+        <Project Path="_build/_build.csproj" />
+    </Folder>
+    <Folder Name="/ops/">
+        <File Path="ops/build.cmd" />
+        <File Path="ops/build.ps1" />
+        <File Path="ops/build.sh" />
+        <File Path="ops/compose.yaml" />
     </Folder>
     <Folder Name="/src/">
         <Project Path="src/Application/Application.csproj" />

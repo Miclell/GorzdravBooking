@@ -1,11 +1,34 @@
+root = true
+
+[*]
+end_of_line = lf
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+insert_final_newline = true
+charset = utf-8
+
+[*.{cmd,bat}]
+end_of_line = crlf
+
+[*.{json,csproj,xml,props,targets}]
+indent_size = 2
+
+[*.cs]
+csharp_style_namespace_declarations = file_scoped:warning
+resharper_csharp_space_within_single_line_array_initializer_braces = true
+dotnet_style_readonly_field = true:warning
+dotnet_naming_rule.private_fields_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_underscore.style = underscore_camel
+dotnet_naming_rule.private_fields_underscore.severity = warning
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_style.underscore_camel.required_prefix = _
+dotnet_naming_style.underscore_camel.capitalization = camel_case
+
 [_build/Build.cs]
-# NUKE discovers Target properties on the build instance; making them static breaks dependency discovery.
 dotnet_diagnostic.CA1822.severity = none
 resharper_member_can_be_made_static_local_highlighting = none
-
-# NUKE target and parameter names are part of its command-line API, and Build.cs has no application namespace.
 resharper_inconsistent_naming_highlighting = none
 resharper_check_namespace_highlighting = none
-
-# NUKE populates the nullable Runtime field through reflection; its explicit default avoids CS0649.
 resharper_redundant_default_member_initializer_highlighting = none

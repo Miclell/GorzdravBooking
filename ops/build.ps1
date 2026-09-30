@@ -1,5 +1,5 @@
 $ErrorActionPreference = 'Stop'
-Push-Location $PSScriptRoot
+Push-Location (Join-Path $PSScriptRoot '..')
 try {
     dotnet run --project ./_build/_build.csproj --configuration Release -- @args
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

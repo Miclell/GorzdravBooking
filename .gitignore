@@ -1,4 +1,5 @@
 # .NET
+/.slopwatch/baseline.json
 artifacts/
 .nuke/temp/
 .nuke/build.schema.json
