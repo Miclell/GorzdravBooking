@@ -41,12 +41,8 @@ jobs:
           dotnet nuke --target Test --verbosity normal
 
   cli:
-    name: Build CLI (${{ matrix.runtime }})
+    name: Build CLI
     needs: unit-tests
-    strategy:
-      fail-fast: false
-      matrix:
-        runtime: [linux-x64, win-x64]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
