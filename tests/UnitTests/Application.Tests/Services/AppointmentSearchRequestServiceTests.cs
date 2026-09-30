@@ -174,7 +174,7 @@ public class AppointmentSearchRequestServiceTests
             TimeSpan.FromMinutes(5),
             30,
             false
-            );
+        );
         var existingRequest = CreateTestRequest(requestId, presetName: "OldPreset");
 
         _repositoryMock
@@ -204,7 +204,7 @@ public class AppointmentSearchRequestServiceTests
         );
         _repositoryMock
             .Setup(x => x.GetByIdAsync(dto.RequestId, default))
-            .ReturnsAsync((AppointmentSearchRequest?)null);
+            .ReturnsAsync((AppointmentSearchRequest?) null);
 
         // Act
         var result = await _sut.UpdateTimePreferencesAsync(dto);

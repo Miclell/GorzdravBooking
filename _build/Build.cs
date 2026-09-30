@@ -1,18 +1,13 @@
-using Nuke.Common;
-using Nuke.Common.IO;
-using Nuke.Common.Tools.DotNet;
-using Nuke.Common.Tooling;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
+using Nuke.Common;
+using Nuke.Common.IO;
+using Nuke.Common.Tooling;
+using Nuke.Common.Tools.DotNet;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
 internal class BuildPipeline : NukeBuild
 {
-    public static int Main()
-    {
-        return Execute<BuildPipeline>(build => build.Build);
-    }
-
     [Parameter("Build configuration (Debug or Release).")]
     private readonly string Configuration = "Release";
 
@@ -30,30 +25,29 @@ internal class BuildPipeline : NukeBuild
             if (Runtime is not null)
                 return ValidateRuntime(Runtime);
 
-            if (OperatingSystem.IsAndroid() || RuntimeInformation.RuntimeIdentifier.StartsWith("linux-bionic-", StringComparison.Ordinal))
-                throw new PlatformNotSupportedException("Termux uses Android bionic; this self-contained single-file CLI target does not support it. Build and run with the Termux .NET SDK instead.");
+            if (OperatingSystem.IsAndroid() ||
+                RuntimeInformation.RuntimeIdentifier.StartsWith("linux-bionic-", StringComparison.Ordinal))
+                throw new PlatformNotSupportedException(
+                    "Termux uses Android bionic; this self-contained single-file CLI target does not support it. Build and run with the Termux .NET SDK instead.");
 
             var architecture = RuntimeInformation.OSArchitecture.ToString().ToLowerInvariant();
             if (architecture is not ("x64" or "arm64"))
                 throw new PlatformNotSupportedException("Use --runtime to select a supported x64 or arm64 target.");
 
-            var system = OperatingSystem.IsWindows() ? "win"
-                : OperatingSystem.IsMacOS() ? "osx"
-                : OperatingSystem.IsLinux() && RuntimeInformation.RuntimeIdentifier.StartsWith("linux-musl-", StringComparison.Ordinal)
-                    ? "linux-musl"
-                : OperatingSystem.IsLinux() ? "linux"
-                : throw new PlatformNotSupportedException("Use --runtime to select a supported target.");
+            var system = OperatingSystem.IsWindows()
+                ? "win"
+                : OperatingSystem.IsMacOS()
+                    ? "osx"
+                    : OperatingSystem.IsLinux() &&
+                      RuntimeInformation.RuntimeIdentifier.StartsWith("linux-musl-", StringComparison.Ordinal)
+                        ? "linux-musl"
+                        : OperatingSystem.IsLinux()
+                            ? "linux"
+                            : throw new PlatformNotSupportedException("Use --runtime to select a supported target.");
 
             return ValidateRuntime($"{system}-{architecture}");
         }
     }
-
-    private static string ValidateRuntime(string runtime) => runtime switch
-    {
-        "linux-x64" or "linux-arm64" or "linux-musl-x64" or "linux-musl-arm64"
-            or "win-x64" or "win-arm64" or "osx-x64" or "osx-arm64" => runtime,
-        _ => throw new ArgumentException("--runtime must be a supported portable .NET RID, such as linux-x64.")
-    };
 
     private Target Restore => target => target.Executes(() =>
         DotNetRestore(settings => settings.SetProjectFile(SolutionFile)));
@@ -62,15 +56,20 @@ internal class BuildPipeline : NukeBuild
         DotNetBuild(settings => settings.SetProjectFile(SolutionFile)
             .SetConfiguration(Configuration).EnableNoRestore()));
 
-    private Target Test => target => target.DependsOn(Build).Executes(() =>
-        DotNetTest(settings => settings.SetProjectFile(SolutionFile).SetConfiguration(Configuration)
-            .EnableNoBuild().SetResultsDirectory(Artifacts / "test-results")
-            .SetLoggers("trx").SetDataCollector("XPlat Code Coverage")));
+    private Target Test => target => target.Executes(() =>
+    {
+        var projects = (RootDirectory / "tests/UnitTests").GlobFiles("**/*.csproj");
+        if (projects.Count == 0)
+            throw new InvalidOperationException("No unit test projects found in tests/UnitTests.");
+
+        foreach (var project in projects)
+            DotNetTest(settings => settings.SetProjectFile(project).SetConfiguration(Configuration));
+    });
 
     private Target Slopwatch => target => target.Executes(() =>
     {
         DotNet("tool restore", RootDirectory);
-        DotNet("slopwatch analyze --fail-on warning", RootDirectory);
+        DotNet("slopwatch analyze --no-baseline --fail-on warning", RootDirectory);
     });
 
     [UsedImplicitly]
@@ -84,8 +83,7 @@ internal class BuildPipeline : NukeBuild
         npm("run build", FrontendDirectory);
     });
 
-    [UsedImplicitly]
-    private Target Check => target => target.DependsOn(Test, Slopwatch, Frontend);
+    [UsedImplicitly] private Target Check => target => target.DependsOn(Test, Slopwatch, Frontend);
 
     [UsedImplicitly]
     private Target CLI => target => target.Executes(() =>
@@ -111,4 +109,19 @@ internal class BuildPipeline : NukeBuild
         ToolResolver.GetPathTool("docker")(
             "build -f src/Presentation/Server/Dockerfile -t gorzdravbooking-server:local .",
             RootDirectory));
+
+    public static int Main()
+    {
+        return Execute<BuildPipeline>(build => build.Build);
+    }
+
+    private static string ValidateRuntime(string runtime)
+    {
+        return runtime switch
+        {
+            "linux-x64" or "linux-arm64" or "linux-musl-x64" or "linux-musl-arm64"
+                or "win-x64" or "win-arm64" or "osx-x64" or "osx-arm64" => runtime,
+            _ => throw new ArgumentException("--runtime must be a supported portable .NET RID, such as linux-x64.")
+        };
+    }
 }

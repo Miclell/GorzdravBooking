@@ -17,7 +17,7 @@ public class UserController(
     [HttpDelete]
     public async Task<IActionResult> DeleteUser()
     {
-        var userId = (Guid)HttpContext.Items["UserId"]!;
+        var userId = (Guid) HttpContext.Items["UserId"]!;
 
         var result = await userService.Delete(userId);
 
@@ -31,7 +31,7 @@ public class UserController(
     public async Task<IActionResult> UpdatePassword(
         [FromBody] UpdatePasswordRequest request)
     {
-        var userId = (Guid)HttpContext.Items["UserId"]!;
+        var userId = (Guid) HttpContext.Items["UserId"]!;
 
         var result = await userService.UpdatePassword(userId, request.NewPassword);
 

@@ -101,7 +101,7 @@ public class FakeApiService(FakeApiDataService dataService) : IApiService
         return new ApiResponse<TResponse>
         {
             Success = result.Success,
-            Result = (TResponse)(object)result.Result,
+            Result = (TResponse) (object) result.Result,
             Message = result.Message,
             ErrorCode = result.ErrorCode
         };
@@ -113,7 +113,7 @@ public class FakeApiService(FakeApiDataService dataService) : IApiService
         return new ApiResponse<TResponse>
         {
             Success = result.Success,
-            Result = (TResponse)(object)result.Result,
+            Result = (TResponse) (object) result.Result,
             Message = result.Message,
             ErrorCode = result.ErrorCode
         };
@@ -125,7 +125,7 @@ public class FakeApiService(FakeApiDataService dataService) : IApiService
         return new ApiResponse<TResponse>
         {
             Success = result.Success,
-            Result = (TResponse)(object)result.Result,
+            Result = (TResponse) (object) result.Result,
             Message = result.Message,
             ErrorCode = result.ErrorCode
         };
@@ -236,7 +236,7 @@ public class FakeApiService(FakeApiDataService dataService) : IApiService
         return new ApiResponse<TResponse>
         {
             Success = true,
-            Result = (TResponse)result
+            Result = (TResponse) result
         };
     }
 

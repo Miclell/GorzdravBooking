@@ -43,14 +43,14 @@ public class TimePreferenceConfiguration : IEntityTypeConfiguration<TimePreferen
         builder.Property(tp => tp.PreferredTimeFrom)
             .IsRequired(false)
             .HasConversion(
-                time => time.HasValue ? time.Value.ToTimeSpan() : (TimeSpan?)null,
+                time => time.HasValue ? time.Value.ToTimeSpan() : (TimeSpan?) null,
                 ts => ts.HasValue ? TimeOnly.FromTimeSpan(ts.Value) : null
             );
 
         builder.Property(tp => tp.PreferredTimeTo)
             .IsRequired(false)
             .HasConversion(
-                time => time.HasValue ? time.Value.ToTimeSpan() : (TimeSpan?)null,
+                time => time.HasValue ? time.Value.ToTimeSpan() : (TimeSpan?) null,
                 ts => ts.HasValue ? TimeOnly.FromTimeSpan(ts.Value) : null
             );
 

@@ -39,7 +39,6 @@ public class ExternalSpecialtyServiceTests
         };
 
         const int lpuId = 1;
-        // ВОЗМОЖНО НУЖНО ИСПРАВИТЬ URI - проверь реальный запрос
         var uri = GorzdravApiEndpoints.SpecialtiesByLpu(lpuId);
 
         fakeApiService.SetupGetResponse(uri, new ApiResponse<List<MedicalSpeciality>>

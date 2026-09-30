@@ -22,11 +22,12 @@ public static class DatabaseConfiguration
     private static string GetDataDirectory()
     {
         // Source runs share one database; published apps keep it beside the executable.
-        for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
-        {
+        for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
+             directory is not null;
+             directory = directory.Parent)
             if (File.Exists(Path.Combine(directory.FullName, "GorzdravBooking.slnx")))
                 return Path.Combine(directory.FullName, "data");
-        }
+
         return AppContext.BaseDirectory;
     }
 }

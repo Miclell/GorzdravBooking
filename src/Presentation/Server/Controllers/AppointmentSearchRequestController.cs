@@ -20,7 +20,7 @@ public class AppointmentSearchRequestController(
     [HttpPost("create")]
     public async Task<ActionResult<Guid>> Create([FromBody] CreateAppointmentSearchRequestDto request)
     {
-        var userId = (Guid)HttpContext.Items["UserId"]!;
+        var userId = (Guid) HttpContext.Items["UserId"]!;
 
         var canAccess = await authorizationProvider
             .CanAccessAsync<PatientProfile>(userId, request.PatientProfileId);
@@ -39,7 +39,7 @@ public class AppointmentSearchRequestController(
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AppointmentSearchRequestDto>>> Get()
     {
-        var userId = (Guid)HttpContext.Items["UserId"]!;
+        var userId = (Guid) HttpContext.Items["UserId"]!;
 
         var result = await appointmentSearchRequestService.GetActiveByUserAsync(userId);
 
@@ -52,7 +52,7 @@ public class AppointmentSearchRequestController(
     [HttpPatch("update")]
     public async Task<IActionResult> Update([FromBody] UpdatePreferencesDto request)
     {
-        var userId = (Guid)HttpContext.Items["UserId"]!;
+        var userId = (Guid) HttpContext.Items["UserId"]!;
 
         var canAccess = await authorizationProvider
             .CanAccessAsync<AppointmentSearchRequest>(userId, request.RequestId);
@@ -71,7 +71,7 @@ public class AppointmentSearchRequestController(
     [HttpDelete]
     public async Task<IActionResult> Delete([FromBody] Guid requestId)
     {
-        var userId = (Guid)HttpContext.Items["UserId"]!;
+        var userId = (Guid) HttpContext.Items["UserId"]!;
 
         var canAccess = await authorizationProvider
             .CanAccessAsync<AppointmentSearchRequest>(userId, requestId);

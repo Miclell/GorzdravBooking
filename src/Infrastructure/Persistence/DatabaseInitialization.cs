@@ -6,7 +6,8 @@ namespace Infrastructure.Persistence;
 
 public static class DatabaseInitialization
 {
-    public static async Task MigrateDatabaseAsync(this IServiceProvider services, CancellationToken cancellationToken = default)
+    public static async Task MigrateDatabaseAsync(this IServiceProvider services,
+        CancellationToken cancellationToken = default)
     {
         await using var scope = services.CreateAsyncScope();
         var database = scope.ServiceProvider.GetRequiredService<AppDbContext>().Database;

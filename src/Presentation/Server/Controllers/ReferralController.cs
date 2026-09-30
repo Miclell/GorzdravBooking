@@ -16,7 +16,7 @@ public class ReferralController(ProcessReferralUseCase processReferralUseCase) :
     [HttpPost("validate")]
     public async Task<ActionResult<ReferralValidationResult>> Validate([FromBody] ValidateReferralDto request)
     {
-        var userId = (Guid)HttpContext.Items["UserId"]!;
+        var userId = (Guid) HttpContext.Items["UserId"]!;
 
         var result = await processReferralUseCase.Execute(
             new ReferralValidationRequest(userId, request.ReferralNumber, request.LastName));

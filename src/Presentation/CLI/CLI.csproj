@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\..\Application\Application.csproj" />
-        <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Application\Application.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Infrastructure.csproj" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Serilog.Extensions.Hosting" />
-      <PackageReference Include="Serilog.Sinks.File" />
-      <PackageReference Include="StatefulMenu" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Serilog.Extensions.Hosting" />
+    <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="StatefulMenu" />
+  </ItemGroup>
 
 </Project>

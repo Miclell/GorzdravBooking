@@ -13,18 +13,18 @@ namespace Server.Controllers;
 
 [ApiController]
 [Route($"{ApiRoutes.ApiV1Prefix}/[controller]")]
-public class 
+public class
     PatientController(
-    IPatientService patientService,
-    IExternalPatientService externalPatientService,
-    IAuthorizationProvider authorizationProvider) : ControllerBase
+        IPatientService patientService,
+        IExternalPatientService externalPatientService,
+        IAuthorizationProvider authorizationProvider) : ControllerBase
 {
     [Authorize]
     [RequireUserClaims]
     [HttpPost("create")]
     public async Task<ActionResult<Guid>> Create([FromBody] CreatePatientDto request)
     {
-        var userId = (Guid)HttpContext.Items["UserId"]!;
+        var userId = (Guid) HttpContext.Items["UserId"]!;
 
         if (userId != request.UserId)
             return Forbid();
@@ -48,7 +48,7 @@ public class
     [HttpGet]
     public async Task<ActionResult<IEnumerable<BasePatientProfileDto>>> Get()
     {
-        var userId = (Guid)HttpContext.Items["UserId"]!;
+        var userId = (Guid) HttpContext.Items["UserId"]!;
 
         var result = await patientService.GetByUser(userId);
 
@@ -63,7 +63,7 @@ public class
     [HttpDelete]
     public async Task<IActionResult> Delete([FromBody] Guid patientId)
     {
-        var userId = (Guid)HttpContext.Items["UserId"]!;
+        var userId = (Guid) HttpContext.Items["UserId"]!;
 
         var canAccess = await authorizationProvider
             .CanAccessAsync<PatientProfile>(userId, patientId);

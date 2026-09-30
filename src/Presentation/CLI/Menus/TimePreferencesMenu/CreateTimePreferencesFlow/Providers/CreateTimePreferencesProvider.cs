@@ -61,7 +61,7 @@ public class CreateTimePreferencesProvider(
             return result;
         }
 
-        var timeSelectionMode = (TimeSelectionMode)(await inputService
+        var timeSelectionMode = (TimeSelectionMode) (await inputService
             .ReadModelAsync<TimeSelectionModeInputModel>())!.TimeSelectionMode;
 
         if (timeSelectionMode == TimeSelectionMode.WeekdayPattern)

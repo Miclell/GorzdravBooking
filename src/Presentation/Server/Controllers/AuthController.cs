@@ -55,8 +55,8 @@ public class AuthController(
     [HttpGet("me")]
     public ActionResult<UserResponse> GetCurrentUser()
     {
-        var userId = (Guid)HttpContext.Items["UserId"]!;
-        var username = (string)HttpContext.Items["Username"]!;
+        var userId = (Guid) HttpContext.Items["UserId"]!;
+        var username = (string) HttpContext.Items["Username"]!;
 
         return new UserResponse(username, userId);
     }

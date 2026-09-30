@@ -132,7 +132,8 @@ public class TimePreferencesService(
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Ошибка при обновлении пресета {Name} для пользователя {UserId]}", dtos.FirstOrDefault()?.Name, dtos.FirstOrDefault()?.UserId);
+            logger.LogError(e, "Ошибка при обновлении пресета {Name} для пользователя {UserId]}",
+                dtos.FirstOrDefault()?.Name, dtos.FirstOrDefault()?.UserId);
             return Error.Failure("UnexpectedError", "Failed to update time preferences");
         }
     }
