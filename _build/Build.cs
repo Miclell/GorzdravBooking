@@ -69,7 +69,7 @@ internal class BuildPipeline : NukeBuild
     private Target Slopwatch => target => target.Executes(() =>
     {
         DotNet("tool restore", RootDirectory);
-        DotNet("slopwatch analyze --fail-on warning", RootDirectory);
+        DotNet("slopwatch analyze --no-baseline --fail-on warning", RootDirectory);
     });
 
     [UsedImplicitly]
