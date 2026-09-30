@@ -1,6 +1,5 @@
 ﻿using Application.DTOs.TimePreferences;
 using Application.Services.Interfaces;
-using Core.Interfaces.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Auth;
@@ -18,7 +17,7 @@ public class TimePreferencesController(
     [HttpPost("create")]
     public async Task<ActionResult<List<Guid>>> Create([FromBody] List<CreateTimePreferenceDto> request)
     {
-        var userId = (Guid)HttpContext.Items["UserId"]!;
+        var userId = (Guid) HttpContext.Items["UserId"]!;
 
         if (request.Any(tp => tp.UserId != userId))
             return Forbid();
@@ -34,7 +33,7 @@ public class TimePreferencesController(
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TimePreferencesPresetDto>>> GetAll()
     {
-        var userId = (Guid)HttpContext.Items["UserId"]!;
+        var userId = (Guid) HttpContext.Items["UserId"]!;
         var result = await timePreferencesService.GetByUserAsync(userId);
         if (result.IsSuccess)
             return Ok(result.Value);
@@ -44,7 +43,7 @@ public class TimePreferencesController(
     [HttpGet("{name}")]
     public async Task<ActionResult<TimePreferencesPresetDto>> Get(string name)
     {
-        var userId = (Guid)HttpContext.Items["UserId"]!;
+        var userId = (Guid) HttpContext.Items["UserId"]!;
 
         var result = await timePreferencesService.GetByPresetAsync(userId, name);
 
@@ -57,13 +56,13 @@ public class TimePreferencesController(
     [HttpPut]
     public async Task<ActionResult> Update([FromBody] List<CreateTimePreferenceDto> request)
     {
-        var userId = (Guid)HttpContext.Items["UserId"]!;
-        
+        var userId = (Guid) HttpContext.Items["UserId"]!;
+
         if (request.Any(tp => tp.UserId != userId))
             return Forbid();
-        
+
         var result = await timePreferencesService.UpdatePresetAsync(request);
-        
+
         if (result.IsSuccess)
             return Ok();
 
@@ -73,7 +72,7 @@ public class TimePreferencesController(
     [HttpDelete]
     public async Task<ActionResult> Delete([FromBody] DeleteTimePreferencesDto request)
     {
-        var userId = (Guid)HttpContext.Items["UserId"]!;
+        var userId = (Guid) HttpContext.Items["UserId"]!;
 
         if (userId != request.UserId)
             return Forbid();

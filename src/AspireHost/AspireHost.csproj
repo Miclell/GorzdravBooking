@@ -1,15 +1,15 @@
 <Project Sdk="Aspire.AppHost.Sdk/13.5.4">
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <AspireUseCliBundle>true</AspireUseCliBundle>
-        <AssemblyName>GorzdravBooking.AspireHost</AssemblyName>
-        <UserSecretsId>gorzdravbooking-aspirehost</UserSecretsId>
-    </PropertyGroup>
-    <ItemGroup>
-        <ProjectReference Include="../Presentation/Server/Server.csproj"/>
-    </ItemGroup>
-    <ItemGroup>
-        <PackageReference Include="Aspire.Hosting.AppHost"/>
-        <PackageReference Include="Aspire.Hosting.JavaScript"/>
-    </ItemGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AspireUseCliBundle>true</AspireUseCliBundle>
+    <AssemblyName>GorzdravBooking.AspireHost</AssemblyName>
+    <UserSecretsId>gorzdravbooking-aspirehost</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Presentation/Server/Server.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" />
+    <PackageReference Include="Aspire.Hosting.JavaScript" />
+  </ItemGroup>
 </Project>

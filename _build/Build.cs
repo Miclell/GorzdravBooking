@@ -1,18 +1,13 @@
-using Nuke.Common;
-using Nuke.Common.IO;
-using Nuke.Common.Tools.DotNet;
-using Nuke.Common.Tooling;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
+using Nuke.Common;
+using Nuke.Common.IO;
+using Nuke.Common.Tooling;
+using Nuke.Common.Tools.DotNet;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
 internal class BuildPipeline : NukeBuild
 {
-    public static int Main()
-    {
-        return Execute<BuildPipeline>(build => build.Build);
-    }
-
     [Parameter("Build configuration (Debug or Release).")]
     private readonly string Configuration = "Release";
 
@@ -53,13 +48,6 @@ internal class BuildPipeline : NukeBuild
             return ValidateRuntime($"{system}-{architecture}");
         }
     }
-
-    private static string ValidateRuntime(string runtime) => runtime switch
-    {
-        "linux-x64" or "linux-arm64" or "linux-musl-x64" or "linux-musl-arm64"
-            or "win-x64" or "win-arm64" or "osx-x64" or "osx-arm64" => runtime,
-        _ => throw new ArgumentException("--runtime must be a supported portable .NET RID, such as linux-x64.")
-    };
 
     private Target Restore => target => target.Executes(() =>
         DotNetRestore(settings => settings.SetProjectFile(SolutionFile)));
@@ -121,4 +109,19 @@ internal class BuildPipeline : NukeBuild
         ToolResolver.GetPathTool("docker")(
             "build -f src/Presentation/Server/Dockerfile -t gorzdravbooking-server:local .",
             RootDirectory));
+
+    public static int Main()
+    {
+        return Execute<BuildPipeline>(build => build.Build);
+    }
+
+    private static string ValidateRuntime(string runtime)
+    {
+        return runtime switch
+        {
+            "linux-x64" or "linux-arm64" or "linux-musl-x64" or "linux-musl-arm64"
+                or "win-x64" or "win-arm64" or "osx-x64" or "osx-arm64" => runtime,
+            _ => throw new ArgumentException("--runtime must be a supported portable .NET RID, such as linux-x64.")
+        };
+    }
 }

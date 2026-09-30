@@ -1,6 +1,6 @@
 ﻿using Application.DTOs.Appointment;
 using CLI.Helpers;
-using CLI.Menus.AppointmentMenu.ShowActiveAppointmentsFlow.Commands;
+using CLI.Menus.AppointmentMenu.ShowAppointmentsFlow.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using StatefulMenu.Commands.BuiltIn;
 using StatefulMenu.Commands.Interfaces;

@@ -1,11 +1,12 @@
 using Microsoft.Extensions.Configuration;
+using Projects;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
 var dataDirectory = Path.GetFullPath(Path.Combine(builder.AppHostDirectory, "../../data"));
 Directory.CreateDirectory(dataDirectory);
 
-var server = builder.AddProject<Projects.Server>("server", "http")
+var server = builder.AddProject<Server>("server", "http")
     .WithEnvironment("ConnectionStrings__GorzdravBooking", builder.Configuration.GetConnectionString("GorzdravBooking")
                                                            ??
                                                            $"Data Source={Path.Combine(dataDirectory, "GorzdravBooking.db")}")

@@ -20,7 +20,7 @@ public class AppointmentController(
     [HttpGet]
     public async Task<ActionResult<AppointmentListItemDto>> Get()
     {
-        var userId = (Guid)HttpContext.Items["UserId"]!;
+        var userId = (Guid) HttpContext.Items["UserId"]!;
 
         var result = await appointmentService.GetByUserAsync(userId);
 
@@ -33,7 +33,7 @@ public class AppointmentController(
     [HttpDelete]
     public async Task<IActionResult> Cancel([FromBody] Guid appointmentId)
     {
-        var userId = (Guid)HttpContext.Items["UserId"]!;
+        var userId = (Guid) HttpContext.Items["UserId"]!;
 
         var canAccess = await authorizationProvider
             .CanAccessAsync<Appointment>(userId, appointmentId);

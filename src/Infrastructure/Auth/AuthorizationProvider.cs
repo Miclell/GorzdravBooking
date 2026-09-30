@@ -16,7 +16,7 @@ public class AuthorizationProvider(
                 .GetMethod(nameof(IOwnershipChecker.IsOwnerAsync))!
                 .MakeGenericMethod(typeof(T));
 
-            var task = (Task<bool>)method.Invoke(ownershipChecker, [userId, resourceId])!;
+            var task = (Task<bool>) method.Invoke(ownershipChecker, [userId, resourceId])!;
             return await task;
         }
 
@@ -26,7 +26,7 @@ public class AuthorizationProvider(
                 .GetMethod(nameof(IOwnershipChecker.IsPatientOwnerAsync))!
                 .MakeGenericMethod(typeof(T));
 
-            var task = (Task<bool>)method.Invoke(ownershipChecker, [userId, resourceId])!;
+            var task = (Task<bool>) method.Invoke(ownershipChecker, [userId, resourceId])!;
             return await task;
         }
 

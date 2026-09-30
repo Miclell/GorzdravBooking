@@ -42,7 +42,7 @@ public class InMemoryEventBus : IEventBus
         }
 
         var tasks = handlers.Select(handler =>
-            ((IEventHandler<T>)handler).Handle(@event, cancellationToken));
+            ((IEventHandler<T>) handler).Handle(@event, cancellationToken));
 
         await Task.WhenAll(tasks);
     }

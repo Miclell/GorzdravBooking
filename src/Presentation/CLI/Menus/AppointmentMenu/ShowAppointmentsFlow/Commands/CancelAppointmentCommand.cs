@@ -4,7 +4,7 @@ using StatefulMenu.Commands.Interfaces;
 using StatefulMenu.Core.Interfaces;
 using StatefulMenu.Core.Models;
 
-namespace CLI.Menus.AppointmentMenu.ShowActiveAppointmentsFlow.Commands;
+namespace CLI.Menus.AppointmentMenu.ShowAppointmentsFlow.Commands;
 
 public class CancelAppointmentCommand(
     IDataService dataService,

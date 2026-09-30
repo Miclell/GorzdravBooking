@@ -90,7 +90,9 @@ public class PatientServiceTests
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => (v == null ? string.Empty : v.ToString() ?? string.Empty).Contains("Ошибка при добавлении PatientProfile")),
+                It.Is<It.IsAnyType>((v, t) =>
+                    (v == null ? string.Empty : v.ToString() ?? string.Empty).Contains(
+                        "Ошибка при добавлении PatientProfile")),
                 exception,
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
@@ -136,7 +138,9 @@ public class PatientServiceTests
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => (v == null ? string.Empty : v.ToString() ?? string.Empty).Contains($"Ошибка при удалении пациента с id {patientId}")),
+                It.Is<It.IsAnyType>((v, t) =>
+                    (v == null ? string.Empty : v.ToString() ?? string.Empty).Contains(
+                        $"Ошибка при удалении пациента с id {patientId}")),
                 exception,
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
@@ -237,7 +241,8 @@ public class PatientServiceTests
                 LogLevel.Error,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) =>
-                    (v == null ? string.Empty : v.ToString() ?? string.Empty).Contains($"Ошибка при получении пациентов для пользователя с id {userId}")),
+                    (v == null ? string.Empty : v.ToString() ?? string.Empty).Contains(
+                        $"Ошибка при получении пациентов для пользователя с id {userId}")),
                 exception,
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
@@ -320,7 +325,7 @@ public class PatientServiceTests
 
         _mockPatientRepository
             .Setup(x => x.GetByIdAsync(patientId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((PatientProfile?)null);
+            .ReturnsAsync((PatientProfile?) null);
 
         // Act
         var result = await _patientService.Update(basePatientProfileDto, CancellationToken.None);
@@ -374,7 +379,8 @@ public class PatientServiceTests
                 LogLevel.Error,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) =>
-                    (v == null ? string.Empty : v.ToString() ?? string.Empty).Contains($"Ошибка при обновлении данных пациента с id {patientId}")),
+                    (v == null ? string.Empty : v.ToString() ?? string.Empty).Contains(
+                        $"Ошибка при обновлении данных пациента с id {patientId}")),
                 exception,
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);

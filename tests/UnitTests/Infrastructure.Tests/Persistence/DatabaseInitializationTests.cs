@@ -16,6 +16,12 @@ public sealed class DatabaseInitializationTests : IDisposable
     private readonly string _directory =
         Path.Combine(Path.GetTempPath(), "GorzdravBooking.Tests", Guid.NewGuid().ToString("N"));
 
+    public void Dispose()
+    {
+        if (Directory.Exists(_directory))
+            Directory.Delete(_directory, true);
+    }
+
     private ServiceProvider CreateServices()
     {
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
@@ -78,11 +84,5 @@ public sealed class DatabaseInitializationTests : IDisposable
         Assert.True(Path.IsPathFullyQualified(connection.DataSource));
         using var designTime = new DesignTimeDbContextFactory().CreateDbContext([]);
         Assert.Equal(connection.ToString(), designTime.Database.GetConnectionString());
-    }
-
-    public void Dispose()
-    {
-        if (Directory.Exists(_directory))
-            Directory.Delete(_directory, true);
     }
 }

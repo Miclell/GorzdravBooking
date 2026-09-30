@@ -11,7 +11,7 @@ public class FakeApiService : IApiService
     public Task<ApiResponse<TResponse>> GetAsync<TResponse>(string additionalUri)
     {
         if (_getResponses.TryGetValue(additionalUri, out var response))
-            return Task.FromResult((ApiResponse<TResponse>)response);
+            return Task.FromResult((ApiResponse<TResponse>) response);
 
         return Task.FromResult(new ApiResponse<TResponse>
         {
@@ -23,7 +23,7 @@ public class FakeApiService : IApiService
     public Task<ApiResponse<TResponse>> PostAsync<TRequest, TResponse>(string additionalUri, TRequest data)
     {
         if (_postResponses.TryGetValue(additionalUri, out var response))
-            return Task.FromResult((ApiResponse<TResponse>)response);
+            return Task.FromResult((ApiResponse<TResponse>) response);
 
         return Task.FromResult(new ApiResponse<TResponse>
         {

@@ -34,7 +34,7 @@ public class HeaderStateService :
     public Task Handle(NextSearchScheduled @event, CancellationToken cancellationToken = default)
     {
         var timeUntil = @event.NextTime - DateTime.Now;
-        NextRequestTime = timeUntil.TotalMinutes < 1 ? "now" : $"{(int)timeUntil.TotalMinutes}м";
+        NextRequestTime = timeUntil.TotalMinutes < 1 ? "now" : $"{(int) timeUntil.TotalMinutes}м";
         OnStateChanged?.Invoke();
         return Task.CompletedTask;
     }

@@ -59,13 +59,13 @@ dotnet nuke --target CLI
 dotnet nuke --target CLI --runtime linux-x64
 ```
 
-Для ARM64 укажите `--runtime linux-arm64`. Результат находится в `artifacts/cli/<runtime>/` и запускается
-без установленного .NET runtime на целевой машине.
+Для ARM64 укажите `--runtime linux-arm64`. Результат находится в `artifacts/cli/<runtime>/` и запускается без
+установленного .NET runtime на целевой машине.
 
 ### SQLite и миграции
 
-Server и CLI применяют миграции при запуске. При запуске из исходников база находится в `data/GorzdravBooking.db`,
-у опубликованного приложения – рядом с исполняемым файлом. Путь можно изменить через
+Server и CLI применяют миграции при запуске. При запуске из исходников база находится в `data/GorzdravBooking.db`, у
+опубликованного приложения – рядом с исполняемым файлом. Путь можно изменить через
 `ConnectionStrings__GorzdravBooking`:
 
 ```powershell
