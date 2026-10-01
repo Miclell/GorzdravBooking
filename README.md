@@ -62,6 +62,20 @@ dotnet nuke --target CLI --runtime linux-x64
 Для ARM64 укажите `--runtime linux-arm64`. Результат находится в `artifacts/cli/<runtime>/` и запускается без
 установленного .NET runtime на целевой машине.
 
+
+### Скрипты разработки и сборки
+
+Скрипты разработки находятся в `scripts/`, сборки и публикации — в `ops/`.
+
+Сборка через крипт использует существующие цели NUKE:
+
+```bash
+dotnet fsi ops/build.fsx -- --target Build
+dotnet fsi ops/build.fsx -- --target CLI --runtime linux-x64
+```
+
+Скрипты имеют обертки (*.cmd, *.ps1, *.sh).
+
 ### SQLite и миграции
 
 Server и CLI применяют миграции при запуске. При запуске из исходников база находится в `data/GorzdravBooking.db`, у
@@ -74,6 +88,12 @@ dotnet run --project src/Presentation/CLI -- --migrate-only
 ```
 
 `--migrate-only` подготовит базу и завершит CLI без запуска меню.
+
+Для создания новой миграции (требуется .NET 10 SDK):
+```bash
+dotnet fsi scripts/add-migration.fsx -- AddPatientField
+```
+Или любой другой скрипт генерации миграции (scripts/add-migration.*).
 
 ____
 

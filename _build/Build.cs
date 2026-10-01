@@ -4,7 +4,9 @@ using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
+using Nuke.Common.Tools.EntityFramework;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
+using static Nuke.Common.Tools.EntityFramework.EntityFrameworkTasks;
 
 internal class BuildPipeline : NukeBuild
 {
@@ -13,6 +15,9 @@ internal class BuildPipeline : NukeBuild
 
     [Parameter("CLI runtime identifier (for example, linux-x64). Defaults to the current platform.")]
     private readonly string? Runtime = null;
+
+    [Parameter("Name of the EF Core migration to create.")]
+    private readonly string? MigrationName = null;
 
     private static AbsolutePath SolutionFile => RootDirectory / "GorzdravBooking.slnx";
     private static AbsolutePath Artifacts => RootDirectory / "artifacts";
@@ -65,6 +70,26 @@ internal class BuildPipeline : NukeBuild
         foreach (var project in projects)
             DotNetTest(settings => settings.SetProjectFile(project).SetConfiguration(Configuration));
     });
+
+    [UsedImplicitly]
+    private Target AddMigration => target => target
+        .Requires(() => MigrationName)
+        .Executes(() =>
+        {
+            if (string.IsNullOrWhiteSpace(MigrationName) || MigrationName.StartsWith('-'))
+                throw new ArgumentException("Specify --migration-name with a non-empty migration name.");
+
+            DotNet("tool restore", RootDirectory);
+            var project = RootDirectory / "src/Infrastructure/Infrastructure.csproj";
+            EntityFrameworkMigrationsAdd(settings => settings
+                .SetName(MigrationName)
+                .SetProject(project)
+                .SetStartupProject(project)
+                .SetContext("AppDbContext")
+                .SetOutputDirectory("Persistence/Migrations")
+                .SetConfiguration(Configuration)
+                .SetProcessWorkingDirectory(RootDirectory));
+        });
 
     private Target Slopwatch => target => target.Executes(() =>
     {
