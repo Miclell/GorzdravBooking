@@ -11,9 +11,16 @@
     </Folder>
     <Folder Name="/ops/">
         <File Path="ops/build.cmd" />
+        <File Path="ops/build.fsx" />
         <File Path="ops/build.ps1" />
         <File Path="ops/build.sh" />
         <File Path="ops/compose.yaml" />
+    </Folder>
+    <Folder Name="/scripts/">
+        <File Path="scripts/add-migration.cmd" />
+        <File Path="scripts/add-migration.fsx" />
+        <File Path="scripts/add-migration.ps1" />
+        <File Path="scripts/add-migration.sh" />
     </Folder>
     <Folder Name="/src/">
         <Project Path="src/Application/Application.csproj" />
