@@ -2,22 +2,24 @@
 
 ____
 
-![Demo](https://img.shields.io/badge/⚠️%20Demo%20Project-Non--functional%20(ToS%20limitations)-orange?style=for-the-badge)
+![Demo](https://img.shields.io/badge/Demo_Project-Mock_API-orange?style=for-the-badge)
 ![Tests](https://github.com/Miclell/GorzdravBooking/actions/workflows/dotnet.yml/badge.svg) ![License](https://img.shields.io/badge/license-MIT-green) ![DotNet](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet) ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
 
 ____
 
 # Дисклеймер
 
-Публичная версия проекта демонстрационная и не подключается к Gorzdrav из-за ограничений использования сервиса.
+Данный проект является демонстрационным (Proof of Concept) и создан в образовательных целях для иллюстрации архитектурных и интеграционных решений.
+
+В публичной версии используется имитация внешнего API (FakeApiService). Проект не содержит действующей интеграции со сторонними информационными системами.
+
+Любые совпадения названий, структур данных и принципов взаимодействия с существующими сервисами не означают официальной связи с ними или одобрения с их стороны.
 
 ____
 
 ## Как это работает?
 
-GorzdravBooking автоматизирует процесс записи к врачу через систему Gorzdrav:
-
-Основной сценарий:
+GorzdravBooking реализует сценарий автоматизации записи к врачу, состоящий из трёх этапов:
 
 1. Поиск талонов – система периодически проверяет доступные записи
 2. Фильтрация по предпочтениям – отбор по врачу, специальности, времени
@@ -36,8 +38,6 @@ dotnet run --project src/AspireHost
 ```
 
 Aspire запустит API и веб-интерфейс; ссылку на dashboard покажет терминал.
-
-Аудит frontend UI, скриншоты до/после и браузерные проверки: [docs/ui-audit.md](docs/ui-audit.md).
 
 Отдельный запуск без Aspire:
 
@@ -107,15 +107,3 @@ ____
 ## Лицензия
 
 MIT – см. [LICENSE](./LICENSE).
-
-
-Локальные порты при ручном запуске и через Aspire:
-
-| Сервис | Адрес |
-| --- | --- |
-| API HTTP | `http://localhost:5090` |
-| API HTTPS (профиль `https`) | `https://localhost:5091` |
-| Frontend | `http://localhost:5093` (Vite вручную: `http://127.0.0.1:5093`) |
-| Aspire dashboard | `http://localhost:5099` |
-
-В Aspire порт 5094 — внутренний порт процесса Vite за прокси 5093. Браузерные тесты также используют 5094 и запускаются отдельно от Aspire. Технические endpoints Aspire OTLP и Resource Service остаются на 19280 и 20280. Для HTTPS нужен доверенный dev-сертификат .NET: `dotnet dev-certs https --trust`.
