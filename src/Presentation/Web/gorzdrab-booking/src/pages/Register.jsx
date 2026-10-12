@@ -1,23 +1,35 @@
-import { useState } from 'react';
+import ValidatedForm from '../components/ValidatedForm';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import StatusMessage from '../components/StatusMessage';
 
 function Register() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const submitLock = useRef(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { register } = useAuth();
 
   const handleSubmit = async e => {
     e.preventDefault();
+    if (submitLock.current) return;
+    submitLock.current = true;
     setLoading(true);
     setError('');
 
+    if (!/\p{L}/u.test(password) || !/\d/.test(password)) {
+      setError('Пароль должен содержать хотя бы одну букву и цифру.');
+      submitLock.current = false;
+      setLoading(false); return;
+    }
+
     if (password !== confirmPassword) {
       setError('Пароль и подтверждение не совпадают.');
+      submitLock.current = false;
       setLoading(false);
       return;
     }
@@ -30,11 +42,12 @@ function Register() {
       setError(result.error || 'Ошибка регистрации');
     }
 
+    submitLock.current = false;
     setLoading(false);
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-5rem)] items-center justify-center">
+    <div className="flex flex-1 items-center justify-center">
       <div className="grid w-full max-w-4xl gap-10 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
         <section className="glass-panel p-8 md:p-10">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">
@@ -44,20 +57,17 @@ function Register() {
             Регистрация учётной записи
           </h2>
           <p className="max-w-md text-sm text-slate-300">
-            Учётная запись используется для привязки пациентов, запросов на
+            Учётная запись используется для привязки пациентов, заявок на
             поиск талонов и индивидуальных временных предпочтений.
           </p>
 
-          <form
+          <ValidatedForm
             className="mt-8 space-y-5"
             onSubmit={handleSubmit}
           >
-            {error && (
-              <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-xs text-red-100">
-                {error}
-              </div>
-            )}
+            <StatusMessage>{error}</StatusMessage>
 
+            <fieldset disabled={loading} className="space-y-5">
             <div className="space-y-2">
               <label
                 htmlFor="username"
@@ -67,6 +77,11 @@ function Register() {
               </label>
               <input
                 id="username"
+                minLength={3}
+                maxLength={50}
+                pattern="[a-zA-Z0-9_]+"
+                aria-describedby="username-help"
+                autoComplete="username"
                 name="username"
                 type="text"
                 required
@@ -75,6 +90,7 @@ function Register() {
                 className="input-field"
                 placeholder="Имя пользователя"
               />
+              <p id="username-help" className="text-sm text-slate-300">3–50 латинских букв, цифр или символов подчёркивания.</p>
             </div>
 
             <div className="space-y-2">
@@ -86,6 +102,10 @@ function Register() {
               </label>
               <input
                 id="password"
+                minLength={6}
+                maxLength={100}
+                aria-describedby="password-help"
+                autoComplete="new-password"
                 name="password"
                 type="password"
                 required
@@ -94,6 +114,7 @@ function Register() {
                 className="input-field"
                 placeholder="Надёжный пароль"
               />
+              <p id="password-help" className="text-sm text-slate-300">6–100 символов, минимум одна буква и цифра.</p>
             </div>
 
             <div className="space-y-2">
@@ -105,6 +126,7 @@ function Register() {
               </label>
               <input
                 id="confirmPassword"
+                autoComplete="new-password"
                 name="confirmPassword"
                 type="password"
                 required
@@ -133,7 +155,8 @@ function Register() {
                 Войти
               </button>
             </p>
-          </form>
+            </fieldset>
+          </ValidatedForm>
         </section>
 
         <aside className="glass-panel hidden flex-col p-8 md:flex md:p-9">
@@ -146,7 +169,7 @@ function Register() {
             </h3>
             <p className="text-sm text-slate-300">
               У каждого пользователя свои пациенты, шаблоны временных
-              предпочтений и история запросов. Это позволяет конфигурировать
+              предпочтений и история заявок. Это позволяет конфигурировать
               автопоиск записей под конкретного врача или подразделение.
             </p>
           </div>

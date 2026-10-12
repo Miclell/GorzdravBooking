@@ -4,29 +4,36 @@ function RequestCard({ request, onClick }) {
     InProgress: 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/50',
     Completed: 'bg-emerald-500/30 text-emerald-100 border border-emerald-300/70',
     Failed: 'bg-slate-500/15 text-slate-400 border border-slate-500/40',
-    Cancelled: 'bg-slate-500/10 text-slate-500 border border-slate-600/30', 
+    Cancelled: 'bg-slate-500/10 text-slate-500 border border-slate-600/30',
   };
 
   const statusText = {
     Pending: 'Ожидает',
     InProgress: 'В обработке',
-    Completed: 'Завершён',
+    Completed: 'Завершена',
     Failed: 'Ошибка',
-    Cancelled: "Отменен"
+    Cancelled: 'Отменена'
   };
 
-  const statusKey = typeof request.status === 'string' ? request.status : request.status;
+  const statusKey = request.status;
   const createdAt = request.createdAt
     ? new Date(request.createdAt).toLocaleString('ru-RU')
     : '—';
   const patientName = request.patientFullName || request.patientName || '—';
   const speciality = request.speciality || request.specialty || '—';
-  const presetName = request.timePreferencesPresetName || 'Без пресета';
+  const presetName = request.timePreferencesPresetName || 'Без шаблона';
 
   return (
     <div
       role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
       onClick={onClick}
+      onKeyDown={event => {
+        if (onClick && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault();
+          onClick();
+        }
+      }}
       className={`group flex flex-col rounded-2xl border border-emerald-500/20 bg-slate-900/60 p-4 text-left shadow-sm shadow-black/40 transition hover:border-emerald-300/60 hover:bg-slate-900 hover:shadow-md hover:shadow-emerald-500/30 ${onClick ? 'cursor-pointer' : ''}`}
     >
       <div className="mb-3 flex items-start justify-between gap-3">

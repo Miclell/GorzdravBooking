@@ -44,4 +44,128 @@
   .input-field-light {
     @apply w-full rounded-xl border border-emerald-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 shadow-inner shadow-emerald-100 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-400/60;
   }
+
+  .field-label {
+    @apply mb-1 block text-xs font-medium text-slate-300;
+  }
+
+  .message-error {
+    @apply rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-xs text-rose-100;
+  }
+
+  .message-success {
+    @apply rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-xs text-emerald-100;
+  }
+
+  .ui-dialog {
+    width: min(48rem, calc(100% - 2rem));
+    max-width: none;
+    max-height: calc(100dvh - 2rem);
+    padding: 0;
+    margin: auto;
+  }
+
+  .ui-dialog[open] {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .ui-dialog::backdrop {
+    background: rgb(2 6 23 / 70%);
+    backdrop-filter: blur(4px);
+  }
+
+  .time-interval {
+    @apply flex min-w-0 flex-wrap items-end gap-2 rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2;
+  }
+}
+
+/* Keep native selection, form validation and keyboard behavior while restoring
+   the original dark popup. Browsers without customizable selects keep their
+   native picker; the closed control remains styled in either case. */
+@layer components {
+  .styled-select {
+    cursor: pointer;
+    min-width: 0;
+  }
+
+  .styled-select[data-placeholder="true"] {
+    @apply text-slate-500;
+  }
+
+  @supports (appearance: base-select) {
+    .styled-select,
+    .styled-select::picker(select) {
+      appearance: base-select;
+    }
+
+    .styled-select {
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+      padding-right: 2.5rem;
+    }
+
+    .styled-select::picker-icon {
+      content: '';
+      flex: 0 0 1.25rem;
+      width: 1.25rem;
+      height: 1.25rem;
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      translate: 0 -50%;
+      background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19 9-7 7-7-7'/%3E%3C/svg%3E");
+      transition: rotate 150ms;
+    }
+
+    .styled-select:open::picker-icon {
+      rotate: 180deg;
+    }
+
+    .styled-select::picker(select) {
+      @apply rounded-2xl border border-slate-700/70 bg-slate-900/95 py-1.5 text-slate-100 shadow-xl shadow-black/40 backdrop-blur;
+      margin-block: 0.375rem;
+      max-height: min(14rem, 50dvh);
+      overflow-y: auto;
+      overflow-x: hidden;
+      font: inherit;
+    }
+
+    .styled-select option {
+      @apply cursor-pointer px-3 py-2 text-slate-100;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .styled-select option[value=""] {
+      @apply text-slate-400;
+    }
+
+    .styled-select:required option[value=""] {
+      display: none;
+    }
+
+    .styled-select option:checked {
+      @apply bg-emerald-500/20 text-emerald-100;
+    }
+
+    .styled-select option:hover,
+    .styled-select option:focus-visible {
+      @apply bg-slate-800/80;
+      outline: none;
+    }
+
+    .styled-select option::checkmark {
+      display: none;
+    }
+  }
+}
+
+@layer components {
+  .input-field[aria-invalid="true"], .input-field[aria-invalid="true"]:focus {
+    border-color: #f87171;
+    outline-color: #f87171;
+    --tw-ring-color: rgb(248 113 113 / 60%);
+  }
 }

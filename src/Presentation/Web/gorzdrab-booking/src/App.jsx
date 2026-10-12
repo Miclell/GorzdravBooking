@@ -17,26 +17,26 @@ function ProtectedRoute({ children }) {
 
   if (loading)
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-900 text-slate-100">
+      <div className="flex flex-1 items-center justify-center text-slate-100" role="status">
         <div className="glass-panel px-6 py-4 text-sm text-slate-200">
           Загружаем ваш рабочий кабинет...
         </div>
       </div>
     );
 
-  return userId ? children : <Navigate to="/login" />;
+  return userId ? children : <Navigate to="/login" replace />;
 }
 
 function ShellLayout({ children }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-900 text-slate-50">
+    <div className="flex min-h-dvh flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-900 text-slate-50">
       <div className="pointer-events-none fixed inset-0 opacity-60 mix-blend-soft-light">
         <div className="absolute -left-32 top-10 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl" />
         <div className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-emerald-400/10 blur-3xl" />
       </div>
 
       <header className="relative z-10 border-b border-emerald-500/20 bg-slate-950/70 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+        <div className={`mx-auto flex items-center justify-between max-w-6xl px-4 py-4`}>
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-md shadow-emerald-500/60">
               <span className="text-lg font-black text-slate-950">G</span>
@@ -55,8 +55,8 @@ function ShellLayout({ children }) {
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto flex max-w-6xl flex-1 px-4 py-6 sm:py-10">
-        <div className="w-full">{children}</div>
+      <main id="main-content" className={`relative z-10 mx-auto flex w-full flex-1 py-6 sm:py-10 max-w-6xl px-4`}>
+        <div className="flex min-w-0 flex-1 flex-col">{children}</div>
       </main>
     </div>
   );
@@ -77,8 +77,8 @@ function HomeOrRedirect() {
 
 function AppContent() {
   return (
-    <ShellLayout>
-      <Router>
+    <Router>
+      <ShellLayout>
         <Routes>
           <Route path="/" element={<HomeOrRedirect />} />
           <Route path="/register" element={<Register />} />
@@ -109,8 +109,8 @@ function AppContent() {
           />
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </Router>
-    </ShellLayout>
+      </ShellLayout>
+    </Router>
   );
 }
 

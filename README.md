@@ -37,6 +37,8 @@ dotnet run --project src/AspireHost
 
 Aspire запустит API и веб-интерфейс; ссылку на dashboard покажет терминал.
 
+Аудит frontend UI, скриншоты до/после и браузерные проверки: [docs/ui-audit.md](docs/ui-audit.md).
+
 Отдельный запуск без Aspire:
 
 ```bash
@@ -105,3 +107,15 @@ ____
 ## Лицензия
 
 MIT – см. [LICENSE](./LICENSE).
+
+
+Локальные порты при ручном запуске и через Aspire:
+
+| Сервис | Адрес |
+| --- | --- |
+| API HTTP | `http://localhost:5090` |
+| API HTTPS (профиль `https`) | `https://localhost:5091` |
+| Frontend | `http://localhost:5093` (Vite вручную: `http://127.0.0.1:5093`) |
+| Aspire dashboard | `http://localhost:5099` |
+
+В Aspire порт 5094 — внутренний порт процесса Vite за прокси 5093. Браузерные тесты также используют 5094 и запускаются отдельно от Aspire. Технические endpoints Aspire OTLP и Resource Service остаются на 19280 и 20280. Для HTTPS нужен доверенный dev-сертификат .NET: `dotnet dev-certs https --trust`.

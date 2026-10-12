@@ -4,8 +4,8 @@ function NotFound() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex min-h-[calc(100vh-5rem)] items-center justify-center">
-      <div className="glass-panel w-full max-w-2xl p-8 md:p-10">
+    <div className="flex flex-1 items-center justify-center">
+      <div className="glass-panel w-full max-w-2xl p-5 sm:p-8 md:p-10">
         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">
           Ошибка 404
         </p>
