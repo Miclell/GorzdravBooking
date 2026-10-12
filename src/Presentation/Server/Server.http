@@ -1,6 +1,300 @@
-@Server_HostAddress = http://localhost:5023
+######################################
+### Request: GET /api/v1/appointment
+######################################
 
-GET {{Server_HostAddress}}/weatherforecast/
-Accept: application/json
 
-###
+GET {{baseUrl}}/api/v1/appointment
+Content-Type: {{contentType}}
+
+
+#########################################
+### Request: DELETE /api/v1/appointment
+#########################################
+
+
+DELETE {{baseUrl}}/api/v1/appointment
+Content-Type: {{contentType}}
+
+"example"
+
+#############################################################
+### Request: POST /api/v1/appointment-search-request/create
+#############################################################
+
+
+POST {{baseUrl}}/api/v1/appointment-search-request/create
+Content-Type: {{contentType}}
+
+{
+  "referralNumber": "example",
+  "patientProfileId": "example",
+  "lpuName": "example"
+}
+
+#####################################################
+### Request: GET /api/v1/appointment-search-request
+#####################################################
+
+
+GET {{baseUrl}}/api/v1/appointment-search-request
+Content-Type: {{contentType}}
+
+
+########################################################
+### Request: DELETE /api/v1/appointment-search-request
+########################################################
+
+
+DELETE {{baseUrl}}/api/v1/appointment-search-request
+Content-Type: {{contentType}}
+
+"example"
+
+##############################################################
+### Request: PATCH /api/v1/appointment-search-request/update
+##############################################################
+
+
+PATCH {{baseUrl}}/api/v1/appointment-search-request/update
+Content-Type: {{contentType}}
+
+{
+  "requestId": "example",
+  "timePreferencesName": "example",
+  "specificStartPoints": ["item"]
+}
+
+######################################
+### Request: POST /api/v1/auth/login
+######################################
+
+
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: {{contentType}}
+
+{
+  "username": "example",
+  "password": "example"
+}
+
+#######################################
+### Request: POST /api/v1/auth/logout
+#######################################
+
+
+POST {{baseUrl}}/api/v1/auth/logout
+Content-Type: {{contentType}}
+
+
+#########################################
+### Request: POST /api/v1/auth/register
+#########################################
+
+
+POST {{baseUrl}}/api/v1/auth/register
+Content-Type: {{contentType}}
+
+{
+  "username": "example",
+  "password": "example"
+}
+
+##################################
+### Request: GET /api/v1/auth/me
+##################################
+
+
+GET {{baseUrl}}/api/v1/auth/me
+Content-Type: {{contentType}}
+
+
+########################################################
+### Request: GET /api/v1/doctor/{lpuId}/{specialityId}
+########################################################
+
+### Path Parameter: ID ЛПУ (клиники)
+@Get_Doctor_lpuId = 0
+
+### Path Parameter: ID Специальности
+@Get_Doctor_specialityId = str
+
+
+GET {{baseUrl}}/api/v1/doctor/{{Get_Doctor_lpuId}} /{{Get_Doctor_specialityId}}
+Content-Type: {{contentType}}
+
+
+##############################################
+### Request: GET /api/v1/locations/districts
+##############################################
+
+
+GET {{baseUrl}}/api/v1/locations/districts
+Content-Type: {{contentType}}
+
+
+###############################################################
+### Request: GET /api/v1/locations/district/{districtId}/lpus
+###############################################################
+
+### Path Parameter: ID Района
+@Get_DistrictLpus_id = str
+
+
+GET {{baseUrl}}/api/v1/locations/district/{{Get_DistrictLpus_id}}/lpus
+Content-Type: {{contentType}}
+
+
+##########################################
+### Request: POST /api/v1/patient/create
+##########################################
+
+
+POST {{baseUrl}}/api/v1/patient/create
+Content-Type: {{contentType}}
+
+{
+  "userId": "example",
+  "lpuId": "example",
+  "lpuShortName": "example"
+}
+
+########################################
+### Request: POST /api/v1/patient/find
+########################################
+
+
+POST {{baseUrl}}/api/v1/patient/find
+Content-Type: {{contentType}}
+
+{
+  "lpuId": "example",
+  "lastName": "example",
+  "firstName": "example"
+}
+
+##################################
+### Request: GET /api/v1/patient
+##################################
+
+
+GET {{baseUrl}}/api/v1/patient
+Content-Type: {{contentType}}
+
+
+#####################################
+### Request: DELETE /api/v1/patient
+#####################################
+
+
+DELETE {{baseUrl}}/api/v1/patient
+Content-Type: {{contentType}}
+
+"example"
+
+#############################################
+### Request: POST /api/v1/referral/validate
+#############################################
+
+
+POST {{baseUrl}}/api/v1/referral/validate
+Content-Type: {{contentType}}
+
+{
+  "referralNumber": "example",
+  "lastName": "example"
+}
+
+#############################################
+### Request: GET /api/v1/speciality/{lpuId}
+#############################################
+
+### Path Parameter: ID ЛПУ (клиники)
+@Get_Speciality_lpuId = 0
+
+
+GET {{baseUrl}}/api/v1/speciality/{{Get_Speciality_lpuId}}
+Content-Type: {{contentType}}
+
+
+
+###################################################
+### Request: POST /api/v1/time-preferences/create
+###################################################
+
+
+POST {{baseUrl}}/api/v1/time-preferences/create
+Content-Type: {{contentType}}
+
+[
+  "item1",
+  "item2"
+]
+
+###########################################
+### Request: GET /api/v1/time-preferences
+###########################################
+
+
+GET {{baseUrl}}/api/v1/time-preferences
+Content-Type: {{contentType}}
+
+
+###########################################
+### Request: PUT /api/v1/time-preferences
+###########################################
+
+
+PUT {{baseUrl}}/api/v1/time-preferences
+Content-Type: {{contentType}}
+
+[
+  "item1",
+  "item2"
+]
+
+##############################################
+### Request: DELETE /api/v1/time-preferences
+##############################################
+
+
+DELETE {{baseUrl}}/api/v1/time-preferences
+Content-Type: {{contentType}}
+
+{
+  "userId": "example",
+  "name": "example"
+}
+
+##################################################
+### Request: GET /api/v1/time-preferences/{name}
+##################################################
+
+### Path Parameter: Имя настройки времени
+@Get_TimePreferences_name = str
+
+
+GET {{baseUrl}}/api/v1/time-preferences/{{Get_TimePreferences_name}}
+Content-Type: {{contentType}}
+
+
+
+##################################
+### Request: DELETE /api/v1/user
+##################################
+
+
+DELETE {{baseUrl}}/api/v1/user
+Content-Type: {{contentType}}
+
+
+########################################
+### Request: PUT /api/v1/user/password
+########################################
+
+
+PUT {{baseUrl}}/api/v1/user/password
+Content-Type: {{contentType}}
+
+{
+  "newPassword": "example"
+}

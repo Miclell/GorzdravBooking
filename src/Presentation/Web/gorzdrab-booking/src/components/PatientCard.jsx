@@ -1,4 +1,4 @@
-function PatientCard({ patient, onClick, onDelete }) {
+function PatientCard({ patient, onDelete }) {
   const fullName =
     patient.patientFullName ||
     patient.fullName ||

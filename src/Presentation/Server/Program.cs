@@ -36,7 +36,7 @@ public class Program
                 options.AddPolicy("AllowReact", policy =>
                 {
                     policy.WithOrigins(builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-                                       ?? ["http://localhost:5173"])
+                                       ?? ["http://localhost:5093", "http://127.0.0.1:5093"])
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();

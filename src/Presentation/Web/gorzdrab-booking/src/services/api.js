@@ -2,17 +2,37 @@ const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, ''
 
 const apiCall = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
+  const { headers, ...requestOptions } = options;
   const response = await fetch(url, {
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      ...options.headers,
+      ...headers,
     },
-    ...options,
+    ...requestOptions,
+  }).catch(() => {
+    throw new Error('Не удалось связаться с сервером. Проверьте соединение и попробуйте снова.');
   });
 
   if (!response.ok) {
-    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    const messages = {
+      401: endpoint.endsWith('/login') ? 'Не удалось войти. Проверьте логин и пароль.' : 'Сессия завершилась. Войдите в аккаунт повторно.',
+      403: 'Недостаточно прав для этого действия.',
+      404: 'Данные не найдены. Обновите страницу и попробуйте снова.',
+      409: 'Данные уже существуют или были изменены. Обновите список.',
+    };
+    let message = messages[response.status] || 'Не удалось выполнить действие. Попробуйте снова.';
+    let validationErrors = {};
+    if (response.status === 400 || response.status === 422) {
+      const problem = await response.json().catch(() => null);
+      const errors = problem?.errors ? Object.values(problem.errors).flat().filter(value => typeof value === 'string') : [];
+      validationErrors = problem?.errors || {};
+      message = errors.length ? errors.join(' ') : 'Проверьте заполненные поля.';
+    }
+    const error = new Error(message);
+    error.status = response.status;
+    error.validationErrors = validationErrors;
+    throw error;
   }
 
   if (response.status === 204) return null;

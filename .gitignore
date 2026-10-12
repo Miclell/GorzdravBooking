@@ -37,11 +37,17 @@ src/Infrastructure/Http/HttpClientFactorySetup.cs
 # Frontend - Node
 node_modules/
 *.local
+.env
+.env.*
+!.env.development
 
 # Frontend - Build
 dist/
 dist-ssr/
 .vite/
+.playwright-mcp/
+playwright-report/
+test-results/
 
 # Frontend - Logs
 logs/
@@ -67,3 +73,6 @@ lerna-debug.log*
 
 # Empty artifact left by a local CLI invocation (currently locked by that process)
 /--db-type
+
+# 12ui improve kits: candidates, captures and targets are not source
+.improve/

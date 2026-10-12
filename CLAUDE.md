@@ -50,7 +50,7 @@ Working directory: `src/Presentation/Web/gorzdrab-booking/`
 
 ```bash
 npm install       # install dependencies
-npm run dev       # dev server on http://localhost:5173
+npm run dev       # dev server on http://localhost:5093
 npm run build     # production build
 npm run lint      # ESLint
 ```
@@ -109,7 +109,7 @@ Abstract base `TimePreference` with `WeekDayPreference` and `MonthDayPreference`
 
 - `(bool IsSucces, int ErrorCode)` — `IsSucces` is intentionally spelled this way throughout the external service interface and all usages; don't "fix" it.
 - `|| true` in `CheckAppointmentSearchRequestsUseCase` filter is intentional (disables time-gating during development).
-- CORS is hardcoded to `http://localhost:5173` (Vite dev port) in `Server/Program.cs`.
+- CORS is hardcoded to `http://localhost:5093` (Vite dev port) in `Server/Program.cs`.
 - The fake API client returns stub data — all external service calls succeed with mock responses.
 
 ## Known Issues (code analysis, 2026-02-27)
