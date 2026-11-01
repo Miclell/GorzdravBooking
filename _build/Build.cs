@@ -80,13 +80,13 @@ internal class BuildPipeline : NukeBuild
                 throw new ArgumentException("Specify --migration-name with a non-empty migration name.");
 
             DotNet("tool restore", RootDirectory);
-            var project = RootDirectory / "src/Infrastructure/Infrastructure.csproj";
+            var project = RootDirectory / "src/Persistence/Persistence.csproj";
             EntityFrameworkMigrationsAdd(settings => settings
                 .SetName(MigrationName)
                 .SetProject(project)
                 .SetStartupProject(project)
                 .SetContext("AppDbContext")
-                .SetOutputDirectory("Persistence/Migrations")
+                .SetOutputDirectory("Migrations")
                 .SetConfiguration(Configuration)
                 .SetProcessWorkingDirectory(RootDirectory));
         });

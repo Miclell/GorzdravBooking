@@ -24,9 +24,12 @@
     </Folder>
     <Folder Name="/src/">
         <Project Path="src/Application/Application.csproj" />
-        <Project Path="src/AspireHost/AspireHost.csproj" />
         <Project Path="src/Core/Core.csproj" />
         <Project Path="src/Infrastructure/Infrastructure.csproj" />
+        <Project Path="src/Persistence/Persistence.csproj" />
+    </Folder>
+    <Folder Name="/src/Aspire/">
+        <Project Path="src/AspireHost/AspireHost.csproj" />
         <Project Path="src/ServiceDefaults/ServiceDefaults.csproj" />
     </Folder>
     <Folder Name="/src/Presentation/">
@@ -39,5 +42,6 @@
     <Folder Name="/tests/UnitTests/">
         <Project Path="tests/UnitTests/Application.Tests/Application.Tests.csproj" />
         <Project Path="tests/UnitTests/Infrastructure.Tests/Infrastructure.Tests.csproj" />
+        <Project Path="tests/UnitTests/Persistence.Tests/Persistence.Tests.csproj" />
     </Folder>
 </Solution>
