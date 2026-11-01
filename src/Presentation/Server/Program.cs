@@ -1,5 +1,5 @@
 using System.Globalization;
-using Infrastructure.Persistence;
+using Persistence;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;

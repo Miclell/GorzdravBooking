@@ -1,5 +1,5 @@
-using Infrastructure.Persistence;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Persistence;
 
 namespace Server.Configurations;
 

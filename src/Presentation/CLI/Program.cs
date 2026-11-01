@@ -6,7 +6,7 @@ using CLI.Helpers;
 using CLI.Menus;
 using Core.Events.Common;
 using Infrastructure;
-using Infrastructure.Persistence;
+using Persistence;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -40,6 +40,7 @@ public static class Program
             .ConfigureServices((_, services) =>
             {
                 services.AddInfrastructure();
+                services.AddPersistence();
                 services.AddApplication();
                 services.AddStatefulMenu();
                 services.AddHostedService<AppointmentSchedulerWorker>();

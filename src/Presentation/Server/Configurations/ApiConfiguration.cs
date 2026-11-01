@@ -2,6 +2,7 @@
 using Application.Workers;
 using Infrastructure;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Persistence;
 using Server.Configurations.Common;
 
 namespace Server.Configurations;
@@ -15,6 +16,7 @@ public static class ApiConfiguration
         services.ConfigureSwagger();
 
         services.AddInfrastructure();
+        services.AddPersistence();
         services.AddApplication();
         services.AddHostedService<AppointmentSchedulerWorker>();
 
